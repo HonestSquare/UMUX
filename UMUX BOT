@@ -125,19 +125,19 @@ var map = [
 //-----------------------------------------------------------------------
 var room = HBInit({ 
 	roomName: "UMUX의 방",
-	maxPlayers: 15, 
-	playerName : " ", 
-	public : true,
-	noPlayer: false
+	maxPlayers: 15,         // 최대 인원
+	playerName : " ",       // 방장 이름(그대로 놔두는 걸 권장)
+	public : true,          // 공개방 설정
+	noPlayer: false         // 방장 없애기(그대로 놔두는 걸 권장)
 });
 room.setCustomStadium(map[0]);		// 기본 설정된 내장맵
-room.setScoreLimit(0);
-room.setTimeLimit(0);
-//-----------------------------------------------여기서부터 복사-----------------------------------------------------
+room.setScoreLimit(5);                  // 기본 점수 제한
+room.setTimeLimit(5);                   // 기본 시간 제한
+//----------------------------------------------------------------------------------------------------
 var date = new Date();
-var Roomversion = 'v1.00';				// 봇방 버전
-var UXversion  = '1.0.0';				// UMUX 버전
-var dev = false;						// 개발 버전 설정
+var Roomversion = 'v1.00';	        // 봇방 버전
+var UXversion  = '1.0.0';               // UMUX 버전
+var dev = false;			// 개발 버전 설정
 
 class GameManager{													// 게임 매니저 클래스
 	constructor(){
@@ -872,7 +872,7 @@ class Player{														// 플레이어 클래스
 		// 주권한, 보조권한, 일반, 블랙리스트
 		this.mark = ["🟡", "🟢", "⚪", "⚫"];
 		this.blacklist = [ 										// 블랙리스트 명단
-			
+                      // **여기에 블랙리스트 명단을 기입하세요.**
 		];
 		this.cntPlayers = 0;									// 플레이어 인원 체크
 		this.members;
@@ -972,7 +972,7 @@ class TimeManager{													// 시간 관리 클래스
 		this.getDate = function(){ 								// 날짜 및 시간 반환
 			return t.updateDate();
 		}
-		this.updateTimsg = function(){							// 날짜 및 시간 갱신
+		this.updateTime = function(){							// 날짜 및 시간 갱신
 			date = new Date();
 			t.y = date.getFullYear(); t.m = (date.getMonth() + 1); t.d = date.getDate();
 			t.h = date.getHours(); t.min = date.getMinutes(); t.sec = date.getSeconds();
@@ -983,16 +983,16 @@ class TimeManager{													// 시간 관리 클래스
 			return (t.showTimsg() + ' ' + t.showTime());
 		}
 		//-----------------------날짜----------------------------------------------------
-		this.getTimsg = function(){ 							// 날짜 반환
-			return t.updateTimsg();
+		this.getTime = function(){ 							// 날짜 반환
+			return t.updateTime();
 		}
 		this.updateDate = function(){							// 날짜 갱신
 			date = new Date();
 			t.y = date.getFullYear(); t.m = (date.getMonth() + 1); t.d = date.getDate();
 			return date;
 		}		
-		this.showTimsg = function(){ 							// 날짜 출력
-			t.getTimsg(); 
+		this.showTime = function(){ 							// 날짜 출력
+			t.getTime(); 
 			return (t.y + t.co + t.m + t.co + t.d);
 		}	
 		//-----------------------시간----------------------------------------------------
@@ -1094,4 +1094,4 @@ room.onGameStart = function(){ return game.onGameStart(); }							// 게임 시�
 room.onGameTick = function(){ return game.onGameTick(); }							// 게임 도중
 room.onGameStop = function(){ return game.onGameStop(); }							// 게임 종료
 room.onGamePause = function(byPlayer) { return game.onGamePause(byPlayer);}			// 게임 중단
-room.onGameUnpause 	= function(byPlayer) { return game.onGameUnpause(byPlayer); }	// 게임 재개
+room.onGameUnpause = function(byPlayer) { return game.onGameUnpause(byPlayer); }	// 게임 재개
