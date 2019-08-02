@@ -601,7 +601,7 @@ class Notice {														// 알림 클래스
 }
 class ChatSystem {													// 채팅 시스템 클래스
 	constructor(){
-		this.face = [														// 						이모티콘
+		this.face = [									//			이모티콘
 			'🤔', 
 			'😛', '😍', '😅', '😂', '🤣', 
 			'😎', '😐', '😥', '😰', '🙄', 
