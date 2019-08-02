@@ -4,7 +4,7 @@ function cout(io, msg){				// 방에서 콘솔창으로 출력
 		else return console.log(t.showDate() + ' ▶ ' + msg);
 	}
 }
-function c(msg){ 					// 콘솔창에서 방으로 입력
+function c(msg){ 				// 콘솔창에서 방으로 입력
 	room.sendChat(' 외부 : [0]🌐관리자: ' + msg + ' (귓속말 답장: !e 0 답할 내용)'); 
 	cout(true, '전달: ' + msg);
 };
@@ -131,13 +131,13 @@ var room = HBInit({
 	noPlayer: false					// 방장 여부(그대로 두는 걸 권장)
 });
 room.setCustomStadium(map[0]);		// 기본 설정된 내장맵
-room.setScoreLimit(0);				// 기본 제한점수
-room.setTimeLimit(0);				// 기본 제한시간
+room.setScoreLimit(0);			// 기본 제한점수
+room.setTimeLimit(0);			// 기본 제한시간
 //----------------------------------------------------------------------------------------------------
 var date = new Date();
 var Roomversion = 'v1.00';				// 봇방 버전
 var UXversion  = '1.0.0';				// UMUX 버전(건드리지 마시오)
-var dev = false;						// 개발 버전 설정
+var dev = false;					// 개발 버전 설정
 
 class GameManager{													// 게임 매니저 클래스
 	constructor(){
@@ -156,12 +156,12 @@ class GameManager{													// 게임 매니저 클래스
 			game.gamestats = 0;
 			cout(true, '게임 종료');
 		}
-		this.onGamePause = function(byPlayer){ 					// 게임 중단
+		this.onGamePause = function(byPlayer){ 						// 게임 중단
 			if(byPlayer.id) cout(true, byPlayer.name + '(이)가 게임을 일시 중단함.');
 			else cout(true, '게임 일시 중단.');		// 명령어 입력으로 실행되면 플레이어 이름 가림
 			return false;
 		}	
-		this.onGameUnpause 	= function(byPlayer){				// 게임 재개
+		this.onGameUnpause 	= function(byPlayer){					// 게임 재개
 			if(byPlayer.id) cout(true, byPlayer.name + '(이)가 게임을 재개함.');
 			else cout(true, '게임 재개.');			// 명령어 입력으로 실행되면 플레이어 이름 가림
 			return false;
@@ -184,7 +184,7 @@ class GameManager{													// 게임 매니저 클래스
 			admin.updateAdmins(player);
 			if(p.cntPlayers == 1){ 
 				room.startGame();
-				com.setJoinPlayer(player.team, 1, player.name, player.id);					// 사람이 한 명이면 자동 시작 및 투입
+				com.setJoinPlayer(player.team, 1, player.name, player.id);	// 사람이 한 명이면 자동 시작 및 투입
 			}
 			return false;
 		}
@@ -196,15 +196,15 @@ class GameManager{													// 게임 매니저 클래스
 			else admin.kicked = false;
 			admin.cntSubAdmins--;
 			admin.subAdmin[player.id - 1] = false;
-			admin.updateAdmins(player);										// 권한 여부 확인
+			admin.updateAdmins(player);		// 권한 여부 확인
 			// 유저 목록 정리
 			p.updatePlayers(player);  
 			p.getNumbersFun();
 			p.cntPlayers--;
-			if(!p.cntPlayers) room.stopGame();							// 사람이 없으면 자동 종료
+			if(!p.cntPlayers) room.stopGame();	// 사람이 없으면 자동 종료
 			return false;
 		}
-		this.onStadiumChange = function(mapName){				// 맵 교체
+		this.onStadiumChange = function(mapName){					// 맵 교체
 			if(p.cntPlayers){
 				if(Math.floor(Math.random()*6) == 0) n.announce(n.msgCommand('맵 저장 ') + '/store', null, 'green', 1, 3);
 				cout(true, '맵 교체: ' + mapName);
@@ -215,9 +215,9 @@ class GameManager{													// 게임 매니저 클래스
 		this.onPositionsReset = function(){		 				// 좌표 초기화
 			return false; 
 		}
-		this.onPlayerBallKick = function(){ 					// 공 찼을 때
+		this.onPlayerBallKick = function(){ 						// 공 찼을 때
 			return false; 
-		}
+		}			
 		this.onTeamGoal = function(team){ 						// 골 먹힐 때
 			if(team == 1){ 
 				n.announce(n.notice() + '레드팀이 득점했습니다.', null, null, 4, 1);
@@ -229,30 +229,30 @@ class GameManager{													// 게임 매니저 클래스
 			}
 			return false; 
 		}
-		this.onTeamVictory = function(scores){ 					// 팀 승리
+		this.onTeamVictory = function(scores){ 						// 팀 승리
 			return false; 
 		}
 	}
 }
 class Administration{												// 관리 클래스
 	constructor() {
-		this.cntAdmins = 0;									// 관리자 인원
+		this.cntAdmins = 0;								// 관리자 인원
 		this.cntSubAdmins = 0;								// 보조 관리자 인원
 		this.kicked = false;								// 강제 퇴장 여부
 		this.dynamicAdmin = true	 						// 권한 동적 할당
-		this.subAdmin = new Array(15);						// 보조 권한(부 어드민)
+		this.subAdmin = new Array(15);							// 보조 권한(부 어드민)
 		this.teamsLock = false;								// 채팅 잠금
 		this.mutedList = [];								// 채금자 목록
 
-		this.onPlayerAdminChange = function(player){		//							 	플레이어 권한 획득&박탈
-			if(admin.filterPlayer(player)){ 							// 블랙리스트 권한 부여 배제 대상
+		this.onPlayerAdminChange = function(player){				//	플레이어 권한 획득&박탈
+			if(admin.filterPlayer(player)){ 		// 블랙리스트 권한 부여 배제 대상
 				room.setPlayerAdmin(player.id, false);
 				admin.subAdmin[player.id - 1] = false;
 				p.updateMarks(player);
 			}
-			if(!admin.checkAdmins) admin.getSubAdmin(player);		// 관리자가 없으면 보조 권한 부여
+			if(!admin.checkAdmins) admin.getSubAdmin(player);		// 			관리자가 없으면 보조 권한 부여
 			else{
-				if(player.admin){									// 플레이어가 관리자면 보조 권한 지우기
+				if(player.admin){					// 			플레이어가 관리자면 보조 권한 지우기
 					admin.subAdmin[player.id - 1] = false;
 					admin.cntSubAdmins--;
 				}
@@ -260,20 +260,20 @@ class Administration{												// 관리 클래스
 			}
 			return false;
 		}
-		this.onPlayerKicked = function(kickedPlayer, reason, ban, byPlayer){			//	플레이어 강제 퇴장
+		this.onPlayerKicked = function(kickedPlayer, reason, ban, byPlayer){	//	플레이어 강제 퇴장
 			admin.kicked = true;
 			if(reason) cout(true, byPlayer.name + '(이)가 ' + kickedPlayer.name + '(을)을 강제 퇴장함. (사유: ' + reason + ')');
 			else cout(true, byPlayer.name + '(이)가 ' + kickedPlayer.name + '(을)을 강제 퇴장함.');
 			return admin.kicked;
 		}
-		this.adminHelp = function(player){					// !adminhelp				|	관리 명령어
+		this.adminHelp = function(player){					// !adminhelp	|	관리 명령어
 			if (player.admin || admin.subAdmin[player.id -1])
 				n.announce(n.msgCommand('관리 ') 
 				+ 'p | !p | !clearbans | !time 숫자 | !set_pw | !score 숫자 | !rr | !load 숫자 | !lock | !도 ' + com.recommendCom('관련', '!ahc'), player.id, null, 4, 3);
 			else n.acess(player);
 			return false;  // 명령어 흔적을 남기지 않음
 		}
-		this.adminComHelp = function(player){				// !ahc						|	관리 명령어 도움말
+		this.adminComHelp = function(player){					// !ahc		|	관리 명령어 도움말
 			if (player.admin || admin.subAdmin[player.id -1]){
 				n.announce(n.msgCommand('관리 ') + 'p/!p(게임 일시정지/시작) | !clearbans(밴 리스트 초기화)', player.id, null, 4, 3);
 				n.announce(n.msgCommand('관리 ') + '!time(시간 설정) | !score(점수 설정) | !rr(게임 재시작)', player.id, null, 4, 3);
@@ -283,7 +283,7 @@ class Administration{												// 관리 클래스
 			else n.acess(player);
 			return false;  // 명령어 흔적을 남기지 않음
 		}
-		this.updateAdmins = function(player) {				// 								어드민 없으면 권한 부여
+		this.updateAdmins = function(player) {					// 			어드민 없으면 권한 부여
 			var players = room.getPlayerList().filter((player) => player.id != 0 );
 			// 아무도 안 나가면 동작 없음
 			if ( players.length == 0 ) return; 
@@ -299,12 +299,12 @@ class Administration{												// 관리 클래스
 						  cout(true, player.name + '(이)가 권한을 얻음.');
 				  }
 			  }
-		}
-		this.getAdminstats = function(player){				// 								어드민 권한 확인
+		}	
+		this.getAdminstats = function(player){					// 			어드민 권한 확인
 			if(player.admin) return true;
 			else return false;
 		}
-		this.setAdmin = function(player){					// 								권한 동적 할당 옵션
+		this.setAdmin = function(player){					// 			권한 동적 할당 옵션
 			if(player.admin || admin.subAdmin[player.id - 1]){
 				if(!admin.dynamicAdmin){
 					admin.dynamicAdmin = true;
@@ -320,7 +320,7 @@ class Administration{												// 관리 클래스
 			}
 			else return n.acess(player);
 		}
-		this.setScore = function(player, msg){				// !score n 				|	점수 변경 명령어(onlyadmin)
+		this.setScore = function(player, msg){					// !score n 	|	점수 변경 명령어(onlyadmin)
 			if (player.admin || admin.subAdmin[player.id - 1]){
 				if(!game.gamestats){
 					if((msg.substr(6)) >= 0){
@@ -336,7 +336,7 @@ class Administration{												// 관리 클래스
 			else n.acess(player);
 			return false;  // 명령어 흔적을 남기지 않음
 		}
-		this.setTime = function(player, msg){				// !time n					|	시간 변경 명령어(onlyadmin)
+		this.setTime = function(player, msg){					// !time n	|	시간 변경 명령어(onlyadmin)
 			if (player.admin || admin.subAdmin[player.id - 1]){
 				if(!game.gamestats){
 					if((msg.substr(6)) >= 0){
@@ -352,7 +352,7 @@ class Administration{												// 관리 클래스
 			else n.acess(player);
 			return false;  // 명령어 흔적을 남기지 않음
 		}
-		this.setTeamsLock = function(player){				// !lock					|	 팀 이동 금지/허용 명령어
+		this.setTeamsLock = function(player){					// !lock	|	 팀 이동 금지/허용 명령어
 			if(player.admin || admin.subAdmin[player.id - 1]){
 				if(!admin.teamsLock){		// 참이면 금지, 거짓이면 허용
 					admin.teamsLock = true;
@@ -370,7 +370,7 @@ class Administration{												// 관리 클래스
 			else n.acess(player);
 			return false;
 		}
-		this.setReset = function(player){					// !rr						|	게임 재시작
+		this.setReset = function(player){					// !rr		|	게임 재시작
 			if(player.admin || admin.subAdmin[player.id - 1]){
 				room.stopGame();
 				room.startGame();
@@ -378,7 +378,7 @@ class Administration{												// 관리 클래스
 			}
 			return false;  // 명령어 흔적을 남기지 않음
 		}
-		this.setPassword = function(player, pass){			// !set_pw string			|	비번 설정
+		this.setPassword = function(player, pass){				// !set_pw	|	비번 설정
 			if(player.admin || admin.subAdmin[player.id - 1]){
 				if(pass.length <= 10) n.announce(n.locked() + '비밀번호가 너무 짧습니다.', player.id, 'orange', 5, 0);
 				else if(pass.length >= 28) n.announce(n.locked() + '비밀번호가 너무 길어서 설정할 수 없습니다.', player.id, 'orange', 5, 0);
@@ -390,11 +390,11 @@ class Administration{												// 관리 클래스
 			else n.acess(player);
 			return false;
 		}
-		this.missPassword = function(player){ 				// 								어드민 전용 명령어 오타 방지
+		this.missPassword = function(player){ 					//			어드민 전용 명령어 오타 방지
 			cout(true, player.name + '(이)가 관리자 로그인을 시도함. (실패)');
 			return false; 
 		}
-		this.getAdmin = function(player, _msg){				// 								권한 획득
+		this.getAdmin = function(player, _msg){					//			권한 획득
 			if (!player.admin){
 				if(!admin.filterPlayer(player)){
 					room.setPlayerAdmin(player.id, true);
@@ -408,28 +408,28 @@ class Administration{												// 관리 클래스
 		this.getSubAdmin = function(player){				// 								보조 권한 획득
 			if (!player.admin){
 				admin.subAdmin[player.id - 1] = true;	// 보조 권한 설정
-				admin.cntSubAdmins++;					// 보조 관리자 갱신
-				p.updateMarks();						// 마크 갱신
+				admin.cntSubAdmins++;			// 보조 관리자 갱신
+				p.updateMarks();			// 마크 갱신
 				n.announce(n.notice() + player.name + '님이 보조 권한을 획득했습니다. ' + com.recommendCom('관련', '!adminhelp'), null, 'pink', 2, 2);
 				cout(true, player.name + '(이)가 보조 권한을 얻음.');
 			}
 			return false; // 명령어 입력한 흔적이 남지 않음
 		}
-		this.checkAdmins = function(){						// 								관리자 인원 체크
+		this.checkAdmins = function(){						//			관리자 인원 체크
 			var members = room.getPlayerList();
 			for(var i = 0; i < p.cntPlayers; i++){
 				if(admin.getAdminstats(members[i])) admin.cntAdmins++;
 			}
 			return admin.cntAdmins;
 		}
-		this.checkSubAdmins = function(){					// 								보조 관리자 인원 체크
+		this.checkSubAdmins = function(){					// 			보조 관리자 인원 체크
 			var members = room.getPlayerList();
 			for(var i = 0; i < p.cntPlayers; i++){
 				if(admin.subAdmin[members[i] - 1]) admin.cntSubAdmins++;
 			}
 			return admin.cntSubAdmins;
 		}
-		this.clearBans = function(player){					// !clearbans				|	강제 퇴장 목록 초기화 명령어
+		this.clearBans = function(player){					// !clearbans	|	강제 퇴장 목록 초기화 명령어
 			if (player.admin || admin.subAdmin[player.id - 1]){
 				room.clearBans();
 				n.announce(n.notice() + 'Ban 처리 내역이 초기화되었습니다.', null, 'pink', 2, 2);
@@ -438,12 +438,12 @@ class Administration{												// 관리 클래스
 			else n.acess(player);
 			return false;  // 명령어 흔적을 남기지 않음
 		}
-		this.showPassword = function(player){				// !show_pw					| 	비번 공개
+		this.showPassword = function(player){					// !show_pw	| 	비번 공개
 			if(player.admin || admin.subAdmin[player.id - 1]) n.announce(n.notice() + '현재 비밀번호는 ' + room.password + '입니다.', player.id, 'green', 4, 0);
 			else n.acess(player);
 			return false;
 		}
-		this.releasePassword = function(player){			// !clear_pw				|	비번 해제
+		this.releasePassword = function(player){				// !clear_pw	|	비번 해제
 			if(player.admin || admin.subAdmin[player.id - 1]){
 				n.announce(n.unlocked() + '비밀번호가 해제되었습니다.', null, 'pink', 4, 1);
 				room.setPassword();
@@ -451,11 +451,11 @@ class Administration{												// 관리 클래스
 			else n.acess(player);
 			return false;
 		}
-		this.filterPlayer = function(player){				//								사칭 및 중복 필터(onlyadmin)
+		this.filterPlayer = function(player){					//			사칭 및 중복 필터(onlyadmin)
 			let i = 0;
 			p.members = room.getPlayerList();
 
-			if(p.cntPlayers > 1)											// 사칭 감지
+			if(p.cntPlayers > 1)		// 사칭 감지
 			{
 				for (let i = 1; i <= p.cntPlayers; i++){
 					var checkname = p.members[i].name;
@@ -463,18 +463,18 @@ class Administration{												// 관리 클래스
 						return admin.doKick(player, "사칭 및 중복 접속 감지 시스템으로 인해 퇴장되었습니다.");
 				}
 			}
-			while(i < p.blacklist.length){									// 블랙 리스트 감지
+			while(i < p.blacklist.length){					//			블랙 리스트 감지
 				// 포함되면 필터 반환 | 포함되지 않으면 i 증가
 				if(player.name.search(p.blacklist[i]) != -1) return true;
 				else i++;
 			}
 			return false;
 		}
-		this.doKick = function(player, msg){				//								강제 퇴장 처리
+		this.doKick = function(player, msg){					//			강제 퇴장 처리
 			room.kickPlayer(player.id, n.cnot() + msg, false);
 			return false;
 		}
-		this.getMute = function(player, msg){				// !mute ID					|	채금 설정
+		this.getMute = function(player, msg){					// !mute ID	|	채금 설정
 			p.members = room.getPlayerList();
 
 			if(player.admin || admin.subAdmin[player.id - 1]){
@@ -491,7 +491,7 @@ class Administration{												// 관리 클래스
 			else if(!player.admin || !admin.subAdmin[player.id - 1]) n.acess(player);
 			return false;
 		}
-		this.releaseMute = function(player, msg){			// !unmute ID				|	채금 풀기
+		this.releaseMute = function(player, msg){				// !unmute ID	|	채금 풀기
 			p.members = room.getPlayerList();
 
 			if(player.admin || admin.subAdmin[player.id - 1]){
@@ -514,13 +514,13 @@ class Administration{												// 관리 클래스
 			else if(!player.admin || !admin.subAdmin[player.id - 1]) n.acess(player);
 			return false;
 		}
-		this.putPause = function(player){				// p						|	일시 정지(onlyadmin)
+		this.putPause = function(player){					// p		|	일시 정지(onlyadmin)
 			if(player.admin || admin.subAdmin[player.id - 1]){
 				room.pauseGame(true);
 				return false;  
 			}
 		}
-		this.unPause = function(player){ 				// !p						|	계속(onlyadmin)
+		this.unPause = function(player){ 					// !p		|	계속(onlyadmin)
 			if(player.admin || admin.subAdmin[player.id - 1]) room.pauseGame(false);
 			else n.acess(player);
 			return false;
@@ -532,22 +532,22 @@ class Notice {														// 알림 클래스
 		this.devCheck = function(player){		// 개발 버전 안내 메세지
 			if(dev) return n.announce(n.cnot() + '개발 전용 테스트방이므로 원활한 플레이가 어렵습니다.', player.id, 'orange', 5, 2);
 		}
-		this.info = function () {				// 상세 정보
+		this.info = function () {			// 상세 정보
 			return "📡상세정보📡 : ";
 		};
-		this.help = function () {				// 도움말
+		this.help = function () {			// 도움말
 			return "💬도움말🗨 : ";
 		};
 		this.infoplayer = function () {			// 플레이어 정보
 			return "🔎플레이어 정보🔍 : ";
 		};
-		this.notice = function () {				// 알림
+		this.notice = function () {			// 알림
 			return "🛎알림🛎 : ";
 		};
-		this.cnot = function () {				// 주의
+		this.cnot = function () {			// 주의
 			return "⛔주의⛔ : ";
 		};
-		this.locked = function () {				// 비활성화
+		this.locked = function () {			// 비활성화
 			return "🔒잠금🔒 : ";
 		};
 		this.unlocked = function () {			// 활성화
@@ -564,14 +564,14 @@ class Notice {														// 알림 클래스
 		this.ruleCommand = function(msg){ 		// 규칙
 			msg = "🕹" + msg + "규칙🎮 : ";
 			return msg;
-		}										// 알림 메시지
+		}						// 알림 메시지
 		this.announce = function(msg, target, color, style, sound){ 
 			room.sendAnnouncement(msg, target, n.getColor(color), n.getStyle(style), sound);
 			return false;
 		}
 		this.getColor = function(color){
 			switch(color){
-				case 'um': color = "6CB858"; break;				// UM
+				case 'um': color = "6CB858"; break;			// UM
 				case 'red': color = "FF0000"; break;			// 빨강
 				case 'orange': color = "FF5E00"; break;			// 주황
 				case 'yellow': color = "FFE400"; break;			// 노랑
@@ -588,10 +588,10 @@ class Notice {														// 알림 클래스
 		}
 		this.getStyle = function(style){
 			switch(style){
-				case 1: style = "nomarl"; break;		// 기본
-				case 2: style = "bold"; break;			// 볼드체
-				case 3: style = "italic"; break;		// 이탈릭
-				case 4: style = "small"; break;			// 작게
+				case 1: style = "nomarl"; break;	// 기본
+				case 2: style = "bold"; break;		// 볼드체
+				case 3: style = "italic"; break;	// 이탈릭
+				case 4: style = "small"; break;		// 작게
 				case 5: style = "small-bold"; break;	// 작은 볼드체
 				case 6: style = "small-italic"; break;	// 작은 이탈릭
 			}
@@ -608,7 +608,7 @@ class ChatSystem {													// 채팅 시스템 클래스
 			'😴', '🥶', '😱', '🥵'
 		]
 		this.getFace = function(emoji, name){ return (emoji + name + emoji) }
-		this.onPlayerChat = function(player, msg) {						//							채팅 시스템
+		this.onPlayerChat = function(player, msg) {					//			채팅 시스템
 			let i = 0;
 			let spacePos = msg.search(" ");
 			let command = msg.substr(0, spacePos !== -1 ? spacePos : msg.length);
@@ -625,7 +625,7 @@ class ChatSystem {													// 채팅 시스템 클래스
 		this.FfilterFun = function(player){
 			admin.doKick(player);		// 퇴장 처리
 		}
-		this.send = function(player, msg, chatPublic){					//							일반 채팅
+		this.send = function(player, msg, chatPublic){					//			일반 채팅
 			var fmsg = (" 전체 : [" + p.getIdofPlayer(player) + "]");
 			var lmsg = (player.name + ": " + msg);
 
@@ -633,22 +633,22 @@ class ChatSystem {													// 채팅 시스템 클래스
 			else p.getMarks(false, player, fmsg, lmsg);
 			return false;
 		}
-		this.alltoChat = function(player, msg, type){					//							나 빼고 다 보내기
+		this.alltoChat = function(player, msg, type){					//			나 빼고 다 보내기
 			p.members = room.getPlayerList();
 			for(var i = 0; i<= p.cntPlayers; i++){
 				if(p.members[i].id != player.id){
 					if(type) n.announce(msg, p.members[i].id, 'yellow', 5, 1);	// 공지로 출력
-					else room.sendChat(msg, p.members[i].id);					// 일반 채팅으로 출력
+					else room.sendChat(msg, p.members[i].id);			// 일반 채팅으로 출력
 				}
 			}
 			return false;
 		}
-		this.whisperChat = function(player, msg)						// !e ID				|	귓속말 명령어
+		this.whisperChat = function(player, msg)					// !e ID	|	귓속말 명령어
 		{
 			p.members = room.getPlayerList();
 			for(var i = 0; i <= p.cntPlayers; i++){
 				if(p.members[i] && (i == msg.substr(3, 2))){
-					if(p.members[i].id == player.id) 		// 동일 인물인 경우
+					if(p.members[i].id == player.id) 	// 동일 인물인 경우
 					n.announce(n.cnot() + '자기 자신에게 귓속말을 보낼 수 없습니다.', player.id, 'orange', 2, 3);
 					else if(!p.members[i].id){				// id가 0이면 콘솔창으로 전달
 						room.sendChat("외부 : [" + p.getIdofPlayer(player) + "]" + p.checkMarks(player) + player.name + "→ [0]🌐관리자: " + msg.substr(5, 50), player.id);
@@ -664,7 +664,7 @@ class ChatSystem {													// 채팅 시스템 클래스
 			// 귓속말 처리
 			return false;
 		}
-		this.teamChat = function(player, msg)							// !t 					|	팀 채팅 명령어
+		this.teamChat = function(player, msg)						// !t 		|	팀 채팅 명령어
 		{
 			p.members = room.getPlayerList();
 			var toTeam;
@@ -685,7 +685,7 @@ class ChatSystem {													// 채팅 시스템 클래스
 			}
 			return false;
 		}
-		this.allChat = function(player, msg){							// !a 					|	전체 채팅 명령어
+		this.allChat = function(player, msg){						// !a 		|	전체 채팅 명령어
 			let senseFilter = msg.search('!a');
 			var i = 0;
 			
@@ -698,7 +698,7 @@ class ChatSystem {													// 채팅 시스템 클래스
 }
 class Commands{														// 명령어 클래스
 	constructor(){
-		this.plaster = function(player){										// !도			|	도움말, 도배방지문자(onlyadmin)
+		this.plaster = function(player){						// !도		|	도움말, 도배방지문자(onlyadmin)
     		if (player.admin || admin.subAdmin[player.id - 1]){ 
 				room.sendChat(chat.getFace(chat.face[9], 'AlphaGo'));
 				room.sendChat(chat.getFace(chat.face[9], 'AlphaGo') + ': ' + n.cnot() + '도배 방지');
@@ -711,7 +711,7 @@ class Commands{														// 명령어 클래스
 			else com.comHelp(player, '!도');	// 도움말
 			return false; 						// 명령어 흔적을 남기지 않음
 		}
-		this.comHelp = function(player, msg){ 									// !help		|	명령어 도움말
+		this.comHelp = function(player, msg){ 						// !help		|	명령어 도움말
 			var players = room.getPlayerList();
 
 			chat.send(player, msg, true);
@@ -727,7 +727,7 @@ class Commands{														// 명령어 클래스
 			}
 			return false;
 		}
-		this.botHelp = function(player, msg){									// !bothelp		|	봇방 도움말
+		this.botHelp = function(player, msg){						// !bothelp		|	봇방 도움말
 			var players = room.getPlayerList();
 			chat.send(player, msg, true);
 			for(var i = 1; i <= p.cntPlayers; i++){
@@ -742,7 +742,7 @@ class Commands{														// 명령어 클래스
 			}
 			return false;
 		}
-		this.chatHelp = function(player, msg){									// !chathelp	|	채팅 도움말
+		this.chatHelp = function(player, msg){						// !chathelp	|	채팅 도움말
 			var players = room.getPlayerList();
 			chat.send(player, msg, true);
 			for(var i = 1; i <= p.cntPlayers; i++){
@@ -757,7 +757,7 @@ class Commands{														// 명령어 클래스
 			}
 			return false;
 		}
-		this.mapHelp = function(player, msg){									// !maphelp		|	맵 도움말
+		this.mapHelp = function(player, msg){						// !maphelp	|	맵 도움말
 			var players = room.getPlayerList();
 			chat.send(player, msg, true);
 			for(var i = 1; i <= p.cntPlayers; i++){
@@ -772,7 +772,7 @@ class Commands{														// 명령어 클래스
 			}
 			return false;
 		}
-		this.etcHelp = function(player, msg){									// !etchelp		|	기타 도움말
+		this.etcHelp = function(player, msg){						// !etchelp	|	기타 도움말
 			var players = room.getPlayerList();
 			chat.send(player, msg, true);
 			for(var i = 1; i <= p.cntPlayers; i++){
@@ -790,31 +790,31 @@ class Commands{														// 명령어 클래스
 		this.recommendCom = function(kind, commands){							// 					추천 도움말
 			return ('(' + kind + ' 도움말: ' + commands + ')'); 
 		}
-		this.helpJoinP = function(player){ 										// !join		|  	참가 도움말
+		this.helpJoinP = function(player){ 						// !join	|  	참가 도움말
 			n.announce(n.msgCommand('투입 ') + 
 			'레드팀: !red | 관전석: !spec | 블루팀: !blue', player.id, null, 4, 3);
 			return false;
 		}
-		this.helpJoinA = function(){ 											// !join		| 	참가 도움말(공용)
+		this.helpJoinA = function(){ 							// !join	| 	참가 도움말(공용)
 			n.announce(n.msgCommand('투입 ') + 
 			'레드팀: !red | 관전석: !spec | 블루팀: !blue', null, null, 1, 3);
 			return false;
 		}
-		this.helpScore = function(player){ 										// !rankhelp	| 	점수 도움말
+		this.helpScore = function(player){ 						// !rankhelp	| 	점수 도움말
 			n.announce('🔎점수🔍 : 득점: n점 | 승리: n점 | 패전: n점'+ com.recommendCom('관련', '!ranking'), player.id, null, 4, 3);
 			return false;
 		}
-		this.helpMaps = function(player, msg){ 									// !maplist		|	맵 도움말
+		this.helpMaps = function(player, msg){ 						// !maplist	|	맵 도움말
 			chat.send(player, msg, true);
 			n.announce('🔎맵 정렬 목록🔍 : [1]Classic Rop'+ com.recommendCom('관련', '!maphelp'), player.id, null, 5, 3);
 			return false;
 		}
-		this.infoRoom = function(player, msg){ 									// !info		| 	방 정보
+		this.infoRoom = function(player, msg){ 						// !info	| 	방 정보
 			chat.send(player, msg, true);
 			n.announce(n.info() + '봇방입니다. | 버전: ' + Roomversion + ' (Based by UMUX ' + UXversion + ') | 최종 업데이트: 19/08/01 | ' + com.recommendCom('관련', '!help'), null, 'green', 5, 3);
 			return false;
 		}
-		this.setJoinPlayer = function(includedTeam, toTeam, name, id){			// 					플레이어 투입
+		this.setJoinPlayer = function(includedTeam, toTeam, name, id){			// 			플레이어 투입
 			if(includedTeam == toTeam) n.announce(n.cnot() + "중복된 명령어입니다.", id, 'orange', 5, 1);
 			else{
 				switch(toTeam){  // 0: 관중, 1: 레드, 2: 블루
@@ -829,7 +829,7 @@ class Commands{														// 명령어 클래스
 		this.setJoinSpec = function(player){ return com.setJoinPlayer(player.team, 0, player.name, player.id);}		// 0: 관중
 		this.setJoinRed = function(player){ return com.setJoinPlayer(player.team, 1, player.name, player.id);}		// 1: 레드
 		this.setJoinBlue = function(player){ return com.setJoinPlayer(player.team, 2, player.name, player.id);}		// 2: 블루		
-		this.loadMap = function(player, mapId){									// !load n		|	유즈맵 로드 명령어(onlyadmin)
+		this.loadMap = function(player, mapId){						// !load n		|	유즈맵 로드 명령어(onlyadmin)
 			if (player.admin || admin.subAdmin[player.id - 1]){
 				if((mapId.substr(6, 2)) >= 1 && ((mapId.substr(6, 2)) <= 12)){
 					room.stopGame();
@@ -845,17 +845,17 @@ class Commands{														// 명령어 클래스
 			return false;
 		}
 		// ------------이스터 에그------------------
-		this.joke = function(player, msg){										//	!넝담		|	joke 명령어
+		this.joke = function(player, msg){						//	!넝담	|	joke 명령어
 			chat.send(player, msg, true);
 			room.sendChat(' 전체 : ' + chat.getFace(chat.face[1], 'Alphago') + ': 헤헤헷, 들켜버렸군, 엣큥.');
 			return false;
 		}
-		this.hawawa = function(player, msg){									//	그치만		|	킹치만 명령어
+		this.hawawa = function(player, msg){						//	그치만	|	킹치만 명령어
 			chat.send(player, msg, true);
 			room.sendChat(' 전체 : ' + chat.getFace(chat.face[10], 'Alphago') + ': ...이렇게라도 하지 않으면...지켜봐주지 않는 걸...');
 			return false;
 		}
-		this.taebo = function(player, msg){										//	태보해 		|	태보 응답
+		this.taebo = function(player, msg){						//	태보해 	|	태보 응답
 			chat.send(player, msg, true);
 			room.sendChat(' 전체 : ' + chat.getFace(chat.face[2], 'Alphago') + ': @(^0^)==@ 절대 태보해! @==(^0^)@');
 			return false;
@@ -871,20 +871,20 @@ class Player{														// 플레이어 클래스
 	constructor() {
 		// 주권한, 보조권한, 일반, 블랙리스트
 		this.mark = ["🟡", "🟢", "⚪", "⚫"];
-		this.blacklist = [ 										// 블랙리스트 명단
+		this.blacklist = [ 					// 블랙리스트 명단
 			// **여기에 블랙리스트 명단을 기입하세요.**
 		];
-		this.cntPlayers = 0;									// 플레이어 인원 체크
+		this.cntPlayers = 0;					// 플레이어 인원 체크
 		this.members;
-		this.playersid = new Array(15);							// 플레이어 ID
+		this.playersid = new Array(15);				// 플레이어 ID
 
-		this.onPlayerTeamChange = function(player){				// 팀 교체
+		this.onPlayerTeamChange = function(player){		// 팀 교체
 			return false;
 		}
 		this.onPlayerAcivity = function(){
 			return false;
 		}
-		this.getIdofPlayer = function(player) {					// 플레이어 ID 확인
+		this.getIdofPlayer = function(player) {			// 플레이어 ID 확인
 			var players = room.getPlayerList();
 			var ids = new Array(15);
 			ids = p.getNumbersFun();
@@ -894,20 +894,20 @@ class Player{														// 플레이어 클래스
 			}
 			ids = null;
 		};
-		this.getNumbersFun = function(){						// 플레이어 번호 가져오기
+		this.getNumbersFun = function(){			// 플레이어 번호 가져오기
 			var players = room.getPlayerList();
 			for(var i = 1; i <= 15; i++){
 				if(players[i]) p.playersid[i - 1] = i;
 			}
 			return p.playersid;
 		}
-		this.getMarks = function(pub, player, fmsg, lmsg){		// 플레이어 마크 부여
+		this.getMarks = function(pub, player, fmsg, lmsg){	// 플레이어 마크 부여
 			cout(true, (fmsg + p.checkMarks(player) + lmsg));
 			if(pub) return room.sendChat(fmsg + p.checkMarks(player) + lmsg);
 			else return room.sendChat(fmsg + p.checkMarks(player) + lmsg, player.id);
 			
 		}
-		this.getTeamofPlayer = function (player) {				// 플레이어 소속 확인
+		this.getTeamofPlayer = function (player) {		// 플레이어 소속 확인
 			var players = room.getPlayerList();
 			for (var i = 1; i <= 15; i++) {
 				if (players[i].id == player.id)
@@ -915,7 +915,7 @@ class Player{														// 플레이어 클래스
 			}
 			ofTeam = null;
 		};
-		this.updatePlayers = function(player) {	// 플레이어 정보 갱신
+		this.updatePlayers = function(player) {			// 플레이어 정보 갱신
 			var players = room.getPlayerList();
 			//var tempop;
 			var tempPlayers;
@@ -933,32 +933,32 @@ class Player{														// 플레이어 클래스
 			}
 			return true;
 		};
-		this.checkMarks = function(player){						// 플레이어 마크 정보
-			if(player.admin) return p.mark[0];							// 주권한
+		this.checkMarks = function(player){			// 플레이어 마크 정보
+			if(player.admin) return p.mark[0];				// 주권한
 			else if(admin.subAdmin[player.id - 1]) return p.mark[1];	// 보조권한
-			else if(admin.filterPlayer(player)) return p.mark[3];			// 블랙리스트
-			else return p.mark[2];										// 일반
+			else if(admin.filterPlayer(player)) return p.mark[3];		// 블랙리스트
+			else return p.mark[2];						// 일반
 		}
-		this.updateMarks = function(){							// 플레이어 마크 갱신
+		this.updateMarks = function(){				// 플레이어 마크 갱신
 			var players = room.getPlayerList();
 			for(var i = 0; i < p.cntPlayers; i++){
 				p.checkMarks(players[i]);
 			}
 			return true;
 		}
-		this.setAvatar = function(player, msg){					// 등번호 설정
+		this.setAvatar = function(player, msg){			// 등번호 설정
 			if(msg.substr(1 ,6) == "avatar") 
 				room.setPlayerAvatar(player.id, msg.substr(8, 10));
 			else room.setPlayerAvatar(player.id, msg.substr(5, 10));
 			return false;
 		}
-		this.getX = function(player){							// 플레이어 X좌표
+		this.getX = function(player){				// 플레이어 X좌표
 			return player.position().x;
 		}
-		this.getY = function(player){							// 플레이어 Y좌표
+		this.getY = function(player){				// 플레이어 Y좌표
 			return player.position().y;
 		}
-		this.getPos = function(player){							// 플레이어 좌표
+		this.getPos = function(player){				// 플레이어 좌표
 			return player.position();
 		}
 	}
@@ -969,7 +969,7 @@ class TimeManager{													// 시간 관리 클래스
 		this.h; this.min; this.sec		// 시, 분, 초
 		this.co = '/'; this.ti = ':';
 		//-----------------------날짜 및 시간----------------------------------------------
-		this.getDate = function(){ 								// 날짜 및 시간 반환
+		this.getDate = function(){ 							// 날짜 및 시간 반환
 			return t.updateDate();
 		}
 		this.updateTimsg = function(){							// 날짜 및 시간 갱신
@@ -996,7 +996,7 @@ class TimeManager{													// 시간 관리 클래스
 			return (t.y + t.co + t.m + t.co + t.d);
 		}	
 		//-----------------------시간----------------------------------------------------
-		this.getTime = function(){ 								// 시간 반환
+		this.getTime = function(){ 							// 시간 반환
 			return t.updateTime();
 		}
 		this.updateTime = function(){							// 시간 갱신
@@ -1015,12 +1015,12 @@ class TimeManager{													// 시간 관리 클래스
 
 var game = new GameManager();		// 게임 매니저 클래스
 var admin = new Administration();	// 관리 클래스
-var n = new Notice();				// 알림 클래스
+var n = new Notice();			// 알림 클래스
 var chat = new ChatSystem();		// 채팅 시스템 클래스
-var com = new Commands();			// 명령어 클래스
-var p = new Player();				// 플레이어 클래스
-var t = new TimeManager();			// 시간 관리 클래스
-var commands = {					// 명령어 모음
+var com = new Commands();		// 명령어 클래스
+var p = new Player();			// 플레이어 클래스
+var t = new TimeManager();		// 시간 관리 클래스
+var commands = {			// 명령어 모음
 	"!help": com.comHelp, "!헬프": com.comHelp, "!도움": com.comHelp, "!명령" : com.comHelp, "!명령어" : com.comHelp, "!ㅗ디ㅔ" : com.comHelp,
 	"!bothelp" : com.botHelp, "!봇헬프" : com.botHelp, "!봇방" : com.botHelp, "봇방도움말" : com.botHelp, "ㅠㅐ소디ㅔ" : com.botHelp, 
 	"!maphelp" : com.mapHelp, "!맵도움" : com.mapHelp, "!맵도움말" : com.mapHelp, "!맵헬프" : com.mapHelp, "!유즈맵" : com.mapHelp, "!유즈맵도움말" : com.mapHelp, "!ㅡ메ㅗ디ㅔ" : com.mapHelp, 
@@ -1048,23 +1048,23 @@ var commands = {					// 명령어 모음
 	// 권한 얻기(오타)
 	"!!" : admin.missPassword,
 
-	"!rr": admin.setReset, "!ㄱㄱ": admin.setReset,"!리": admin.setReset, "!re": admin.setReset,		// 다시 시작
-	"!clearbans" : admin.clearBans, "!cb" : admin.clearBans, 					// 밴 초기화
+	"!rr": admin.setReset, "!ㄱㄱ": admin.setReset,"!리": admin.setReset, "!re": admin.setReset,	// 다시 시작
+	"!clearbans" : admin.clearBans, "!cb" : admin.clearBans,					// 밴 초기화
 	// 팀 이동 제한(전체)
 	"!lock" : admin.setTeamsLock, "!l" : admin.setTeamsLock, "!L" : admin.setTeamsLock, "!락" : admin.setTeamsLock, "!fkr" : admin.setTeamsLock,
 
 	"!set_pw": admin.setPassword,														// 비번 설정
 	"!clear_pw": admin.releasePassword,													// 비번 해제
 	"!score" : admin.setScore,     														// 점수 제한
-	"!time" : admin.setTime, "!제한시간" : admin.setTime,								// 시간 제한
-	"!load" : com.loadMap, "!ㅣㅐㅁㅇ" : com.loadMap,									// 기본 내장맵
+	"!time" : admin.setTime, "!제한시간" : admin.setTime,	// 시간 제한
+	"!load" : com.loadMap, "!ㅣㅐㅁㅇ" : com.loadMap,		// 기본 내장맵
 	"!도" : com.plaster,																// 도배 방지 문자
-	//"!mute": admin.getMute,	"!ㅡㅕㅅㄷ": admin.getMute,									// 채금 설정
-	//"!unmute": admin.releaseMute, "!ㅕㅜㅡㅕㅅㄷ": admin.releaseMute, 					// 채금 풀기
+	//"!mute": admin.getMute,	"!ㅡㅕㅅㄷ": admin.getMute,					// 채금 설정
+	//"!unmute": admin.releaseMute, "!ㅕㅜㅡㅕㅅㄷ": admin.releaseMute,				// 채금 풀기
 
 	"!a": chat.allChat, "!올" : chat.allChat, "!전체" : chat.allChat, "!전" : chat.allChat,		// 전체 채팅
-	"!t" : chat.teamChat, "!팀" : chat.teamChat, "!ㅅ" : chat.teamChat,							// 팀 채팅
-	"!e" : chat.whisperChat, "!귓" : chat.whisperChat, "!ㄷ" : chat.whisperChat,				// 개인 채팅(귓속말)
+	"!t" : chat.teamChat, "!팀" : chat.teamChat, "!ㅅ" : chat.teamChat,				// 팀 채팅
+	"!e" : chat.whisperChat, "!귓" : chat.whisperChat, "!ㄷ" : chat.whisperChat,			// 개인 채팅(귓속말)
 
 	// 이스터 에그
 	"!joke": com.joke, "!농담": com.joke, "!조크": com.joke, "!넝담": com.joke, "!알파고": com.joke, "!네모형": com.jongikannemohyung, "!정네": com.jongikannemohyung,
@@ -1075,22 +1075,22 @@ var commands = {					// 명령어 모음
 	"!aboutver" : com.infoRoom,"!verinfo" : com.infoRoom,"!version" : com.infoRoom,"!버전" : com.infoRoom, "!ver" : com.infoRoom, "!정보" : com.infoRoom,
 }
 
-room.onPlayerJoin = function(player) { return game.onPlayerJoin(player); }			// 플레이어 입장
+room.onPlayerJoin = function(player) { return game.onPlayerJoin(player); }		// 플레이어 입장
 room.onPlayerLeave = function(player) { return game.onPlayerLeave(player); }		// 플레이어 퇴장
 room.onPlayerAcivity = function(){ return p.onPlayerAcivity() }
 // 플레이어 강제 퇴장
 room.onPlayerKicked = function(kickedPlayer, reason, ban, byPlayer){ return admin.onPlayerKicked(kickedPlayer, reason, ban, byPlayer) }
 room.onPlayerAdminChange = function(player){ return admin.onPlayerAdminChange(player) }		// 플레이어 권한 획득&박탈
-room.onStadiumChange = function(mapName){ return game.onStadiumChange(mapName); }			// 맵 교체
-room.onPlayerChat = function(player, msg){ return chat.onPlayerChat(player, msg); }			// 채팅 시스템
+room.onStadiumChange = function(mapName){ return game.onStadiumChange(mapName); }		// 맵 교체
+room.onPlayerChat = function(player, msg){ return chat.onPlayerChat(player, msg); }		// 채팅 시스템
 
-room.onPositionsReset = function(){ return game.onPositionsReset(); }				// 좌표 초기화
-room.onPlayerBallKick = function(){ return game.onPlayerBallKick(); }				// 공 찼을 때
-room.onTeamGoal = function(team){ return game.onTeamGoal(team); }					// 골 먹힐 때
+room.onPositionsReset = function(){ return game.onPositionsReset(); }			// 좌표 초기화
+room.onPlayerBallKick = function(){ return game.onPlayerBallKick(); }			// 공 찼을 때
+room.onTeamGoal = function(team){ return game.onTeamGoal(team); }			// 골 먹힐 때
 room.onPlayerTeamChange = function(player){ return p.onPlayerTeamChange(player) }	// 팀 교체
-room.onTeamVictory = function(scores){ return game.onTeamVictory(scores); }			// 팀 승리
-room.onGameStart = function(){ return game.onGameStart(); }							// 게임 시작
-room.onGameTick = function(){ return game.onGameTick(); }							// 게임 도중
-room.onGameStop = function(){ return game.onGameStop(); }							// 게임 종료
-room.onGamePause = function(byPlayer){ return game.onGamePause(byPlayer);}			// 게임 중단
+room.onTeamVictory = function(scores){ return game.onTeamVictory(scores); }		// 팀 승리
+room.onGameStart = function(){ return game.onGameStart(); }				// 게임 시작
+room.onGameTick = function(){ return game.onGameTick(); }				// 게임 도중
+room.onGameStop = function(){ return game.onGameStop(); }				// 게임 종료
+room.onGamePause = function(byPlayer){ return game.onGamePause(byPlayer);}		// 게임 중단
 room.onGameUnpause 	= function(byPlayer){ return game.onGameUnpause(byPlayer); }	// 게임 재개
