@@ -753,7 +753,7 @@ class ChatSystem {													// 채팅 시스템 클래스
 }
 class Commands{														// 명령어 클래스
 	constructor(){
-		this.plaster = function(player){										// !도			|	도움말, 도배방지문자(onlyadmin)
+		this.plaster = function(player){						// !도			|	도움말, 도배방지문자(onlyadmin)
     		if (player.admin || admin.subAdmin[player.id - 1]){ 
 				room.sendChat(chat.getFace(chat.face[9], 'AlphaGo'));
 				room.sendChat(chat.getFace(chat.face[9], 'AlphaGo') + ': ' + n.cnot() + '도배 방지');
@@ -797,7 +797,7 @@ class Commands{														// 명령어 클래스
 			}
 			return false;
 		}
-		this.chatHelp = function(player, msg){						// !chathelp	|	채팅 도움말
+		this.chatHelp = function(player, msg){						// !chathelp		|	채팅 도움말
 			var players = room.getPlayerList();
 			chat.send(player, msg, true);
 			for(var i = 1; i <= p.cntPlayers; i++){
