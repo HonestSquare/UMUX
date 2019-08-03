@@ -1093,4 +1093,4 @@ room.onGameStart = function(){ return game.onGameStart(); }				// 게임 시작
 room.onGameTick = function(){ return game.onGameTick(); }				// 게임 도중
 room.onGameStop = function(){ return game.onGameStop(); }				// 게임 종료
 room.onGamePause = function(byPlayer){ return game.onGamePause(byPlayer);}		// 게임 중단
-room.onGameUnpause 	= function(byPlayer){ return game.onGameUnpause(byPlayer); }	// 게임 재개
+room.onGameUnpause = function(byPlayer){ return game.onGameUnpause(byPlayer); }		// 게임 재개
