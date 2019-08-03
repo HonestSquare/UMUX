@@ -166,11 +166,11 @@ class GameManager{													// 게임 매니저 클래스
 			else cout(true, '게임 재개.');			// 명령어 입력으로 실행되면 플레이어 이름 가림
 			return false;
 		}
-		this.onPlayerJoin = function(player) {											// 플레이어 입장
+		this.onPlayerJoin = function(player) {						// 플레이어 입장
 			p.cntPlayers++;
-			p.getNumbersFun();																// 할당
+			p.getNumbersFun();									// 할당
 			room.sendChat("This room only supports Korean language. :", player.id);		
-			n.devCheck(player);																// 개발자 버전 체크
+			n.devCheck(player);									// 개발자 버전 체크
 			chat.alltoChat(player, n.notice() + player.name + '님이 입장했습니다.', true);		// 안내 메시지
 			// 사칭 및 블랙리스트 탐지
 			if(admin.filterPlayer(player)){ 
@@ -188,8 +188,8 @@ class GameManager{													// 게임 매니저 클래스
 			}
 			return false;
 		}
-		this.onPlayerLeave = function(player) {											// 플레이어 퇴장
-			if(!admin.kicked){													// 강제 퇴장 확인
+		this.onPlayerLeave = function(player) {							// 플레이어 퇴장
+			if(!admin.kicked){			// 강제 퇴장 확인
 				cout(true, player.name + '(이)가 퇴장함.');
 				n.announce(n.notice() + player.name + '님이 떠났습니다.', null, 'green', 5, 1);
 			}
@@ -244,7 +244,7 @@ class Administration{												// 관리 클래스
 		this.teamsLock = false;								// 채팅 잠금
 		this.mutedList = [];								// 채금자 목록
 
-		this.onPlayerAdminChange = function(player){				//	플레이어 권한 획득&박탈
+		this.onPlayerAdminChange = function(player){				//			플레이어 권한 획득&박탈
 			if(admin.filterPlayer(player)){ 		// 블랙리스트 권한 부여 배제 대상
 				room.setPlayerAdmin(player.id, false);
 				admin.subAdmin[player.id - 1] = false;
@@ -260,7 +260,7 @@ class Administration{												// 관리 클래스
 			}
 			return false;
 		}
-		this.onPlayerKicked = function(kickedPlayer, reason, ban, byPlayer){	//	플레이어 강제 퇴장
+		this.onPlayerKicked = function(kickedPlayer, reason, ban, byPlayer){	//			플레이어 강제 퇴장
 			admin.kicked = true;
 			if(reason) cout(true, byPlayer.name + '(이)가 ' + kickedPlayer.name + '(을)을 강제 퇴장함. (사유: ' + reason + ')');
 			else cout(true, byPlayer.name + '(이)가 ' + kickedPlayer.name + '(을)을 강제 퇴장함.');
@@ -742,7 +742,7 @@ class Commands{														// 명령어 클래스
 			}
 			return false;
 		}
-		this.chatHelp = function(player, msg){						// !chathelp	|	채팅 도움말
+		this.chatHelp = function(player, msg){						// !chathelp		|	채팅 도움말
 			var players = room.getPlayerList();
 			chat.send(player, msg, true);
 			for(var i = 1; i <= p.cntPlayers; i++){
@@ -757,7 +757,7 @@ class Commands{														// 명령어 클래스
 			}
 			return false;
 		}
-		this.mapHelp = function(player, msg){						// !maphelp	|	맵 도움말
+		this.mapHelp = function(player, msg){						// !maphelp		|	맵 도움말
 			var players = room.getPlayerList();
 			chat.send(player, msg, true);
 			for(var i = 1; i <= p.cntPlayers; i++){
@@ -772,7 +772,7 @@ class Commands{														// 명령어 클래스
 			}
 			return false;
 		}
-		this.etcHelp = function(player, msg){						// !etchelp	|	기타 도움말
+		this.etcHelp = function(player, msg){						// !etchelp		|	기타 도움말
 			var players = room.getPlayerList();
 			chat.send(player, msg, true);
 			for(var i = 1; i <= p.cntPlayers; i++){
@@ -790,31 +790,31 @@ class Commands{														// 명령어 클래스
 		this.recommendCom = function(kind, commands){							// 					추천 도움말
 			return ('(' + kind + ' 도움말: ' + commands + ')'); 
 		}
-		this.helpJoinP = function(player){ 						// !join	|  	참가 도움말
+		this.helpJoinP = function(player){ 						// !join		|  	참가 도움말
 			n.announce(n.msgCommand('투입 ') + 
 			'레드팀: !red | 관전석: !spec | 블루팀: !blue', player.id, null, 4, 3);
 			return false;
 		}
-		this.helpJoinA = function(){ 							// !join	| 	참가 도움말(공용)
+		this.helpJoinA = function(){ 							// !join		| 	참가 도움말(공용)
 			n.announce(n.msgCommand('투입 ') + 
 			'레드팀: !red | 관전석: !spec | 블루팀: !blue', null, null, 1, 3);
 			return false;
 		}
-		this.helpScore = function(player){ 						// !rankhelp	| 	점수 도움말
+		this.helpScore = function(player){ 						// !rankhelp		| 	점수 도움말
 			n.announce('🔎점수🔍 : 득점: n점 | 승리: n점 | 패전: n점'+ com.recommendCom('관련', '!ranking'), player.id, null, 4, 3);
 			return false;
 		}
-		this.helpMaps = function(player, msg){ 						// !maplist	|	맵 도움말
+		this.helpMaps = function(player, msg){ 						// !maplist		|	맵 도움말
 			chat.send(player, msg, true);
 			n.announce('🔎맵 정렬 목록🔍 : [1]Classic Rop'+ com.recommendCom('관련', '!maphelp'), player.id, null, 5, 3);
 			return false;
 		}
-		this.infoRoom = function(player, msg){ 						// !info	| 	방 정보
+		this.infoRoom = function(player, msg){ 						// !info		| 	방 정보
 			chat.send(player, msg, true);
 			n.announce(n.info() + '봇방입니다. | 버전: ' + Roomversion + ' (Based by UMUX ' + UXversion + ') | 최종 업데이트: 19/08/01 | ' + com.recommendCom('관련', '!help'), null, 'green', 5, 3);
 			return false;
-		}
-		this.setJoinPlayer = function(includedTeam, toTeam, name, id){			// 			플레이어 투입
+		}		
+		this.setJoinPlayer = function(includedTeam, toTeam, name, id){			// 				플레이어 투입
 			if(includedTeam == toTeam) n.announce(n.cnot() + "중복된 명령어입니다.", id, 'orange', 5, 1);
 			else{
 				switch(toTeam){  // 0: 관중, 1: 레드, 2: 블루
@@ -1059,7 +1059,7 @@ var commands = {			// 명령어 모음
 	"!time" : admin.setTime, "!제한시간" : admin.setTime,	// 시간 제한
 	"!load" : com.loadMap, "!ㅣㅐㅁㅇ" : com.loadMap,		// 기본 내장맵
 	"!도" : com.plaster,																// 도배 방지 문자
-	//"!mute": admin.getMute,	"!ㅡㅕㅅㄷ": admin.getMute,					// 채금 설정
+	//"!mute": admin.getMute, "!ㅡㅕㅅㄷ": admin.getMute,					// 채금 설정
 	//"!unmute": admin.releaseMute, "!ㅕㅜㅡㅕㅅㄷ": admin.releaseMute,				// 채금 풀기
 
 	"!a": chat.allChat, "!올" : chat.allChat, "!전체" : chat.allChat, "!전" : chat.allChat,		// 전체 채팅
