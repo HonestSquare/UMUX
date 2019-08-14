@@ -14,7 +14,7 @@
 
 ## 버전 및 업데이트 내역
 현재 최신 버전은 1.1.1 Asan입니다.
-[(자세히 보기)](https://github.com/HonestSquare/UMUX/wiki/News)
+[(자세히 보기)](https://github.com/HonestSquare/UMUX/wiki/Updates)
 
 ## 원저작자 및 문의 안내
 - 제작: 정직한네모형
