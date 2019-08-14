@@ -13,7 +13,7 @@
 [여기를 참고하세요.](https://github.com/HonestSquare/UMUX/wiki/Infomations)
 
 ## 버전 및 업데이트 내역
-현재 최신 버전은 1.1 Asan입니다.
+현재 최신 버전은 1.1.1 Asan입니다.
 [(자세히 보기)](https://github.com/HonestSquare/UMUX/wiki/News)
 
 ## 원저작자 및 문의 안내
