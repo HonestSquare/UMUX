@@ -888,8 +888,9 @@ class Commands{														// 명령어 클래스
 			n.announce(n.info() + '봇방입니다. | 버전: ' + VersionRoom + ' (Based by UMUX ' + VersionUX + ') | 최종 업데이트: 19/08/17 | ' + com.recommendCom('관련', '!help'), null, 'green', 5, 3);
 			return false;
 		}
-		this.setJoinPlayer = function(includedTeam, toTeam, name, id){			// 					플레이어 투입
-			if(includedTeam == toTeam) n.announce(n.cnot() + "중복된 명령어입니다.", id, 'orange', 5, 1);
+		this.setJoinPlayer = function(includedTeam, toTeam, name, id, player){			// 					플레이어 투입
+			if(admin.teamsLock) return n.acess(player);
+                        if(includedTeam == toTeam) n.announce(n.cnot() + "중복된 명령어입니다.", id, 'orange', 5, 1);
 			else{
 				switch(toTeam){  // 0: 관중, 1: 레드, 2: 블루
 					case 0:	n.announce(n.notice() + '관중석으로 이동했습니다.', id, 'green', 4, 0); break;
@@ -900,9 +901,9 @@ class Commands{														// 명령어 클래스
 			}
 			return false;
 		}
-		this.setJoinSpec = function(player){ return com.setJoinPlayer(player.team, 0, player.name, player.id);}		// 0: 관중
-		this.setJoinRed = function(player){ return com.setJoinPlayer(player.team, 1, player.name, player.id);}		// 1: 레드
-		this.setJoinBlue = function(player){ return com.setJoinPlayer(player.team, 2, player.name, player.id);}		// 2: 블루		
+		this.setJoinSpec = function(player){ return com.setJoinPlayer(player.team, 0, player.name, player.id, player);}		// 0: 관중
+		this.setJoinRed = function(player){ return com.setJoinPlayer(player.team, 1, player.name, player.id, player);}		// 1: 레드
+		this.setJoinBlue = function(player){ return com.setJoinPlayer(player.team, 2, player.name, player.id, player);}		// 2: 블루		
 		this.loadMap = function(player, mapId){									// !load n		|	유즈맵 로드 명령어(onlyadmin)
 			if (player.admin || admin.subAdmin[player.id - 1]){
 				if((mapId.substr(6, 2)) >= 1 && ((mapId.substr(6, 2)) <= 12)){
