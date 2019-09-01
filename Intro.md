@@ -16,6 +16,11 @@
 현재 최신 버전은 1.1.2 Asan입니다.
 [(자세히 보기)](https://github.com/HonestSquare/UMUX/wiki/Updates)
 
+### UMUX Beta Program
+남들보다 빠르게 신버전을 체험해 보세요!
+단 본 프로그램 참여에 앞서 일부 조건이 따릅니다.
+자세한 내용은 [여기를 참고하세요.](https://github.com/HonestSquare/UMUX/wiki/UMUX-Beta-Program)
+
 ## 원저작자 및 문의 안내
 - 제작: 정직한네모형
 - 문의 메일: djdft1456@gmail.com
