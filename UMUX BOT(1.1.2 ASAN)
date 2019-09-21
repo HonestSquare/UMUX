@@ -124,7 +124,7 @@ var map = [
 ]
 //-----------------------------------------------------------------------
 var room = HBInit({ 
-	roomName: "[개발버전]UMUX의 방",
+	roomName: "UMUX의 방",
 	maxPlayers: 15, 				// 플레이어 최대 인원
 	playerName : " ", 				// 방장 이름(그대로 두는 걸 권장)
 	public : true,					// 공개방 여부
