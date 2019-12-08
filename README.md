@@ -11,6 +11,8 @@ WARNING: NEVER EDIT IT FOR OTHERS THAN KOREAN LANGUAGE.
 - UMUX 버전 표기(예: Based by UMUX 1.0.0)
 > `n.announce(n.info() + '봇방입니다. | 버전: ' + Roomversion + ' (Based by UMUX ' + UXversion + '))`
 
+그 외 기타 사항 및 라이센스는 [여기서](https://github.com/HonestSquare/UMUX/blob/master/LICENCE) 확인하십시오.
+
 ### 탑재된 기본 맵은 꼭 UMUX에서만 사용할 수 있나요?
 아니오, UMUX에 국한되지 않으며 어떠한 용도의 수정 및 재배포 또는 수정이 가능합니다.
 그렇지만 이에 따른 문제나 책임은 모두 이용자 본인에게 있습니다.
