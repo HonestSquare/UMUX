@@ -1148,7 +1148,7 @@ class Commands{
 		}
 		this.infoRoom = function(player, msg){ 									// !info		| 	방 정보
 			CS.send(player, msg, true);
-			NC.announce(NC.info() + "UM 봇방입니다. | 버전: " + VersionRoom + " (Based on UMUX " + VersionUX + ") | 릴리스 날짜: 2019.12.08 | " + CM.recommendCom("관련", "!help"), null, "green", 5, 3);
+			NC.announce(NC.info() + "UM 봇방입니다. | 버전: " + VersionRoom + " (Based on UMUX " + VersionUX + ") | 릴리스 날짜: 2019.12.12 | " + CM.recommendCom("관련", "!help"), null, "green", 5, 3);
 			return false;
 		}
 		this.setJoinPlayer = function(player, toTeam, msg){						// 					플레이어 투입
@@ -1251,8 +1251,7 @@ class Player{
 			"⚪", "🔴", "🔵"
 		];
 		this.blacklist = [ 								// 블랙리스트 명단
-			"귀리", "Knife", "현태", "정직힌네모형", "좆모형", "좆직한", "노무노무", "MC무현", "MC재인", "mc무현", "mc재인", "운지", "한남", "재기해", "木", "이과인", "조국법무부장관", "8 seconds", "에드",
-			"6.9", "응딩", "젠더감수성", "젠더 감수성", "한녀", "슨상", "Cᴀᴘᴛᴀɪɴ Kᴏʀᴇᴀ", "축구이적통신원", "영역 지키기", "기가 와이파이 홈", "Haxcups.cc", "해리케인", "뎀잇",  "에든", "초코에몽", "킹덤", "dead"
+			// 여기에 블랙리스트 명단을 작성하십시오.
 		];
 		this.members;
 		this.cntPlayers		 	= 0;					// 플레이어 인원 체크
@@ -1302,7 +1301,7 @@ class Player{
 			return PS.members;
 		}
 		this.getMarks = function(pub, player, fmsg, lmsg){		// 플레이어 마크 부여
-			SYS.log(true, ((PS.cntPlayers >= 10) ? "전체 " + player.id + '(' + SYS.setLine(PS.playersid[player.id], 2) + ')' : "전체 " + player.id + '(' + PS.playersid[player.id] + ')' + PS.checkMarks(player) + lmsg));
+			SYS.log(true, ((PS.cntPlayers >= 10) ? "전체 " + player.id + '(' + SYS.setLine(PS.playersid[player.id], 2) + ')' + PS.checkMarks(player) + lmsg : "전체 " + player.id + '(' + PS.playersid[player.id] + ')' + PS.checkMarks(player) + lmsg));
 			if(pub) return CS.showMsg(fmsg + PS.checkMarks(player) + lmsg);
 			else return CS.showMsg(fmsg + PS.checkMarks(player) + lmsg, player.id);
 			
