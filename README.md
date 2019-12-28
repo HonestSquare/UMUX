@@ -23,7 +23,7 @@ WARNING: NEVER EDIT IT FOR OTHERS THAN KOREAN LANGUAGE.
 
 ## 버전 및 업데이트 내역
 현재 최신 버전은 1.1.2 Asan입니다.
-[(자세히 보기)](https://github.com/HonestSquare/UMUX/wiki/Updates)
+[(자세히 보기)](https://github.com/HonestSquare/UMUX/wiki/UMUX-Updates-&-Versions)
 
 ### UMUX Beta Program
 남들보다 빠르게 신버전을 체험해 보세요!
