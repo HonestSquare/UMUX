@@ -18,8 +18,7 @@ WARNING: NEVER EDIT IT FOR OTHERS THAN KOREAN LANGUAGE.
 그렇지만 이에 따른 문제나 책임은 모두 이용자 본인에게 있습니다.
 
 ## 어떤 기능들이 있나요?
-실용적인 기능들을 담아냈습니다.
-[여기를 참고하세요.](https://github.com/HonestSquare/UMUX/wiki/Infomations)
+슈퍼 블랙리스트, 귓속말 채팅, 팀 채팅, 보조 권한 시스템 등 실용적인 기능들을 담아냈습니다.
 
 ## 버전 및 업데이트 내역
 현재 최신 버전은 2.0.0 Busan입니다.
