@@ -6,7 +6,7 @@ WARNING: NEVER EDIT IT FOR OTHERS THAN KOREAN LANGUAGE.
 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
 
 ## 누구나 마음대로 쓸 수 있나요?
-예, 아래와 같은 항목들을 준수한다면 누구나 [자유롭게 수정이](https://github.com/HonestSquare/UMUX/blob/master/UMUX%20BOT.js) 가능합니다.
+예, 아래와 같은 항목들을 준수한다면 누구나 [자유롭게 수정이](https://github.com/HonestSquare/UMUX/blob/master/2.0%20BUSAN/UMUX%20BOT(2.0.0%20BUSAN).js) 가능합니다.
 - 원저작자 표기
 - UMUX 버전 표기(예: Based by UMUX 1.0.0)
 > `n.announce(n.info() + '봇방입니다. | 버전: ' + Roomversion + ' (Based by UMUX ' + UXversion + '))`
