@@ -148,7 +148,7 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF4HMY0s50X5aJtgfw.nKUN3JojwnM";
+const TOKEN = "thr1.AAAAAF4Kw-H9KpKgGSpSPg.wejpfLpmst0";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
@@ -169,12 +169,12 @@ var date = new Date();
 //-----------------------------------------------------------------------
 class GameManager{													
 constructor(){
-	this.gamestats;											// 0: 정지, 1: 시작, 2: 게임 중
+	this.gameStats;											// 0: 정지, 1: 시작, 2: 게임 중
 	this.error 			= false;							// 에러 여부(Bad actor)
 	this.ballPos 		= {"x": null, "y": null};			// 공 좌표
 	this.stateRecording = false;
 	this.onGameStart = function(){							// 게임 시작
-		GM.gamestats = 1;
+		GM.gameStats = 1;
 		SYS.log(true, "게임 시작.");
 		return false;
 	}
@@ -186,11 +186,11 @@ constructor(){
 		}
 		// 공 좌표
 		GM.ballPos = GM.getBallPosition();
-		if(GM.gamestats != 2) GM.gamestats = 2;
+		if(GM.gameStats != 2) GM.gameStats = 2;
 		return false;
 	}
 	this.onGameStop = function(){							// 게임 종료
-		GM.gamestats = 0;
+		GM.gameStats = 0;
 		SYS.log(true, "게임 종료");
 	}
 	this.onGamePause = function(byPlayer){ 					// 게임 중단
@@ -470,7 +470,7 @@ constructor() {
 	}
 	this.setScore = function(player, msg){				// !score n 				|	점수 변경 명령어(onlyadmin)
 		if(AMN.getAdminstats(player)){
-			if(!GM.gamestats){
+			if(!GM.gameStats){
 				if((msg.substr(6)) >= 0){
 					if((msg.substr(6)) < 15){
 						room.setScoreLimit(msg.substr(6));
@@ -486,7 +486,7 @@ constructor() {
 	}
 	this.setTime = function(player, msg){				// !time n					|	시간 변경 명령어(onlyadmin)
 		if(AMN.getAdminstats(player)){
-			if(!GM.gamestats){
+			if(!GM.gameStats){
 				if((msg.substr(6)) >= 0){
 					if((msg.substr(6)) < 15){
 						room.setTimeLimit(msg.substr(6));
@@ -538,8 +538,8 @@ constructor() {
 	}
 	this.setAutoReset = function(player){				// !r						|	게임 자동 시작/종료
 		if(AMN.getAdminstats(player)){
-			if(!GM.gamestats) room.startGame();
-			else if(GM.gamestats == 2) room.stopGame();
+			if(!GM.gameStats) room.startGame();
+			else if(GM.gameStats == 2) room.stopGame();
 		}
 		else return NC.acess(player);
 		return false;  // 명령어 흔적을 남기지 않음
