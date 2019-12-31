@@ -959,7 +959,7 @@ constructor(){
 	this.sendWhisperChat = function(toPlayer, fromPlayer, msg){		//							귓속말 채팅
 		let slid = PS.cntPlayers >= 10 ? SYS.setLine(PS.getLocalId(fromPlayer), 2) : PS.getLocalId(fromPlayer);
 		let spid = PS.cntPlayers >= 10 ? SYS.setLine(fromPlayer, 2) : fromPlayer;
-		let dlid = PS.cntPlayers >= 10 ? SYS.setLine(PS.getLocalId(tolayer), 2) : PS.getLocalId(toPlayer);
+		let dlid = PS.cntPlayers >= 10 ? SYS.setLine(PS.getLocalId(toPlayer), 2) : PS.getLocalId(toPlayer);
 		let dpid = PS.cntPlayers >= 10 ? SYS.setLine(toPlayer, 2) : toPlayer;
 		// 욕설 필터링
 		if(!PS.getLocalId(toPlayer)) return false;
