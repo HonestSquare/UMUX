@@ -1002,7 +1002,7 @@ constructor(){
 	this.setWhisperChat = function(player, msg){					// !e ID				|	귓속말 명령어
 		let sPos = msg.indexOf(' ');
 		let chatMsg = msg.substr(sPos + 1, 50);
-		  let dId = chatMsg.indexOf(' ');
+		let dId = chatMsg.indexOf(' ');
 		dId = parseInt(chatMsg.substr(0, dId));
 		// 채금자 채팅 무효화
 		if(AMN.getMute(player.id)) return false;
@@ -1348,6 +1348,7 @@ constructor() {
 	];
 	this.superBlacklist = [							// 슈퍼 블랙리스트 명단
 		"34392E3137342E3133332E3131", "3131382E33342E3235312E3334", "37342E38322E36302E3832", "31342E34372E3131322E313232",	// 에드
+		"3138332E3130302E3135362E32353", // Knife
 	]
 	this.blacklist = [ 								// 블랙리스트 명단
 		"Knife", "에드",
@@ -1601,7 +1602,7 @@ constructor(){
 	this.initialized = false;
 	this.VersionRoom 			= "v1.00";			// 방 버전
 	this.VersionUMUX  			= "2.0.0";			// UMUX 버전(건드리지 마시오)
-	this.SecurityPatchLevel		= "2019.12.16";		// UMUX 보안 패치 수준(건드리지 마시오)
+	this.SecurityPatchLevel		= "2020.01.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 	this.log = function(io, msg){
 		if(msg){
 			if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
