@@ -162,7 +162,7 @@ ROOM.setCustomStadium(maps[0]);
 ROOM.setScoreLimit(0);
 ROOM.setTimeLimit(0);
 
-const DEV = true;					// 개발 버전 설정
+const DEV = false;					// 개발 버전 설정
 var date = new Date();
 //-----------------------------------------------------------------------
 // 게임 매니저 클래스
