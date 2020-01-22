@@ -539,7 +539,7 @@ class Administration{
 			if(AMN.getAdminstats(player.id)){
 				if(GM.gameStats != 2){
 					if((time >= 0)&&(time < 15)){ 									// 범위 내에서 벗어나면 종료 처리
-						room.setScoreLimit(time);
+						room.setTimeLimit(time);
 						NC.announce(NC.notice() + "제한 시간이 " + time + "분으로 변경되었습니다.", null, "yellow", 4, 1);
 						SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 제한 시간을 " + time + "점으로 변경함.");
 					}
