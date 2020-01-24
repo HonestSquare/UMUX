@@ -148,7 +148,7 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF4HMY0s50X5aJtgfw.nKUN3JojwnM";
+const TOKEN = "thr1.AAAAAF4qbQ4oS4724TGzhQ.77bar7pK_CY";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
@@ -554,30 +554,6 @@ class Administration{
 				}
 			}
 			else NC.acess(player);
-			return false;
-		}
-		this.setMapLock = function(player){					// !lock_map				|	맵 고정
-			if(AMN.getAdminstats(player)){
-				if(!AMN.mapLock[1]){ 
-					AMN.mapLock[1] = true;
-					for(let i = 1; i <= PS.cntPlayers; i++){
-						if(PS.members[PS.getPublicId(i)].admin)
-							NC.announce(NC.locked() + "맵을 잠궜습니다." + CM.recommendCom("해제 ", "!lock_map"), PS.getPublicId(i), "yellow", 5, 1);
-						else 
-							NC.announce(NC.locked() + "맵이 잠겼습니다.", PS.getPublicId(i), "yellow", 5, 1);
-					}
-					SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 맵을 고정함.");
-				}
-				else{
-					AMN.mapLock[1] = false;
-					for(let i = 1; i <= PS.cntPlayers; i++){
-						if(PS.members[PS.getPublicId(i)].admin)
-							NC.announce(NC.unlocked() + "맵을 풀었습니다." + CM.recommendCom("잠금 ", "!lock_map"), PS.getPublicId(i), "yellow", 5, 1);
-					}
-					SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 맵 고정을 해제함.");
-				}
-			}
-			else return NC.acess(player);
 			return false;
 		}
 		this.setMute = function(mutedPlayer, byPlayer){		//							|	채팅 금지
@@ -1348,9 +1324,12 @@ constructor() {
 	];
 	this.superBlacklist = [							// 슈퍼 블랙리스트 명단
 		// 에드, 핑폭테러단
-		"34392E3137342E3133332E3131", "3131382E33342E3235312E3334", "37342E38322E36302E3832",	// 에드
+		"34392E3137342E3133332E3131", "3131382E33342E3235312E3334", "37342E38322E36302E3832", 
+		"36352E34392E3132362E3839", "3132352E3138372E3133352E3239",
 		"31342E34372E3131322E313232", "3232312E3136352E3136332E313530",
-		"3138332E3130302E3135362E32353",	// Knife
+		"3138332E3130302E3135362E32353", "3138332E3130302E3135362E323532",	// Knife
+		// 플레이보이카티, Aaron Wan-Bissaka
+		"34392E3137322E32362E323130", "3138302E3138322E3137392E313733",
 		// Marz 
 		"3138302E37312E3135322E3438",
 		// 호박, 카푸
@@ -1359,10 +1338,18 @@ constructor() {
 		// 강퇴하면핑폭, 랄랄랄
 		"3132342E35392E37332E313931",
 		// james
-		"3130362E3138362E3233332E313333"
+		"3130362E3138362E3233332E313333",
+		// 어드안주면핑터짐(노진구), 어드 안주면 핑폭함 ㅅㄱ, 핑폭테러단 인원 모집
+		"3138322E3232342E33312E3330", "3130342E3133312E3137362E323334", "3137382E36322E352E313537", "3137382E3132382E38392E313530",
+		// 제몸무게가 220kg인데 정상인가요
+		"3130342E3233362E3231332E323330",
+		// 와이어샤크
+		"33392E3132302E3139362E3732"
 	]
 	this.blacklist = [ 								// 블랙리스트 명단
-		"Knife", "에드",
+		"에드", "핑폭테러단", "Knife", "플레이보이카티", "Aaron Wan-Bissaka", "Marz", "호박", "카푸",
+		"강퇴하면핑폭", "랄랄랄", "james", "어드안주면핑터짐", "노진구", "어드 안주면 핑폭함 ㅅㄱ", "핑폭테러단 인원 모집",
+		"제몸무게가 220kg인데 정상인가요", "와이어샤크"
 	];
 	this.cntPlayers		 	= 0;					// 플레이어 인원 체크
 	this.members 			= new Array();			// 플레이어 정보 데이터
@@ -1613,7 +1600,7 @@ constructor(){
 	this.initialized = false;
 	this.VersionRoom 			= "v1.00";			// 방 버전
 	this.VersionUMUX  			= "2.0.0";			// UMUX 버전(건드리지 마시오)
-	this.SecurityPatchLevel		= "2020.01.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+	this.SecurityPatchLevel		= "2020.02.01_hotfix";		// UMUX 보안 패치 수준(건드리지 마시오)
 	this.log = function(io, msg){
 		if(msg){
 			if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -1766,4 +1753,4 @@ room.onGameStop = function(){ return GM.onGameStop(); }
 // 게임 중단
 room.onGamePause = function(byPlayer){ return GM.onGamePause(byPlayer);}			
 // 게임 재개
-room.onGameUnpause 	= function(byPlayer){ return GM.onGameUnpause(byPlayer); }	
+room.onGameUnpause = function(byPlayer){ return GM.onGameUnpause(byPlayer); }	
