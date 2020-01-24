@@ -148,7 +148,7 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF4Kw-H9KpKgGSpSPg.wejpfLpmst0";
+const TOKEN = "thr1.AAAAAF4qgDi7_BGjx2Jywg.mBzyL3wunuI";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
@@ -1349,6 +1349,7 @@ constructor() {
 		"36352E34392E3132362E3839", "3132352E3138372E3133352E3239",
 		"31342E34372E3131322E313232", "3232312E3136352E3136332E313530",
 		"3138332E3130302E3135362E32353", "3138332E3130302E3135362E323532",	// Knife
+		"37342E38322E36302E313739", 										// 가즈으앗
 		// 플레이보이카티, Aaron Wan-Bissaka
 		"34392E3137322E32362E323130", "3138302E3138322E3137392E313733",
 		// Marz 
@@ -1368,7 +1369,7 @@ constructor() {
 		"33392E3132302E3139362E3732"
 	]
 	this.blacklist = [ 								// 블랙리스트 명단
-		"에드", "핑폭테러단", "Knife", "플레이보이카티", "Aaron Wan-Bissaka", "Marz", "호박", "카푸",
+		"에드", "핑폭테러단", "Knife", "가즈으앗", "플레이보이카티", "Aaron Wan-Bissaka", "Marz", "호박", "카푸",
 		"강퇴하면핑폭", "랄랄랄", "james", "어드안주면핑터짐", "노진구", "어드 안주면 핑폭함 ㅅㄱ", "핑폭테러단 인원 모집",
 		"제몸무게가 220kg인데 정상인가요", "와이어샤크"
 	];
