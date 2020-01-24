@@ -148,7 +148,7 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF4qgDi7_BGjx2Jywg.mBzyL3wunuI";
+const TOKEN = "thr1.AAAAAF4qjSV_CqmQ8cTPHw.A5ETy2X-zZw";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
@@ -1346,7 +1346,7 @@ constructor() {
 	this.superBlacklist = [							// 슈퍼 블랙리스트 명단
 		// 에드, 핑폭테러단
 		"34392E3137342E3133332E3131", "3131382E33342E3235312E3334", "37342E38322E36302E3832", 
-		"36352E34392E3132362E3839", "3132352E3138372E3133352E3239",
+		"36352E34392E3132362E3839", "3132352E3138372E3133352E3239", "37322E35322E38372E3737",
 		"31342E34372E3131322E313232", "3232312E3136352E3136332E313530",
 		"3138332E3130302E3135362E32353", "3138332E3130302E3135362E323532",	// Knife
 		"37342E38322E36302E313739", 										// 가즈으앗
