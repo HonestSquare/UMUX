@@ -2,7 +2,7 @@
 name: Bug report
 about: 버그 제보 양식입니다.
 title: BUG
-labels: 'Bug'
+labels: bug
 assignees: HonestSquare
 
 ---
