@@ -1,9 +1,10 @@
 ![](https://cafeptthumb-phinf.pstatic.net/MjAxOTA5MjFfOSAg/MDAxNTY5MDc1ODk0Mjc3._sMLIst6XK7XoZo-cxRl9zTt83-lCIELbtToC2K6uCIg.dE79B7SXAA6lvrfPUwvhosY1Ibawsl_kaKymLvwibXsg.PNG/UMUX_BANNER.png?type=w740)
 
-WARNING: NEVER EDIT IT FOR OTHERS THAN KOREAN LANGUAGE.
+**WARNING: NEVER EDIT IT FOR OTHERS THAN KOREAN LANGUAGE.**
+
 # UMUX란?
 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로,
-사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
+사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 **사용자 경험(UX)**입니다.
 
 ## 누구나 마음대로 쓸 수 있나요?
 예, 아래와 같은 항목들을 준수한다면 누구나 [자유롭게 수정이](https://github.com/HonestSquare/UMUX/tree/master/2.0%20BUSAN) 가능합니다.
