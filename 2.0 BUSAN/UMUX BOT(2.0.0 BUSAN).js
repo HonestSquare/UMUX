@@ -148,14 +148,14 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF4qjQUJgyDQxLqC_g.gMqLYCptTik";
+const TOKEN = "thr1.AAAAAF5xnmtNE9X13l7W8Q.ifaS5bV2ByE";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
 //=============================================================================
 const ROOM = HBInit({ 
 	roomName: ROOMNAME, maxPlayers: MAXPLAYERS, playerName : PLAYERNAME, public : PUBLIC, token : TOKEN,		
-	geo: { code: "kr", lat: 37.566667, lon: 126.978406},					// 지역, 위도, 경도(대한민국 서울을 기준으로 기본값을 설정해 두었음)
+	geo: { code: "kr", lat: 37.566667 + (Math.floor(Math.random() * 2000) - 1000) * 0.001, lon: 126.978406 + (Math.floor(Math.random() * 2000) - 1000) * 0.001},	// 지역, 위도, 경도(대한민국 서울을 기준으로 기본값을 설정해 두었음)
 	noPlayer : NOPLAYER										
 });
 ROOM.setCustomStadium(maps[0]);
@@ -1329,17 +1329,16 @@ constructor() {
 		"31342E34372E3131322E313232", "3232312E3136352E3136332E313530", "3138322E3232342E33312E313136",
 		"3138332E3130302E3135362E32353", "3138332E3130302E3135362E323532",	// Knife(웨인 루니)
 		"37342E38322E36302E313739", 										// 가즈으앗
+
+		// Bone Collecter, GRF SWORD
+		"31342E342E3134342E313138", "31342E342E3134342E313138",
 		// 플레이보이카티, Aaron Wan-Bissaka
 		"34392E3137322E32362E323130", "3138302E3138322E3137392E313733",
-		// Marz, GANG
-		"3138302E37312E3135322E3438",
 		// 호박, 카푸
 		"312E3233352E3136332E3730",		
 		"3130342E3133312E36362E38",
 		// 강퇴하면핑폭, 랄랄랄
 		"3132342E35392E37332E313931",
-		// james
-		"3130362E3138362E3233332E313333",
 		// 어드안주면핑터짐(노진구), 씨발, 어드 안주면 핑폭함 ㅅㄱ, 핑폭테러단 인원 모집
 		"3138322E3232342E33312E3330", "3130342E3133312E3137362E323334", "3137382E36322E352E313537", "3137382E3132382E38392E313530",
 		// 제몸무게가 220kg인데 정상인가요
@@ -1347,12 +1346,16 @@ constructor() {
 		// 와이어샤크
 		"33392E3132302E3139362E3732",
 		// 핑폭각?(Ready)
-		"3138332E39372E3138302E313534", "3138332E39372E3138302E313334", "3132312E3137352E3134372E313236"
+		"3138332E39372E3138302E313534", "3138332E39372E3138302E313334", "3132312E3137352E3134372E313236",
+		// 서든
+		"31342E34372E3131322E313330",
+		// 명인만두 서울대점
+		"36312E37352E38332E3732",
 	]
 	this.blacklist = [ 								// 블랙리스트 명단
-		"에드", "핑폭테러단", "Walker", "페르난지뉴", "앙헬리노", "Knife", "웨인루니", "가즈으앗", "플레이보이카티", "Aaron Wan-Bissaka", "Marz", "호박", "카푸",
+		"에드", "핑폭테러단", "Walker", "페르난지뉴", "앙헬리노", "Knife", "웨인루니", "가즈으앗", "플레이보이카티", "Aaron Wan-Bissaka", "호박", "카푸",
 		"강퇴하면핑폭", "랄랄랄", "james", "어드안주면핑터짐", "노진구", "어드 안주면 핑폭함 ㅅㄱ", "핑폭테러단 인원 모집",
-		"제몸무게가 220kg인데 정상인가요", "와이어샤크", "핑폭각?", "Ready"
+		"제몸무게가 220kg인데 정상인가요", "와이어샤크", "핑폭각?", "Ready", "Bone Collecter", "GRF SWORD", "서든", "명인만두 서울대점"
 	];
 	this.cntPlayers		 	= 0;					// 플레이어 인원 체크
 	this.members 			= new Array();			// 플레이어 정보 데이터
@@ -1412,7 +1415,7 @@ constructor() {
 		return PS.network[searchId];
 	}
 	this.setAvatar = function(player, msg){					// 등번호 설정
-		if(msg.substr(1 ,6) == "avatar") 
+		if(msg.substr(1, 6) == "avatar") 
 			room.setPlayerAvatar(player.id, msg.substr(8, 10));
 		else room.setPlayerAvatar(player.id, msg.substr(5, 10));
 		NC.announce(NC.notice() + "등번호가 변경되었습니다.", player.id, "green", 4, 3);
@@ -1603,7 +1606,7 @@ constructor(){
 	this.initialized = false;
 	this.VersionRoom 			= "v1.00";			// 방 버전
 	this.VersionUMUX  			= "2.0.0";			// UMUX 버전(건드리지 마시오)
-	this.SecurityPatchLevel		= "2020.02.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+	this.SecurityPatchLevel		= "2020.03.15c";		// UMUX 보안 패치 수준(건드리지 마시오)
 	this.log = function(io, msg){
 		if(msg){
 			if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
