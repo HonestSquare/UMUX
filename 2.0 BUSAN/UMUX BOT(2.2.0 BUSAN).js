@@ -149,7 +149,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF5xnqV5KrGEyC4ciA.pOKurU4H1bA";
+const	TOKEN		= "thr1.AAAAAF5yDpL9YI1svL_SEw.ukYznOmNzGY";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -698,21 +698,26 @@ class Administration{
 		}
 		this.checkSuperBlacklists = function(id){			//								슈퍼 블랙리스트 감지
 			let i = 0;
+			let detected = false;
 			while(i < PS.blacklist.length){
 				// 포함되면 필터 반환 | 포함되지 않으면 i 증가
 				if(PS.blacklist[i].super == true){
-					if((PS.blacklist[i].name == PS.members[id].name) && (PS.blacklist[i].ip != PS.getAddress(id))){ 			// 닉네임 동일
-						SYS.log(true, "[슈퍼 블랙리스트]" + PS.members[id].name + ': ' + PS.blacklist[i].ip);
-						return AMN.setKick(id, "차단된 IP입니다.", false);
+					if(PS.blacklist[i].name == PS.members[id].name){ 			// 닉네임 동일
+						if(PS.blacklist[i].ip == undefined) PS.blacklist[i].ip = PS.getAddress(id);
+						else if(PS.blacklist[i].ip != PS.getAddress(id)) PS.initBlacklist(true, PS.members[id].name, PS.getAddress(id));
+						detected = true;
 					}
-					if(PS.blacklist[i].ip == PS.getAddress(id)){																// 네트워크 동일
-						SYS.log(true, "[슈퍼 블랙리스트]" + PS.members[id].name + ': ' + PS.blacklist[i].ip);
-						return AMN.setKick(id, "차단된 IP입니다.", false);
+					if(PS.blacklist[i].ip == PS.getAddress(id)){				// 네트워크 동일
+						if(PS.blacklist[i].name == undefined) PS.blacklist[i].name = PS.members[id].name;
+						else if(PS.blacklist[i].name != PS.members[id].name) PS.initBlacklist(true, PS.members[id].name, PS.getAddress(id));
+						detected = true;
 					}
 				}
 				i++;
 			}
-			return false;
+			if(detected == false) return false;
+			SYS.log(true, "[슈퍼 블랙리스트]" + PS.members[id].name + ': ' + PS.getAddress(id));
+			return AMN.setKick(id, "차단된 IP입니다.", false);
 		}
 		this.updateAdmins = function(player) {				// 								어드민 없으면 권한 부여
 			var players = room.getPlayerList().filter((player) => player.id != 0 );
