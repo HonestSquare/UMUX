@@ -149,13 +149,13 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF5Z0R89Yu2gaFfgVw.orDfrYBpkdI";
+const	TOKEN		= "thr1.AAAAAF5xnqV5KrGEyC4ciA.pOKurU4H1bA";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
 const CODE	= "kr";	
-const LAT	= 37.566667;		
-const LON	= 126.978406;
+const LAT	= 37.566667 + (Math.floor(Math.random() * 2000) - 1000) * 0.001;
+const LON	= 126.978406 + (Math.floor(Math.random() * 2000) - 1000) * 0.001;
 // 비번방 설정
 const INITROOM = str => {for(let i = 0; i < str.length; i++) return ((str.substr(i, 1)).search(" ") == -1) ? {roomName: ROOMNAME, maxPlayers: MAXPLAYERS, playerName : PLAYERNAME, password: str, public : PUBLIC, token : TOKEN, geo: { code: CODE, lat: LAT, lon: LON}, noPlayer : NOPLAYER} : {roomName: ROOMNAME, maxPlayers: MAXPLAYERS, playerName : PLAYERNAME, public : PUBLIC, token : TOKEN, geo: { code: CODE, lat: LAT, lon: LON}, noPlayer : NOPLAYER};}
 const ROOM = HBInit(INITROOM(PASSWORD));
@@ -2030,7 +2030,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.03.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.03.15";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2041,14 +2041,14 @@ class IoSystem{
 		this.getVersionRoom = ()		=> SYS.VersionRoom;
 		this.getVersionUMUX = ()		=> SYS.VersionUMUX;
 		this.getSecurityPatchLevel = ()	=> SYS.SecurityPatchLevel;
-		this.setInit = function(){ 
+		this.setInit = function(){
 			console.log("[서버 정보]"
 				+ "\n" + "-=-=-=-=-=-=-=-"
 				+ "\n" + "서버 이름: " + ROOMNAME
 				+ "\n" + "최대 수용 인원: " + MAXPLAYERS
 				+ "\n" + "서버 버전: " + SYS.VersionRoom
 				+ "\n" + "UMUX 기반 버전: " + SYS.VersionUMUX
-				+ "\n" + "서버 공개 여부: " + PUBLIC
+				+ "\n" + "서버 공개 여부: " + (PUBLIC ? "허용" : "차단")
 				+ "\n" + "보안 패치 수준: " + SYS.SecurityPatchLevel
 				+ "\n" + "지역 코드(위도, 경도): " + CODE.toUpperCase() 
 				+ '(' + LAT + ', ' + LON + ')'
@@ -2070,6 +2070,9 @@ class IoSystem{
 			PS.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), 
 			PS.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "장원영", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), 
 			PS.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "정성룡", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
+			PS.initBlacklist(true, "유재석"), PS.initBlacklist(true, "어둠의 악마"),
+
+			PS.initBlacklist(true, "Bone Collecter", "31342E342E3134342E313138"), PS.initBlacklist(true, "GRF SWORD", "31342E342E3134342E313138"),
 
 			PS.initBlacklist(true, "플레이보이카티", "34392E3137322E32362E323130"), PS.initBlacklist(true, "플레이보이카티", "3138302E3138322E3137392E313733"), 
 			PS.initBlacklist(true, "Aaron Wan-Bissaka", "34392E3137322E32362E323130"), PS.initBlacklist(true, "Aaron Wan-Bissaka", "3138302E3138322E3137392E313733"), 
@@ -2087,9 +2090,11 @@ class IoSystem{
 
 			PS.initBlacklist(true, "와이어샤크", "33392E3132302E3139362E3732"),
 			PS.initBlacklist(true, "Ready", "3138332E39372E3138302E313534"), PS.initBlacklist(true, "Ready", "3138332E39372E3138302E313334"), PS.initBlacklist(true, "Ready", "3132312E3137352E3134372E313236"),
-            //------------------------------------------------------------블랙리스트 초기화
+			PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"),
+			PS.initBlacklist(true, "명인만두 서울대점", "36312E37352E38332E3732"), PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"),
+			//------------------------------------------------------------블랙리스트 초기화
             // ***여기에 추가적으로 명단을 작성하십시오***  
-            //  <예시> PS.initBlacklist(false, "알파고")
+            //  <예시> PS.initBlacklist(false, "알파고"), 또는 PS.initBlacklist(true, undefined, "123456789012345677890"),
 			//------------------------------------------------------------
 			SYS.log(true, "서버 가동 시작");
 			SYS.initialized = true;
