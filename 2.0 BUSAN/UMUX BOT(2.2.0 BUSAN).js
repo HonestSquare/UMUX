@@ -149,7 +149,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF5yDpL9YI1svL_SEw.ukYznOmNzGY";
+const	TOKEN		= "thr1.AAAAAF5yHZX8owtXuIUydQ.xRJtITbNFAY";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -684,13 +684,14 @@ class Administration{
 		this.checkBlacklists = function(index){				//								블랙리스트 감지
 			let indexName = PS.members[index].name;
 			if(CS.getSpace(indexName)) return false;								// 공백 닉네임 처리
-			var sChar = /[\{\}\[\]\/?.,;:|\)*~`!^\-+<>@\#$%&\\\=\(\'\"]/gi;			// 특수문자 처리
+			var sChar = /[\{\}\[\]\/?.,;:⊙▣◈◎|\)*~`!^\-+<>@\#$%&\\\=\(\'\"]/gi;			// 특수문자 처리
 			let i = 0;
 			if(sChar.test(indexName)) indexName = indexName.replace(sChar, "특문");
 			while(i < PS.blacklist.length){
-				// 포함되면 필터 반환 | 포함되지 않으면 i 증가
-				if(PS.blacklist[i].name.search(indexName) != -1){ 		// 주소 데이터가 없으면 등록 처리
-					return !PS.blacklist[i].ip ? PS.initBlacklist(false, indexName, PS.getAddress(index)) : true;
+				// 주소 데이터가 없으면 등록 처리
+				if(PS.blacklist[i].super == false){
+					let searchName = PS.blacklist[i].name;
+					if(searchName.search(indexName) != -1) return PS.blacklist[i].ip ? true : (PS.blacklist[i].ip = PS.getAddress(index));
 				}
 				i++;
 			}
@@ -703,17 +704,25 @@ class Administration{
 				// 포함되면 필터 반환 | 포함되지 않으면 i 증가
 				if(PS.blacklist[i].super == true){
 					if(PS.blacklist[i].name == PS.members[id].name){ 			// 닉네임 동일
-						if(PS.blacklist[i].ip == undefined) PS.blacklist[i].ip = PS.getAddress(id);
+						if(PS.blacklist[i].ip == undefined) PS.blacklist[i].ip = PS.getAddress(id);			// 주소 데이터가 없으면 등록 처리
 						else if(PS.blacklist[i].ip != PS.getAddress(id)) PS.initBlacklist(true, PS.members[id].name, PS.getAddress(id));
-						detected = true;
+						else return false;
+						detected = true; break;
 					}
 					if(PS.blacklist[i].ip == PS.getAddress(id)){				// 네트워크 동일
-						if(PS.blacklist[i].name == undefined) PS.blacklist[i].name = PS.members[id].name;
+						if(PS.blacklist[i].name == undefined) PS.blacklist[i].name = PS.members[id].name;	// 이름 데이터가 없으면 등록 처리
 						else if(PS.blacklist[i].name != PS.members[id].name) PS.initBlacklist(true, PS.members[id].name, PS.getAddress(id));
-						detected = true;
+						else return false;
+						detected = true; break;
 					}
 				}
 				i++;
+			}
+			for(let i = 0; i < PS.blacklist.length; i++){
+				for(let j = 0; j < PS.blacklist.length; j++){
+					if((PS.blacklist[i].super == true)&&(i != j))
+						if((PS.blacklist[i].name == PS.blacklist[j].name)&&(PS.blacklist[i].ip == PS.blacklist[j].ip)) PS.blacklist.splice(j, 1);
+				}
 			}
 			if(detected == false) return false;
 			SYS.log(true, "[슈퍼 블랙리스트]" + PS.members[id].name + ': ' + PS.getAddress(id));
