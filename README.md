@@ -33,7 +33,7 @@
 
 ## 원저작자 및 문의 안내
 - 제작: 정직한네모형
-- 문의 메일: djdft1456@gmail.com
+- 문의 메일: tjdals1413@naver.com
 - 활동 사이트: 
 [UM스토리지](https://haxballusemapstorage.wixsite.com/haxball), 
 [UM카페](https://cafe.naver.com/usemapmakerno1),
