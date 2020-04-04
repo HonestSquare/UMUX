@@ -149,13 +149,13 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF5yHZX8owtXuIUydQ.xRJtITbNFAY";
+const	TOKEN		=  "thr1.AAAAAF6IBQs5zINbd09cOQ.7zwSXJCiya0";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
 const CODE	= "kr";	
-const LAT	= 37.566667 + (Math.floor(Math.random() * 2000) - 1000) * 0.001;
-const LON	= 126.978406 + (Math.floor(Math.random() * 2000) - 1000) * 0.001;
+const LAT	= 37.566667 + (Math.floor(Math.random() * 4000) - 2000) * 0.001;
+const LON	= 126.978406 + (Math.floor(Math.random() * 4000) - 2000) * 0.001;
 // 비번방 설정
 const INITROOM = str => {for(let i = 0; i < str.length; i++) return ((str.substr(i, 1)).search(" ") == -1) ? {roomName: ROOMNAME, maxPlayers: MAXPLAYERS, playerName : PLAYERNAME, password: str, public : PUBLIC, token : TOKEN, geo: { code: CODE, lat: LAT, lon: LON}, noPlayer : NOPLAYER} : {roomName: ROOMNAME, maxPlayers: MAXPLAYERS, playerName : PLAYERNAME, public : PUBLIC, token : TOKEN, geo: { code: CODE, lat: LAT, lon: LON}, noPlayer : NOPLAYER};}
 const ROOM = HBInit(INITROOM(PASSWORD));
@@ -2044,7 +2044,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.03.15";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.04.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2064,8 +2064,8 @@ class IoSystem{
 				+ "\n" + "UMUX 기반 버전: " + SYS.VersionUMUX
 				+ "\n" + "서버 공개 여부: " + (PUBLIC ? "허용" : "차단")
 				+ "\n" + "보안 패치 수준: " + SYS.SecurityPatchLevel
-				+ "\n" + "지역 코드(위도, 경도): " + CODE.toUpperCase() 
-				+ '(' + LAT + ', ' + LON + ')'
+				+ "\n" + "지역 코드: " + CODE.toUpperCase() 
+				+ "\n"  + "상세 위치(바로가기): " + LAT + ', ' + LON + '(' + "https://www.google.com/maps/place/" + ((LAT + "%20" + LON).toString()) + ')'
 				+ "\n" + "-=-=-=-=-=-=-=-");
 			if(DEV == true){ 
 				let tempPass = prompt("보안을 위해 비밀번호를 입력해야 합니다. 아래에 기입하십시오.");
@@ -2083,13 +2083,10 @@ class IoSystem{
 			PS.initBlacklist(true, "에드", "37342E38322E36302E313739"), 
 			PS.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), 
 			PS.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "장원영", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), 
-			PS.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "정성룡", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
-			PS.initBlacklist(true, "유재석"), PS.initBlacklist(true, "어둠의 악마"),
+			PS.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
+			PS.initBlacklist(true, "유재석"), PS.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
 
 			PS.initBlacklist(true, "Bone Collecter", "31342E342E3134342E313138"), PS.initBlacklist(true, "GRF SWORD", "31342E342E3134342E313138"),
-
-			PS.initBlacklist(true, "플레이보이카티", "34392E3137322E32362E323130"), PS.initBlacklist(true, "플레이보이카티", "3138302E3138322E3137392E313733"), 
-			PS.initBlacklist(true, "Aaron Wan-Bissaka", "34392E3137322E32362E323130"), PS.initBlacklist(true, "Aaron Wan-Bissaka", "3138302E3138322E3137392E313733"), 
 			
 			PS.initBlacklist(true, "카푸", "312E3233352E3136332E3730"), PS.initBlacklist(true, "카푸", "3130342E3133312E36362E38"),
 			PS.initBlacklist(true, "호박", "312E3233352E3136332E3730"), PS.initBlacklist(true, "호박", "3130342E3133312E36362E38"),
@@ -2104,11 +2101,17 @@ class IoSystem{
 
 			PS.initBlacklist(true, "와이어샤크", "33392E3132302E3139362E3732"),
 			PS.initBlacklist(true, "Ready", "3138332E39372E3138302E313534"), PS.initBlacklist(true, "Ready", "3138332E39372E3138302E313334"), PS.initBlacklist(true, "Ready", "3132312E3137352E3134372E313236"),
-			PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"),
-			PS.initBlacklist(true, "명인만두 서울대점", "36312E37352E38332E3732"), PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"),
+
+			PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"), PS.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), 
+			PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
+
+			PS.initBlacklist(true, "명인만두 서울대점", "36312E37352E38332E3732"), 
+			PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"),
+			PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
+			PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"),
 			//------------------------------------------------------------블랙리스트 초기화
             // ***여기에 추가적으로 명단을 작성하십시오***  
-            //  <예시> PS.initBlacklist(false, "알파고"), 또는 PS.initBlacklist(true, undefined, "123456789012345677890"),
+            //  <예시> PS.initBlacklist(false, "알파고"), 또는 PS.initBlacklist(true, undefined, "12345678901234567890"),
 			//------------------------------------------------------------
 			SYS.log(true, "서버 가동 시작");
 			SYS.initialized = true;
