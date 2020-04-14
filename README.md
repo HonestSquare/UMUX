@@ -24,17 +24,10 @@
 
 ## 버전 및 업데이트 내역
 현재 최신 버전은 2.2.0 Busan입니다.
-[(자세히 보기)](https://github.com/HonestSquare/UMUX/wiki/UMUX-Updates-&-Versions)
+[(자세히 보기)](https://github.com/HonestSquare/UMUX/wiki/UMUX-News)
 
 ### UMUX Beta Program
 남들보다 빠르게 신버전을 체험해 보세요!
 단 본 프로그램 참여에 앞서 일부 조건이 따릅니다.
 자세한 내용은 [여기를 참고하세요.](https://github.com/HonestSquare/UMUX/wiki/UMUX-Beta-Program)
-
-## 원저작자 및 문의 안내
-- 제작: 정직한네모형
-- 문의 메일: tjdals1413@naver.com
-- 활동 사이트: 
-[UM스토리지](https://haxballusemapstorage.wixsite.com/haxball), 
-[UM카페](https://cafe.naver.com/usemapmakerno1),
-[UM채널](https://www.youtube.com/channel/UC0wGoPrwTGd5jTgayjfmeFA?view_as=subscriber)
+wwwwwDDDDDDDD
