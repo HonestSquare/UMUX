@@ -1,3 +1,4 @@
+// API LEVEL(VERSION): 7(2.1.0 r9)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -148,7 +149,7 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF6IBQCRcPRwldXygg.1me-8ie7Oy4";
+const TOKEN = "thr1.AAAAAF6Wz_nXj0sDy6QVwA.yTzL7-0SgfI";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
@@ -716,7 +717,7 @@ class Administration{
 				return (AMN.filterPlayer(player) == false) ? AMN.setAdmin(player.id) : AMN.setSubAdmin(player.id);
 		}
 		this.updatePassword = function(pass){				// 								비번 갱신
-			AMN.password = pass;
+			AMN.password = pass == " " ? null : pass;
 			return room.setPassword(AMN.password);
 		}
 		this.releaseMute = function(player){				// !unmute					|	채팅 허용(onlyadmin)
@@ -1506,16 +1507,23 @@ class Player{
 			// 핑폭각?(Ready)
 			"3138332E39372E3138302E313534", "3138332E39372E3138302E313334", "3132312E3137352E3134372E313236",
 
+			"3132352E3137362E342E313335", "3137352E3231342E392E3834", "312E3234362E3139312E323134",
+
 			// 서든, Preber, 프레버
 			"31342E34372E3131322E313330", "31342E34372E3131322E313330", "37322E35322E38372E3937", "36352E34392E3132362E3931", "37322E35322E38372E3937",
 
 			// 명인만두 서울대점
 			"36312E37352E38332E3732",
+			// 쥐알티
+			"312E3234362E3139312E323134",
+			// 겐류사이 육두봉
+			"3132312E3135332E3137302E323131",
 		]
 		this.blacklist = [ 								// 블랙리스트 명단
 			"에드", "핑폭테러단", "Walker", "페르난지뉴", "앙헬리노", "Knife", "웨인루니", "가즈으앗", "플레이보이카티", "Aaron Wan-Bissaka", "호박", "카푸",
 			"강퇴하면핑폭", "랄랄랄", "james", "어드안주면핑터짐", "노진구", "어드 안주면 핑폭함 ㅅㄱ", "핑폭테러단 인원 모집", "제몸무게가 220kg인데 정상인가요", 
 			"와이어샤크", "핑폭각?", "Ready", "Bone Collecter", "GRF SWORD", "서든", "Preber", "프레버", "명인만두 서울대점",
+			"쥐알티", "겐류사이 육두봉",
 		];
 		this.cntPlayers		 	= 0;					// 플레이어 인원 체크
 		this.members 			= new Array();			// 플레이어 정보 데이터
@@ -1999,7 +2007,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.1.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.04.01c";	// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.04.15c";	// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
