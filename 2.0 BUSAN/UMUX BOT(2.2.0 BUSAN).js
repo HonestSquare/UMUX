@@ -1,3 +1,4 @@
+// API LEVEL(VERSION): 8(2.2.0 r4)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +150,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		=  "thr1.AAAAAF6IBQs5zINbd09cOQ.7zwSXJCiya0";
+const	TOKEN		= "thr1.AAAAAF6Wz97yTO_zACvlig.Bf_yp8UsA6Q";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -213,7 +214,7 @@ class GameManager{
 			SC.initStatus(player.id);				// 전적 초기화
 			SC.initRanking(player.id);				// 랭킹 초기화
 			SC.updateRanking();						// 랭킹 갱신
-			CS.sendMsg("This Room Only Supports Korean Language. :", player.id);		
+			CS.sendMsg("This Room is Supported in Korean Language Only. :", player.id);	
 			NC.devCheck(player);								// 개발자 버전 체크		
 			PS.setAddress(player.id, player.conn);				// 공용 주소 부여
 			PS.setNetwork(player.id, player.auth);				// 공용 네트워크 부여
@@ -346,7 +347,12 @@ class GameManager{
 			GM.link = address;
 			if(!SYS.getInit()) return SYS.setInit();
 			NC.announce(NC.info() + address, null, null, 4, 3);
+			NC.announce(NC.notice() + "서버자동방어 시스템 가동중", null, "pink", 5, 2);
 			SYS.log(true, "서버 복구 완료");
+			SYS.setRequireRecaptcha(true);
+			console.log("DDoS 공격 방지를 위해 reCAPTCHA가 자동으로 활성화되었습니다.");
+			console.log("콘솔 입력창에 아래와 같은 코드를 작성하여 수동으로 해제할 수 있지만, 권장하지 않습니다.");
+			console.log("SYS.setRequireRecaptcha(false);");
 		}
 		this.onKickRateLimitSet = function(						// 킥 제한 설정
 			min, rate, burst, player){
@@ -706,13 +712,11 @@ class Administration{
 					if(PS.blacklist[i].name == PS.members[id].name){ 			// 닉네임 동일
 						if(PS.blacklist[i].ip == undefined) PS.blacklist[i].ip = PS.getAddress(id);			// 주소 데이터가 없으면 등록 처리
 						else if(PS.blacklist[i].ip != PS.getAddress(id)) PS.initBlacklist(true, PS.members[id].name, PS.getAddress(id));
-						else return false;
 						detected = true; break;
 					}
 					if(PS.blacklist[i].ip == PS.getAddress(id)){				// 네트워크 동일
 						if(PS.blacklist[i].name == undefined) PS.blacklist[i].name = PS.members[id].name;	// 이름 데이터가 없으면 등록 처리
 						else if(PS.blacklist[i].name != PS.members[id].name) PS.initBlacklist(true, PS.members[id].name, PS.getAddress(id));
-						else return false;
 						detected = true; break;
 					}
 				}
@@ -739,7 +743,7 @@ class Administration{
 				return (AMN.filterPlayer(player) == false) ? AMN.setAdmin(player.id) : AMN.setSubAdmin(player.id);
 		}
 		this.updatePassword = function(pass){				// 								비번 갱신
-			PASSWORD = pass;
+			PASSWORD = pass == " " ? null : pass;
 			room.setPassword(PASSWORD);
 			return PASSWORD;
 		}
@@ -2044,7 +2048,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.04.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.04.15";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2082,9 +2086,9 @@ class IoSystem{
 			PS.initBlacklist(true, "에드", "3138332E3130302E3135362E32353"), PS.initBlacklist(true, "에드", "3138332E3130302E3135362E323532"), PS.initBlacklist(true, "에드", "3139382E31362E37342E323035"), 
 			PS.initBlacklist(true, "에드", "37342E38322E36302E313739"), 
 			PS.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), 
-			PS.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "장원영", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), 
+			PS.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), 
 			PS.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
-			PS.initBlacklist(true, "유재석"), PS.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
+			PS.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
 
 			PS.initBlacklist(true, "Bone Collecter", "31342E342E3134342E313138"), PS.initBlacklist(true, "GRF SWORD", "31342E342E3134342E313138"),
 			
@@ -2106,15 +2110,21 @@ class IoSystem{
 			PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
 
 			PS.initBlacklist(true, "명인만두 서울대점", "36312E37352E38332E3732"), 
-			PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"),
-			PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
-			PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"),
+			PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"), PS.initBlacklist(true, undefined, "312E3234362E3139312E323134"),
+			PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
+			PS.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
+			PS.initBlacklist(true, "겐류사이 육두봉", "3132312E3135332E3137302E323131"),
 			//------------------------------------------------------------블랙리스트 초기화
             // ***여기에 추가적으로 명단을 작성하십시오***  
             //  <예시> PS.initBlacklist(false, "알파고"), 또는 PS.initBlacklist(true, undefined, "12345678901234567890"),
 			//------------------------------------------------------------
 			SYS.log(true, "서버 가동 시작");
 			SYS.initialized = true;
+		}
+		this.setRequireRecaptcha = function(isActive){							// reCAPTCHA 자동 설정
+			ROOM.setRequireRecaptcha(isActive);
+			SYS.log(true, "reCAPTCHA가 " + ((isActive == true) ? "활성화" : "비활성화") + "됨");
+			(isActive == true) ? NC.announce(NC.locked() + "reCAPTCHA가 설정되었습니다.", null, "pink", 5, 2) : NC.announce(NC.unlocked() + "reCAPTCHA가 해제되었습니다.", null, "pink", 5, 2);
 		}
 		this.setLine = function(amount, line){									// 	자릿수 교정
 			let list = 1;
