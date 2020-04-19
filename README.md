@@ -7,7 +7,7 @@
 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
 
 ## 누구나 마음대로 쓸 수 있나요?
-예, 아래와 같은 항목들을 준수한다면 누구나 [자유롭게 수정이](https://github.com/HonestSquare/UMUX/tree/master/2.0%20BUSAN) 가능합니다.
+예, 아래와 같은 항목들을 준수한다면 누구나 자유롭게 수정이 가능합니다.
 - 원저작자 표기
 - UMUX 버전 표기(예: Based by UMUX 1.0.0)
 > `n.announce(n.info() + '봇방입니다. | 버전: ' + Roomversion + ' (Based by UMUX ' + UXversion + '))`
@@ -21,6 +21,12 @@
 ## 어떤 기능들이 있나요?
 슈퍼 블랙리스트, 귓속말 채팅, 팀 채팅, 보조 권한 시스템 등 실용적인 기능들을 담아냈습니다.
 그 외에 각 상황별에 적합한 [가이드라인도 제공](https://github.com/HonestSquare/UMUX/wiki/UMUX-User-Guidelines)합니다.
+
+## 소스 파일은 어디서 구할 수 있나요?
+[여기에 오픈 소스를 제공](https://github.com/HonestSquare/UMUX/tree/master/2.0%20BUSAN)하고 있습니다.
+
+## 서버는 어떻게 가동하나요?
+[여기를 참고](https://github.com/HonestSquare/UMUX/wiki/HOW-TO-HOST-A-SERVER)하십시오.
 
 ## 버전 및 업데이트 내역
 현재 최신 버전은 2.2.0 Busan입니다.
