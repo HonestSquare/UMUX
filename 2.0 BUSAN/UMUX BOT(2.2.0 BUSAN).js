@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r4)
+// API LEVEL(VERSION): 8(2.2.0 r5)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -150,7 +150,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF6Wz97yTO_zACvlig.Bf_yp8UsA6Q";
+const	TOKEN		= "thr1.AAAAAF6upMn-fAmeEF9o6Q.J9kbsuXQ1zg";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -1555,26 +1555,22 @@ class Commands{
 			if(AMN.getAdminstats(player.id)) return AMN.clearBans(player.id);
 			else return NC.acess(player.id);
 		}
-		// ------------이스터 에그------------------
+		// ------------이스터에그------------------
 		this.joke = function(player, msg){										//	!넝담			|	joke 명령어
 			CS.sendAllChat(player, msg);
-			CS.sendMsg('전체 ' + CS.getFace(CS.face[1], "Alphago") + ": 헤헤헷, 들켜버렸군, eigu.");
-			return false;
+			return CS.freezeChat ? false : CS.sendMsg("전체 " + CS.getFace(CS.face[1], "AlphaGo") + ": 헤헤헷, 들켜버렸군, eigu.");
 		}
 		this.hawawa = function(player, msg){									//	그치만			|	킹치만 명령어
 			CS.sendAllChat(player, msg);
-			CS.sendMsg('전체 ' + CS.getFace(CS.face[10], "Alphago") + ": ...이렇게라도 하지 않으면...지켜봐주지 않는 걸...");
-			return false;
+			return CS.freezeChat ? false : CS.sendMsg("전체 " + CS.getFace(CS.face[10], "AlphaGo") + ": ...이렇게라도 하지 않으면...지켜봐주지 않는 걸...");
 		}
 		this.taebo = function(player, msg){										//	태보해 			|	태보 응답
 			CS.sendAllChat(player, msg);
-			CS.sendMsg("전체 " + CS.getFace(CS.face[2], "Alphago") + ": @(^0^)==@ 절대 태보해! @==(^0^)@");
-			return false;
+			return CS.freezeChat ? false : CS.sendMsg("전체 " + CS.getFace(CS.face[2], "AlphaGo") + ": @(^0^)==@ 절대 태보해! @==(^0^)@");
 		}
 		this.jongikannemohyung = function(player, msg){
 			CS.sendAllChat(player, msg);
-			CS.sendMsg("전체 (2)" + PS.mark[0] + player.name + ": 본인 방금 네모형 되는 상상함. 하지만 어림도 없지!");
-			return false;
+			return CS.freezeChat ? false : CS.sendMsg("전체 (2)" + PS.mark[0] + player.name + ": 본인 방금 네모형 되는 상상함. 하지만 어림도 없지!");
 		}
 	}
 }
@@ -2048,7 +2044,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.04.15";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.05.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2114,6 +2110,16 @@ class IoSystem{
 			PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
 			PS.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
 			PS.initBlacklist(true, "겐류사이 육두봉", "3132312E3135332E3137302E323131"),
+
+			PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
+			PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
+			PS.initBlacklist(true, undefined, "3231312E3234332E3232322E3733"),
+			PS.initBlacklist(true, undefined, "33392E3131372E37392E313337"),
+
+			PS.initBlacklist(true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"),
+
+			PS.initBlacklist(true, "soy el mas pro", "3139302E34392E3137302E313038"),
+			PS.initBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
 			//------------------------------------------------------------블랙리스트 초기화
             // ***여기에 추가적으로 명단을 작성하십시오***  
             //  <예시> PS.initBlacklist(false, "알파고"), 또는 PS.initBlacklist(true, undefined, "12345678901234567890"),
@@ -2188,13 +2194,13 @@ var commands = {
 
 	"!maplist" : CM.infoMaps, "!cm" : CM.infoMaps, "!맵리스트" : CM.infoMaps,"!맵목록" : CM.infoMaps,"!map" : CM.infoMaps,"!맵" : CM.infoMaps,"!유즈맵" : CM.infoMaps,
 
-	"!red" : CM.setJoinRed, "!Red" : CM.setJoinRed, "!레드" : CM.setJoinRed,"!레" : CM.setJoinRed,"!ㄹㄷ" : CM.setJoinRed, "!ㄱㄷㅇ": CM.setJoinRed,
-	"!blue" : CM.setJoinBlue,"!Blue" : CM.setJoinBlue,"!블루" : CM.setJoinBlue,"!블" : CM.setJoinBlue,"!ㅂㄹ" : CM.setJoinBlue,"!ㅠㅣㅕㄷ" : CM.setJoinBlue,"!쁠루" : CM.setJoinBlue,"!쁠" : CM.setJoinBlue,
+	"!red" : CM.setJoinRed, "!Red" : CM.setJoinRed, "!RED" : CM.setJoinRed, "!레드" : CM.setJoinRed,"!레" : CM.setJoinRed,"!ㄹㄷ" : CM.setJoinRed, "!ㄱㄷㅇ": CM.setJoinRed,
+	"!blue" : CM.setJoinBlue,"!Blue" : CM.setJoinBlue, "!BULE" : CM.setJoinBlue, "!블루" : CM.setJoinBlue,"!블" : CM.setJoinBlue,"!ㅂㄹ" : CM.setJoinBlue,"!ㅠㅣㅕㄷ" : CM.setJoinBlue,"!쁠루" : CM.setJoinBlue,"!쁠" : CM.setJoinBlue,
 	"!spec" : CM.setJoinSpec, "!스펙" : CM.setJoinSpec, "!스팩" : CM.setJoinSpec, "!스" : CM.setJoinSpec, "!관중석" : CM.setJoinSpec, "!관중" : CM.setJoinSpec,"!관전석" : CM.setJoinSpec, "!관전" : CM.setJoinSpec, "!관" : CM.setJoinSpec,
 	"!afk" : CM.setSleep, "!ㅁ라" : CM.setSleep, "!잠수" : CM.setSleep, 
 	"!join" : CM.joinHelpPers, "!joinhelp" : CM.joinHelpPers, "!joinHelp" : CM.joinHelpPers, "!enter" : CM.joinHelpPers, "!enterhelp" : CM.joinHelpPers, "!helpenter" : CM.joinHelpPers, "!조인" : CM.joinHelpPers, "!입장" : CM.joinHelpPers, 
 	"!투입" : CM.joinHelpPers, "투입" : CM.joinHelpPers, "투입?" : CM.joinHelpPers, "투입!" : CM.joinHelpPers, "투입해" : CM.joinHelpPers, "투입하셈" : CM.joinHelpPers, "투입요" : CM.joinHelpPers, "투입좀시켜라" : CM.joinHelpPers, "넣어" : CM.joinHelpPers, 
-	"넣어줘" : CM.joinHelpPers,"넣어라" : CM.joinHelpPers,"넣어봐라" : CM.joinHelpPers,"넣어주세요" : CM.joinHelpPers,"투입해주세요" : CM.joinHelpPers,
+	"넣어줘" : CM.joinHelpPers,"넣어라" : CM.joinHelpPers,"넣어봐라" : CM.joinHelpPers,"넣어주세요" : CM.joinHelpPers,"투입해주세요" : CM.joinHelpPers, "껴줘": CM.joinHelpPers,
 	"투입해드려" : CM.joinHelpPub, "투입명령어" : CM.joinHelpPub, "투입도움말" : CM.joinHelpPub, 
  
 	"!!2128" : AMN.getAdmin,		// 권한 얻기
@@ -2204,9 +2210,9 @@ var commands = {
 
 	"!rr": AMN.setReset, "!ㄱㄱ": AMN.setReset,"!리": AMN.setReset, "!re": AMN.setReset,		// 다시 시작
 	"!r" : AMN.setAutoReset, "!ㄱ" : AMN.setAutoReset,  "!고" : AMN.setAutoReset, 				// 자동 재시작
-	"!clearbans" : CM.clearBans, "!cb" : CM.clearBans, 									// 밴 초기화
-	"!freeze" : CM.setFreezeChat, "!ㄺㄷㄷㅋㄷ" : CM.setFreezeChat, 
+	"!clearbans" : CM.clearBans, "!cb" : CM.clearBans, 											// 밴 초기화
 																								// 채팅창 얼리기/녹이기
+	"!freeze" : CM.setFreezeChat, "!ㄺㄷㄷㅋㄷ" : CM.setFreezeChat, 
 	"!얼리기" : CM.setFreezeChat, "!얼기" : CM.setFreezeChat, "!채팅얼기" : CM.setFreezeChat, "!채팅얼리기" : CM.setFreezeChat, 
 	"!djfflrl" : CM.setFreezeChat, "!djfrl" : CM.setFreezeChat, "!coxlddjfrl" : CM.setFreezeChat, "!coxlddjfflrl" : CM.setFreezeChat, 
 	"!unfreeze" : CM.setUnfreezeChat, "!ㅕㅜㄺㄷㄷㅋㄷ" : CM.setUnfreezeChat, 
