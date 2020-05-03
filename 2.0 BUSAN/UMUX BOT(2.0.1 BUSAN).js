@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 6(2.0.1 r13)
+// API LEVEL(VERSION): 6(2.0.1 r14)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +149,7 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF6W0AzcI89y_91qOw.RAieUI7yZus";
+const TOKEN = "thr1.AAAAAF6upOWy6DK52kxlkg.230N329PinY";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
@@ -1027,333 +1027,328 @@ constructor(){
 // 명령어 클래스
 //-----------------------------------------------------------------------
 class Commands{														
-constructor(){
-	this.recommendCom = function(kind, commands){							// 					추천 도움말
-		return ('(' + kind + " 도움말: " + commands + ')'); 
-	}
-	this.plaster = function(player){										// !도			|	도움말, 도배방지문자(onlyadmin)
-		if(AMN.getAdminstats(player)){ 
-			SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 도배 방지 문자를 출력함.");
-			NC.announce("────────────────", null, "orange", 2, 2);
-			NC.announce(NC.cnot() + "도배 방지", null, "orange", 2, 2);
-			NC.announce(NC.cnot() + "분란 방지", null, "orange", 2, 2);
-			NC.announce(NC.cnot() + "정숙 유지", null, "orange", 2, 2);
-			NC.announce(NC.cnot() + "질서 유지", null, "orange", 2, 2);
-			NC.announce("────────────────", null, "orange", 2, 2);
-			
+	constructor(){
+		this.recommendCom = function(kind, commands){							// 					추천 도움말
+			return ('(' + kind + " 도움말: " + commands + ')'); 
 		}
-		else CM.comHelp(player, "!도");		// 도움말
-		return false; 						// 명령어 흔적을 남기지 않음
-	}
-	this.comHelp = function(player, msg){ 									// !help		|	명령어 도움말
-		CS.sendAllChat(player, msg);
-		for(let i = 1; i <= PS.cntPlayers; i++){
-			if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
-				NC.announce(NC.msgCommand("일반 ") 
-				+ "!adminhelp(방 관리) | !bothelp(봇방) | !maphelp(맵) | !joinhelp(투입) | !chathelp(채팅) | !rankhelp(점수) | !etchelp(기타)", PS.getPublicId(i), null, 4, 3);
+		this.plaster = function(player){										// !도			|	도움말, 도배방지문자(onlyadmin)
+			if(AMN.getAdminstats(player)){ 
+				SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 도배 방지 문자를 출력함.");
+				NC.announce("────────────────", null, "orange", 2, 2);
+				NC.announce(NC.cnot() + "도배 방지", null, "orange", 2, 2);
+				NC.announce(NC.cnot() + "분란 방지", null, "orange", 2, 2);
+				NC.announce(NC.cnot() + "정숙 유지", null, "orange", 2, 2);
+				NC.announce(NC.cnot() + "질서 유지", null, "orange", 2, 2);
+				NC.announce("────────────────", null, "orange", 2, 2);
 			}
-			else{
-				NC.announce(NC.msgCommand("일반 ") 
-				+ "!bothelp(봇방) | !maphelp(맵) | !joinhelp(투입) | !chathelp(채팅) | !rankhelp(점수) | !etchelp(기타)", PS.getPublicId(i), null, 4, 3);
-			}
+			else CM.comHelp(player, "!도");		// 도움말
+			return false; 						// 명령어 흔적을 남기지 않음
 		}
-		return false;
-	}
-	this.botHelp = function(player, msg){									// !bothelp		|	봇방 도움말
-		CS.sendAllChat(player, msg);
-		for(let i = 1; i <= PS.cntPlayers; i++){
-			if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
-				NC.announce(NC.msgCommand("봇방 ") 
-				+ "!about(봇방 정보) | !host(호스트 이동) | !set_pw(비번 설정) | !clear_pw(비번 해제) | !show_pw(비번 표시) | !도(도배 방지 문자)", PS.getPublicId(i), null, 4, 3);
-			}
-			else{
-				NC.announce(NC.msgCommand("봇방 ") 
-				+ "!about(봇방 정보)", PS.getPublicId(i), null, 4, 3);
-			}
-		}
-		return false;
-	}
-	this.chatHelp = function(player, msg){									// !chathelp	|	채팅 도움말
-		CS.sendAllChat(player, msg);
-		let modeCom;
-		for(let i = 1; i <= PS.cntPlayers; i++){
-			if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
-				NC.announce(NC.msgCommand("채팅 ")  
-				+ "!e ID(귓속말) | !t(팀별 채팅) | !a(전체 채팅) | !chatmode n(채팅 모드) | ?mark(채팅창 마크) | !도(도배 방지 문자)", PS.getPublicId(i), null, 4, 3);
-			}
-			else{
-				NC.announce(NC.msgCommand("채팅 ") 
-				+ "!e ID(귓속말) | !t(팀별 채팅) | !a(전체 채팅) | !chatmode n(채팅 모드) | ?mark(채팅창 마크)", PS.getPublicId(i), null, 4, 3);
-			}
-		}
-		return false;
-	}
-	this.mapHelp = function(player, msg){									// !maphelp		|	맵 도움말
-		CS.sendAllChat(player, msg);
-		for(let i = 1; i <= PS.cntPlayers; i++){
-			if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
-				NC.announce(NC.msgCommand("맵 ") 
-				+ "/checksum(맵 정보 확인) | /store(맵 저장) | !maplist(내장 맵 목록) | !load ID(내장 맵 불러오기)", PS.getPublicId(i), null, 4, 3);
-			}
-			else{
-				NC.announce(NC.msgCommand('맵 ') 
-				+ "/checksum(맵 정보 확인) | /store(맵 저장) | !maplist(내장 맵 목록)", PS.getPublicId(i), null, 4, 3);
-			}
-		}
-		return false;
-	}
-	this.helpJoinP = function(player){ 										// !join		|  	참가 도움말
-		NC.announce(NC.msgCommand("투입 ") + 
-		"레드팀: !red | 관전석: !spec | 블루팀: !blue | 잠수: !afk", player.id, null, 4, 3);
-		return false;
-	}
-	this.helpJoinA = function(){ 											// !join		| 	참가 도움말(공용)
-		NC.announce(NC.msgCommand("투입 ") + 
-		"레드팀: !red | 관전석: !spec | 블루팀: !blue | 잠수: !afk", null, null, 4, 3);
-		return false;
-	}
-	this.scoreHelp = function(player, msg){ 								// !rankhelp	| 	랭크 도움말
-		CS.sendAllChat(player, msg);
-		for(let i = 1; i <= PS.cntPlayers; i++){
-			if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
-				NC.announce(NC.msgCommand("랭크 ") 
-				+ "!playlist(플레이어 목록) | ?score(점수 도움말)", PS.getPublicId(i), null, 4, 3);
-			}
-			else{
-				NC.announce(NC.msgCommand("랭크 ") 
-				+ "!playlist(플레이어 목록) | ?score(점수 도움말)", PS.getPublicId(i), null, 4, 3);
-			}
-		}
-		return false;
-	}
-	this.etcHelp = function(player, msg){									// !etchelp		|	기타 도움말
-		CS.sendAllChat(player, msg);
-		for(let i = 1; i <= PS.cntPlayers; i++){
-			if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
-				NC.announce(NC.msgCommand("기타 ") 
-				+ "!avatar(등번호 변경) | !adminhelp(관리 도움말)", PS.getPublicId(i), null, 4, 3);
-			}
-			else{
-				NC.announce(NC.msgCommand("기타 ") 
-				+ "!avatar(등번호 변경)", PS.getPublicId(i), null, 4, 3);
-			}
-		}
-		return false;
-	}
-	this.qE_Chat = function(player){										// ?e			| 	질문_채팅 귓속말
-		NC.announce(NC.help()+ "3번 플레이어에게 '안녕?'이라는 말을 조용히 전달하고 싶으면", player.id, "green", 4, 3);
-		NC.announce(NC.help() + "!e 3 안녕", player.id, "yellow", 4, 3);
-		NC.announce(NC.help() + "위와 같은 형식으로 보내면 됩니다."+ CM.recommendCom("관련 ", "!playlist") , player.id, "green", 4, 3);
-		return false;
-	}
-	this.qT_Chat = function(player){										// ?t			| 	질문_채팅 팀채팅
-		NC.announce(NC.help() + "상대팀이 못 엿듣게 살포시 같은 팀원에게 '민트초코 최고야'라고 전하려면", player.id, "green", 4, 3);
-		NC.announce(NC.help() + "!t 민트초코 최고야", player.id, "yellow", 4, 3);
-		NC.announce(NC.help() + "위와 같은 형식으로 보내면 됩니다.", player.id, "green", 4, 3);
-		return false;
-	}
-	this.qMark = function(player){											// ?mark		| 	질문_채팅 마크
-		NC.announce(NC.help()
-			+ "🌐" 		+ ": 서버 매니저 | "
-			+ PS.mark[0] + ": 관리자 |"
-			+ PS.mark[1] + ": 보조 관리자 |"
-			+ PS.mark[2] + ": 일반 |"
-			+ PS.mark[3] + ": 블랙리스트 "
-			+ CM.recommendCom("관련 ", "!chathelp"),
-			player.id, "green", 4, 3);
-		return false;
-	}
-	this.qChatmode = function(player){										// ?chatmode | 	질문_채팅모드
-		NC.announce(NC.help() 
-			+ "0: " + "전체 채팅"
-			+ ' | '
-			+ "1: " + "팀 채팅"
-			+ CM.recommendCom("관련", "!chatmode n")
-			, player.id, "green", 5, 3);
-			NC.announce(NC.help()+ "상대팀이 못 듣게 같은 팀원에게 '민트초코는 진리야'라고 계속해서 설교하려면", player.id, "green", 4, 3);
-			NC.announce(NC.help() + "!chatmode 1", player.id, "yellow", 4, 3);
-			NC.announce(NC.help() + "위와 같은 형식을 적은 다음에, 마저 설교하면 됩니다.", player.id, "green", 4, 3);
-		return false;
-	}
-	this.qScore = function(player){ 										// ?score		| 	점수 도움말
-		//NC.announce("🔎점수🔍 : " 
-		//+ "여기에 점수 정보를 기입하십시오." 
-		//+ CM.recommendCom("관련", "!ranking"), player.id, "green", 4, 3);
-		//return false;	
-	}
-	this.infoRoom = function(player, msg){ 									// !info		| 	방 정보
-		CS.sendAllChat(player, msg);
-		NC.announce(NC.info() 
-		+ "봇방입니다."	
-		+ "(Based on UMUX)" 					// 이 문장은 지우지 마시오
-		+ ' | ' + "릴리스 날짜: 2019.12.30" 	// 릴리스 및 업데이트 날짜
-		, null, "green", 5, 3);
-		// 지우지 마시오
-		NC.announce(SYS.showInfo() + CM.recommendCom("관련", "!help"), null, "green", 5, 3);
-		return false;
-	}
-	this.infoPlayers = function(player){ 									// !playlist	|	플레이어 정보
-		NC.announce(NC.infoPlayer(), player.id, "yellow", 5, 3);
-		for(let i = 1; i <= PS.cntPlayers; i++){
-			NC.announce("등급: " + PS.checkMarks(PS.members[PS.getPublicId(i)])
-				+ ' | '
-				+ "ID: " + SYS.setLine(i, 2)
-				+ ' | '
-				+ "ID(공용): " + SYS.setLine(PS.getPublicId(i), 2)
-				+ ' | '
-				+ "이름: " + PS.members[PS.getPublicId(i)].name
-				, player.id, null, 5, 3);
-		}
-		NC.announce(CM.recommendCom("유용할", "!chathelp"), player.id, "green", 5, 3);
-		return false;
-	}
-	this.infoMaps = function(player, msg){ 									// !maplist		|	맵 정보
-		CS.sendAllChat(player, msg);
-		for(let i = 0; i < 50; i++)
-			if(mapsName[i]) NC.announce('[' + SYS.setLine(i + 1, 2) + ']' + mapsName[i], player.id, null, 4, 0);
-		NC.announce("🔎맵 정렬 목록🔍 " + CM.recommendCom("관련", "!maphelp"), player.id, "yellow", 5, 3);
-		return false;
-	}
-	this.setChatMode = function(player, msg){								// !chatmode	|	채팅 모드 설정
-		let sPos = msg.indexOf(' ');
-		let type = parseInt(msg.substr(sPos + 1, 1));
-		if(msg.search(' ') == -1) return false;
-		if((type >= 0)&&(type < 2)) 										// 범위 내에서 벗어나면 종료 처리
-			return CS.setChatMode(player, type);
-		return NC.announce(NC.cnot() + "올바르지 않은 값입니다. 0~1 사이의 값을 입력하세요.", player.id, "orange", 5, 3);
-	}
-	this.setClearBans = function(player){									// !clearbans	|	영구 퇴장 명단 초기화 명령어
-		if(AMN.getAdminstats(player)) return AMN.setClearBans(player);
-		else return NC.acess(player);
-	}
-	this.setJoinPlayer = function(player, toTeam, msg){						// 					플레이어 투입
-		let team = player.team;
-		let id = player.id;
-		let name = player.name;
-		if(AMN.getAdminstats(player)){
-			if(msg.substr(3, 2) && PS.members[msg.substr(3, 2)]){
-				if(PS.getPublicId(msg.substr(3, 2)).id != player.id){
-					team = PS.members[PS.getPublicId(msg.substr(3, 2))].team;
-					id = PS.getPublicId(msg.substr(3, 2));
-					name = PS.members[PS.getPublicId(msg.substr(3, 2))].name;
+		this.comHelp = function(player, msg){ 									// !help		|	명령어 도움말
+			CS.sendAllChat(player, msg);
+			for(let i = 1; i <= PS.cntPlayers; i++){
+				if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
+					NC.announce(NC.msgCommand("일반 ") 
+					+ "!adminhelp(방 관리) | !bothelp(봇방) | !maphelp(맵) | !joinhelp(투입) | !chathelp(채팅) | !rankhelp(점수) | !etchelp(기타)", PS.getPublicId(i), null, 4, 3);
 				}
-			}
-		}
-		else if(AMN.teamsLock) return NC.acess(player);		// 팀 이동 금지 처리
-		if(team == toTeam) return NC.announce(NC.cnot() + "중복된 명령어입니다.", id, "orange", 5, 1);
-		else if(PS.members[id].asleep){ 
-			if(player.id != id) id = player.id;
-			return NC.announce(NC.cnot() + "게임 참여 의사가 없어 플레이할 수 없습니다. " + CM.recommendCom("관련 ", "!afk"), id, "orange", 5, 1);
-		}
-		else{
-			switch(toTeam){  // 0: 관중, 1: 레드, 2: 블루
-				case 0:	NC.announce(NC.notice() + "관중석으로 이동했습니다.", id, "green", 4, 3); break;
-				case 1: NC.announce(NC.notice() + name + "님이 레드팀으로 참가했습니다.", null, "green", 4, 3); break;
-				case 2: NC.announce(NC.notice() + name + "님이 블루팀으로 참가했습니다.", null, "green", 4, 3); break;
-			}
-			room.setPlayerTeam(id, toTeam);
-		}
-		return false;
-	}
-	this.setJoinSpec = function(player, msg){ return CM.setJoinPlayer(player, 0, msg);}	//	 0: 관중
-	this.setJoinRed = function(player, msg){ return CM.setJoinPlayer(player, 1, msg);}	// 	 1: 레드
-	this.setJoinBlue = function(player, msg){ return CM.setJoinPlayer(player, 2, msg);}	//	 2: 블루		
-	this.setMute = function(player, msg){									// !mute ID		|	채팅 금지
-		if(AMN.getAdminstats(player)){
-			if(PS.cntPlayers > 1){
-				let sPos = msg.indexOf(' ');
-				let dId = parseInt(msg.substr(sPos + 1));
-				if(dId == PS.getLocalId(player.id)) 
-					return NC.announce(NC.cnot() + "자기 자신의 채팅을 금지할 수 없습니다.", player.id, "orange", 5, 3);
-				if((dId > 0)&&(dId <= PS.cntPlayers)) return AMN.setMute(PS.getPublicId(dId), player.id);
 				else{
-					return NC.announce(NC.cnot() 
-					+ "올바르지 않은 값입니다. " 
-					+ "1부터 " + PS.cntPlayers + "까지 값을 입력하세요."
-					, player.id, "orange", 5, 3);
+					NC.announce(NC.msgCommand("일반 ") 
+					+ "!bothelp(봇방) | !maphelp(맵) | !joinhelp(투입) | !chathelp(채팅) | !rankhelp(점수) | !etchelp(기타)", PS.getPublicId(i), null, 4, 3);
 				}
 			}
-			else return false;
+			return false;
 		}
-		return NC.acess(player);
-	}
-	this.setSleep = function(player){										// !afk			|	장기 대기 플레이어 설정
-		if(!PS.members[player.id].asleep) return PS.setSleep(player, true);
-		return PS.setSleep(player, false);
-	}
-	this.setRecording = function(player){									// !rec			|	녹화 시작/종료
-		if(player.admin){
-			if(GM.stateRecording) return GM.stopRecording();
-			else return GM.startRecording();
+		this.botHelp = function(player, msg){									// !bothelp		|	봇방 도움말
+			CS.sendAllChat(player, msg);
+			for(let i = 1; i <= PS.cntPlayers; i++){
+				if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
+					NC.announce(NC.msgCommand("봇방 ") 
+					+ "!about(봇방 정보) | !host(호스트 이동) | !set_pw(비번 설정) | !clear_pw(비번 해제) | !show_pw(비번 표시) | !도(도배 방지 문자)", PS.getPublicId(i), null, 4, 3);
+				}
+				else{
+					NC.announce(NC.msgCommand("봇방 ") 
+					+ "!about(봇방 정보)", PS.getPublicId(i), null, 4, 3);
+				}
+			}
+			return false;
 		}
-		else NC.acess(player);
-		return false;
-	}
-	this.loadMap = function(player, mapId){									// !load n		|	맵 로드 명령어(onlyadmin)
-		if(AMN.getAdminstats(player)){
-			let mapData = (maps[mapId.substr(6, 2) - 1]);
-			if((mapId.substr(6, 2)) >= 1 && ((mapId.substr(6, 2)) <= mapsName.length)){
-				if((AMN.mapLock[1] == true) && (AMN.mapLock[0] != mapData)){
-					NC.announce(NC.cnot() + "권한이 없어 불러올 수 없습니다.", null, "green", 5, 3);
+		this.chatHelp = function(player, msg){									// !chathelp	|	채팅 도움말
+			CS.sendAllChat(player, msg);
+			let modeCom;
+			for(let i = 1; i <= PS.cntPlayers; i++){
+				if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
+					NC.announce(NC.msgCommand("채팅 ")  
+					+ "!e ID(귓속말) | !t(팀별 채팅) | !a(전체 채팅) | !chatmode n(채팅 모드) | ?mark(채팅창 마크) | !도(도배 방지 문자)", PS.getPublicId(i), null, 4, 3);
+				}
+				else{
+					NC.announce(NC.msgCommand("채팅 ") 
+					+ "!e ID(귓속말) | !t(팀별 채팅) | !a(전체 채팅) | !chatmode n(채팅 모드) | ?mark(채팅창 마크)", PS.getPublicId(i), null, 4, 3);
+				}
+			}
+			return false;
+		}
+		this.mapHelp = function(player, msg){									// !maphelp		|	맵 도움말
+			CS.sendAllChat(player, msg);
+			for(let i = 1; i <= PS.cntPlayers; i++){
+				if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
+					NC.announce(NC.msgCommand("맵 ") 
+					+ "/checksum(맵 정보 확인) | /store(맵 저장) | !maplist(내장 맵 목록) | !load ID(내장 맵 불러오기)", PS.getPublicId(i), null, 4, 3);
+				}
+				else{
+					NC.announce(NC.msgCommand('맵 ') 
+					+ "/checksum(맵 정보 확인) | /store(맵 저장) | !maplist(내장 맵 목록)", PS.getPublicId(i), null, 4, 3);
+				}
+			}
+			return false;
+		}
+		this.helpJoinP = function(player){ 										// !join		|  	참가 도움말
+			NC.announce(NC.msgCommand("투입 ") + 
+			"레드팀: !red | 관전석: !spec | 블루팀: !blue | 잠수: !afk", player.id, null, 4, 3);
+			return false;
+		}
+		this.helpJoinA = function(){ 											// !join		| 	참가 도움말(공용)
+			NC.announce(NC.msgCommand("투입 ") + 
+			"레드팀: !red | 관전석: !spec | 블루팀: !blue | 잠수: !afk", null, null, 4, 3);
+			return false;
+		}
+		this.scoreHelp = function(player, msg){ 								// !rankhelp	| 	랭크 도움말
+			CS.sendAllChat(player, msg);
+			for(let i = 1; i <= PS.cntPlayers; i++){
+				if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
+					NC.announce(NC.msgCommand("랭크 ") 
+					+ "!playlist(플레이어 목록) | ?score(점수 도움말)", PS.getPublicId(i), null, 4, 3);
+				}
+				else{
+					NC.announce(NC.msgCommand("랭크 ") 
+					+ "!playlist(플레이어 목록) | ?score(점수 도움말)", PS.getPublicId(i), null, 4, 3);
+				}
+			}
+			return false;
+		}
+		this.etcHelp = function(player, msg){									// !etchelp		|	기타 도움말
+			CS.sendAllChat(player, msg);
+			for(let i = 1; i <= PS.cntPlayers; i++){
+				if(AMN.getAdminstats(PS.members[PS.getPublicId(i)])){
+					NC.announce(NC.msgCommand("기타 ") 
+					+ "!avatar(등번호 변경) | !adminhelp(관리 도움말)", PS.getPublicId(i), null, 4, 3);
+				}
+				else{
+					NC.announce(NC.msgCommand("기타 ") 
+					+ "!avatar(등번호 변경)", PS.getPublicId(i), null, 4, 3);
+				}
+			}
+			return false;
+		}
+		this.qE_Chat = function(player){										// ?e			| 	질문_채팅 귓속말
+			NC.announce(NC.help()+ "3번 플레이어에게 '안녕?'이라는 말을 조용히 전달하고 싶으면", player.id, "green", 4, 3);
+			NC.announce(NC.help() + "!e 3 안녕", player.id, "yellow", 4, 3);
+			NC.announce(NC.help() + "위와 같은 형식으로 보내면 됩니다."+ CM.recommendCom("관련 ", "!playlist") , player.id, "green", 4, 3);
+			return false;
+		}
+		this.qT_Chat = function(player){										// ?t			| 	질문_채팅 팀채팅
+			NC.announce(NC.help() + "상대팀이 못 엿듣게 살포시 같은 팀원에게 '민트초코 최고야'라고 전하려면", player.id, "green", 4, 3);
+			NC.announce(NC.help() + "!t 민트초코 최고야", player.id, "yellow", 4, 3);
+			NC.announce(NC.help() + "위와 같은 형식으로 보내면 됩니다.", player.id, "green", 4, 3);
+			return false;
+		}
+		this.qMark = function(player){											// ?mark		| 	질문_채팅 마크
+			NC.announce(NC.help()
+				+ "🌐" 		+ ": 서버 매니저 | "
+				+ PS.mark[0] + ": 관리자 |"
+				+ PS.mark[1] + ": 보조 관리자 |"
+				+ PS.mark[2] + ": 일반 |"
+				+ PS.mark[3] + ": 블랙리스트 "
+				+ CM.recommendCom("관련 ", "!chathelp"),
+				player.id, "green", 4, 3);
+			return false;
+		}
+		this.qChatmode = function(player){										// ?chatmode | 	질문_채팅모드
+			NC.announce(NC.help() 
+				+ "0: " + "전체 채팅"
+				+ ' | '
+				+ "1: " + "팀 채팅"
+				+ CM.recommendCom("관련", "!chatmode n")
+				, player.id, "green", 5, 3);
+				NC.announce(NC.help()+ "상대팀이 못 듣게 같은 팀원에게 '민트초코는 진리야'라고 계속해서 설교하려면", player.id, "green", 4, 3);
+				NC.announce(NC.help() + "!chatmode 1", player.id, "yellow", 4, 3);
+				NC.announce(NC.help() + "위와 같은 형식을 적은 다음에, 마저 설교하면 됩니다.", player.id, "green", 4, 3);
+			return false;
+		}
+		this.qScore = function(player){ 										// ?score		| 	점수 도움말
+			//NC.announce("🔎점수🔍 : " 
+			//+ "여기에 점수 정보를 기입하십시오." 
+			//+ CM.recommendCom("관련", "!ranking"), player.id, "green", 4, 3);
+			//return false;	
+		}
+		this.infoRoom = function(player, msg){ 									// !info		| 	방 정보
+			CS.sendAllChat(player, msg);
+			NC.announce(NC.info() 
+			+ "봇방입니다."	
+			+ "(Based on UMUX)" 					// 이 문장은 지우지 마시오
+			+ ' | ' + "릴리스 날짜: 2019.12.30" 	// 릴리스 및 업데이트 날짜
+			, null, "green", 5, 3);
+			// 지우지 마시오
+			NC.announce(SYS.showInfo() + CM.recommendCom("관련", "!help"), null, "green", 5, 3);
+			return false;
+		}	
+		this.infoPlayers = function(player){ 									// !playlist	|	플레이어 정보
+			NC.announce(NC.infoPlayer(), player.id, "yellow", 5, 3);
+			for(let i = 1; i <= PS.cntPlayers; i++){
+				NC.announce("등급: " + PS.checkMarks(PS.members[PS.getPublicId(i)])
+					+ ' | '
+					+ "ID: " + SYS.setLine(i, 2)
+					+ ' | '
+					+ "ID(공용): " + SYS.setLine(PS.getPublicId(i), 2)
+					+ ' | '
+					+ "이름: " + PS.members[PS.getPublicId(i)].name
+					, player.id, null, 5, 3);
+			}
+			NC.announce(CM.recommendCom("유용할", "!chathelp"), player.id, "green", 5, 3);
+			return false;
+		}
+		this.infoMaps = function(player, msg){ 									// !maplist		|	맵 정보
+			CS.sendAllChat(player, msg);
+			for(let i = 0; i < 50; i++)
+				if(mapsName[i]) NC.announce('[' + SYS.setLine(i + 1, 2) + ']' + mapsName[i], player.id, null, 4, 0);
+			NC.announce("🔎맵 정렬 목록🔍 " + CM.recommendCom("관련", "!maphelp"), player.id, "yellow", 5, 3);
+			return false;
+		}
+		this.setChatMode = function(player, msg){								// !chatmode	|	채팅 모드 설정
+			let sPos = msg.indexOf(' ');
+			let type = parseInt(msg.substr(sPos + 1, 1));
+			if(msg.search(' ') == -1) return false;
+			if((type >= 0)&&(type < 2)) 										// 범위 내에서 벗어나면 종료 처리
+				return CS.setChatMode(player, type);
+			return NC.announce(NC.cnot() + "올바르지 않은 값입니다. 0~1 사이의 값을 입력하세요.", player.id, "orange", 5, 3);
+		}
+		this.setClearBans = function(player){									// !clearbans	|	영구 퇴장 명단 초기화 명령어
+			if(AMN.getAdminstats(player)) return AMN.setClearBans(player);
+			else return NC.acess(player);
+		}
+		this.setJoinPlayer = function(player, toTeam, msg){						// 					플레이어 투입
+			let team = player.team;
+			let id = player.id;
+			let name = player.name;
+			if(AMN.getAdminstats(player)){
+				if(msg.substr(3, 2) && PS.members[msg.substr(3, 2)]){
+					if(PS.getPublicId(msg.substr(3, 2)).id != player.id){
+						team = PS.members[PS.getPublicId(msg.substr(3, 2))].team;
+						id = PS.getPublicId(msg.substr(3, 2));
+						name = PS.members[PS.getPublicId(msg.substr(3, 2))].name;
+					}
+				}
+			}
+			else if(AMN.teamsLock) return NC.acess(player);		// 팀 이동 금지 처리
+			if(team == toTeam) return NC.announce(NC.cnot() + "중복된 명령어입니다.", id, "orange", 5, 1);
+			else if(PS.members[id].asleep){ 
+				if(player.id != id) id = player.id;
+				return NC.announce(NC.cnot() + "게임 참여 의사가 없어 플레이할 수 없습니다. " + CM.recommendCom("관련 ", "!afk"), id, "orange", 5, 1);
+			}
+			else{
+				switch(toTeam){  // 0: 관중, 1: 레드, 2: 블루
+					case 0:	NC.announce(NC.notice() + "관중석으로 이동했습니다.", id, "green", 4, 3); break;
+					case 1: NC.announce(NC.notice() + name + "님이 레드팀으로 참가했습니다.", null, "green", 4, 3); break;
+					case 2: NC.announce(NC.notice() + name + "님이 블루팀으로 참가했습니다.", null, "green", 4, 3); break;
+				}
+				room.setPlayerTeam(id, toTeam);
+			}
+			return false;
+		}
+		this.setJoinSpec = function(player, msg){ return CM.setJoinPlayer(player, 0, msg);}	//	 0: 관중
+		this.setJoinRed = function(player, msg){ return CM.setJoinPlayer(player, 1, msg);}	// 	 1: 레드
+		this.setJoinBlue = function(player, msg){ return CM.setJoinPlayer(player, 2, msg);}	//	 2: 블루		
+		this.setMute = function(player, msg){									// !mute ID		|	채팅 금지
+			if(AMN.getAdminstats(player)){
+				if(PS.cntPlayers > 1){
+					let sPos = msg.indexOf(' ');
+					let dId = parseInt(msg.substr(sPos + 1));
+					if(dId == PS.getLocalId(player.id)) 
+						return NC.announce(NC.cnot() + "자기 자신의 채팅을 금지할 수 없습니다.", player.id, "orange", 5, 3);
+					if((dId > 0)&&(dId <= PS.cntPlayers)) return AMN.setMute(PS.getPublicId(dId), player.id);
+					else{
+						return NC.announce(NC.cnot() 
+						+ "올바르지 않은 값입니다. " 
+						+ "1부터 " + PS.cntPlayers + "까지 값을 입력하세요."
+						, player.id, "orange", 5, 3);
+					}
+				}
+				else return false;
+			}
+			return NC.acess(player);
+		}
+		this.setSleep = function(player){										// !afk			|	장기 대기 플레이어 설정
+			if(!PS.members[player.id].asleep) return PS.setSleep(player, true);
+			return PS.setSleep(player, false);
+		}
+		this.setRecording = function(player){									// !rec			|	녹화 시작/종료
+			if(player.admin){
+				if(GM.stateRecording) return GM.stopRecording();
+				else return GM.startRecording();
+			}
+			else NC.acess(player);
+			return false;
+		}
+		this.loadMap = function(player, mapId){									// !load n		|	맵 로드 명령어(onlyadmin)
+			if(AMN.getAdminstats(player)){
+				let mapData = (maps[mapId.substr(6, 2) - 1]);
+				if((mapId.substr(6, 2)) >= 1 && ((mapId.substr(6, 2)) <= mapsName.length)){
+					if((AMN.mapLock[1] == true) && (AMN.mapLock[0] != mapData)){
+						NC.announce(NC.cnot() + "권한이 없어 불러올 수 없습니다.", null, "green", 5, 3);
+						SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 맵 교체를 시도함 (실패).");
+					}	
+					else{
+						room.stopGame();
+						room.setCustomStadium(mapData);
+						AMN.mapLock[0] = mapData;
+						SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 " + mapId.substr(6, 2) + "번 맵으로 교체함.");
+					}
+				}
+				else{ 
+					NC.announce(NC.cnot() + "올바르지 않은 ID입니다." + CM.recommendCom("관련 ", "!maplist"), player.id, "orange", 5, 1);
 					SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 맵 교체를 시도함 (실패).");
-				}	
-				else{
-					room.stopGame();
-					room.setCustomStadium(mapData);
-					AMN.mapLock[0] = mapData;
-					SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 " + mapId.substr(6, 2) + "번 맵으로 교체함.");
 				}
 			}
-			else{ 
-				NC.announce(NC.cnot() + "올바르지 않은 ID입니다." + CM.recommendCom("관련 ", "!maplist"), player.id, "orange", 5, 1);
-				SYS.log(true, player.id + '(' + PS.members[player.id].Pid + ')' + player.name + "(이)가 맵 교체를 시도함 (실패).");
-			}
+			else NC.acess(player);
+			return false;
 		}
-		else NC.acess(player);
-		return false;
+		// ------------이스터 에그------------------
+		this.joke = function(player, msg){										//	!넝담		|	joke 명령어
+			CS.sendAllChat(player, msg);
+			return CS.sendMsg("전체 " + CS.getFace(CS.face[1], "Alphago") + ": 헤헤헷, 들켜버렸군, eigu.");
+		}
+		this.hawawa = function(player, msg){									//	그치만		|	킹치만 명령어
+			CS.sendAllChat(player, msg);
+			return CS.sendMsg("전체 " + CS.getFace(CS.face[10], "Alphago") + ": ...이렇게라도 하지 않으면...지켜봐주지 않는 걸...");
+		}
+		this.taebo = function(player, msg){										//	태보해 		|	태보 응답
+			CS.sendAllChat(player, msg);
+			return CS.sendMsg("전체 " + CS.getFace(CS.face[2], "Alphago") + ": @(^0^)==@ 절대 태보해! @==(^0^)@");
+		}
+		this.jongikannemohyung = function(player, msg){
+			CS.sendAllChat(player, msg);
+			return CS.sendMsg("전체 (2)" + PS.mark[0] + player.name + ": 본인 방금 네모형 되는 상상함. 하지만 어림도 없지!");
+		}
 	}
-	// ------------이스터 에그------------------
-	this.joke = function(player, msg){										//	!넝담		|	joke 명령어
-		CS.sendAllChat(player, msg);
-		CS.sendMsg('전체 ' + CS.getFace(CS.face[1], "Alphago") + ": 헤헤헷, 들켜버렸군, eigu.");
-		return false;
-	}
-	this.hawawa = function(player, msg){									//	그치만		|	킹치만 명령어
-		CS.sendAllChat(player, msg);
-		CS.sendMsg('전체 ' + CS.getFace(CS.face[10], "Alphago") + ": ...이렇게라도 하지 않으면...지켜봐주지 않는 걸...");
-		return false;
-	}
-	this.taebo = function(player, msg){										//	태보해 		|	태보 응답
-		CS.sendAllChat(player, msg);
-		CS.sendMsg("전체 " + CS.getFace(CS.face[2], "Alphago") + ": @(^0^)==@ 절대 태보해! @==(^0^)@");
-		return false;
-	}
-	this.jongikannemohyung = function(player, msg){
-		CS.sendAllChat(player, msg);
-		CS.sendMsg("전체 (2)" + PS.mark[0] + player.name + ": 본인 방금 네모형 되는 상상함. 하지만 어림도 없지!");
-		return false;
-	}
-}
 }
 //-----------------------------------------------------------------------
 // 플레이어 클래스
 //-----------------------------------------------------------------------
 class Player{														
-constructor() {
-	this.mark = [									// 주권한, 보조권한, 일반, 블랙리스트
-		"🟡", "🟢", "⚪", "🔘",
-		"🚫", "🔴", "🔵",
-	];
-	this.superBlacklist = [							// 슈퍼 블랙리스트 명단
-		// 에드, 핑폭테러단, Walker, 페르난지뉴, 앙헬리노, dd, Man from Wuhan
-		"34392E3137342E3133332E3131", "3131382E33342E3235312E3334", "37342E38322E36302E3832", 
-		"36352E34392E3132362E3839", "3132352E3138372E3133352E3239", "37322E35322E38372E3737",
-		"31342E34372E3131322E313232", "3232312E3136352E3136332E313530", "3138322E3232342E33312E313136",
-		"3138332E3130302E3135362E32353", "3138332E3130302E3135362E323532",	// Knife(웨인 루니)
-		"37342E38322E36302E313739", 										// 가즈으앗
+	constructor() {
+		this.mark = [									// 주권한, 보조권한, 일반, 블랙리스트
+			"🟡", "🟢", "⚪", "🔘",
+			"🚫", "🔴", "🔵",
+		];
+		this.superBlacklist = [							// 슈퍼 블랙리스트 명단
+			// 에드, 핑폭테러단, Walker, 페르난지뉴, 앙헬리노, dd, Man from Wuhan
+			"34392E3137342E3133332E3131", "3131382E33342E3235312E3334", "37342E38322E36302E3832", 
+			"36352E34392E3132362E3839", "3132352E3138372E3133352E3239", "37322E35322E38372E3737",
+			"31342E34372E3131322E313232", "3232312E3136352E3136332E313530", "3138322E3232342E33312E313136",
+			"3138332E3130302E3135362E32353", "3138332E3130302E3135362E323532",	// Knife(웨인 루니)
+			"37342E38322E36302E313739", 										// 가즈으앗
 
-		// 유재석, 어둠의 악마
-		"3231392E3234382E3230332E313430",
+			// 유재석, 어둠의 악마
+			"3231392E3234382E3230332E313430",
 
 		// Bone Collecter, GRF SWORD
 		"31342E342E3134342E313138", "31342E342E3134342E313138",
@@ -1384,12 +1379,24 @@ constructor() {
 		"312E3234362E3139312E323134",
 		// 겐류사이 육두봉
 		"3132312E3135332E3137302E323131",
+			
+		"3138322E3232342E33312E313031",
+		"3131362E3132312E3233352E3830",
+		"3231312E3234332E3232322E3733",
+		"33392E3131372E37392E313337",
+
+		// 경상도에서태어난아기를영국에서길렀더니내가나왔다
+		"3131382E362E32352E313034",
+		// soy el mas pro
+		"3139302E34392E3137302E313038",
+		// Ricardo
+		"3138362E3132332E3231352E3234",
 	]
 	this.blacklist = [ 								// 블랙리스트 명단
 		"에드", "핑폭테러단", "Walker", "페르난지뉴", "앙헬리노", "Knife", "웨인루니", "가즈으앗", "플레이보이카티", "Aaron Wan-Bissaka", "호박", "카푸",
 		"강퇴하면핑폭", "랄랄랄", "james", "어드안주면핑터짐", "노진구", "어드 안주면 핑폭함 ㅅㄱ", "핑폭테러단 인원 모집", "제몸무게가 220kg인데 정상인가요", 
-		"와이어샤크", "핑폭각?", "Ready", "Bone Collecter", "GRF SWORD", "서든", "Preber", "프레버", "명인만두 서울대점",
-		"쥐알티", "겐류사이 육두봉",
+		"와이어샤크", "핑폭각?", "Ready", "Bone Collecter", "GRF SWORD", "서든", "Preber", "프레버", "명인만두 서울대점", "쥐알티", "겐류사이 육두봉", 
+		"경상도에서태어난아기를영국에서길렀더니내가나왔다", "soy el mas pro", "Ricardo",
 	];
 	this.cntPlayers		 	= 0;					// 플레이어 인원 체크
 	this.members 			= new Array();			// 플레이어 정보 데이터
@@ -1641,7 +1648,7 @@ constructor(){
 	this.initialized = false;
 	this.VersionRoom 			= "v1.00";			// 방 버전
 	this.VersionUMUX  			= "2.0.1";			// UMUX 버전(건드리지 마시오)
-	this.SecurityPatchLevel		= "2020.04.15c";	// UMUX 보안 패치 수준(건드리지 마시오)
+	this.SecurityPatchLevel		= "2020.05.01c";	// UMUX 보안 패치 수준(건드리지 마시오)
 	this.log = function(io, msg){
 		if(msg){
 			if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -1711,13 +1718,14 @@ var commands = {
 
 "!maplist" : CM.infoMaps, "!cm" : CM.infoMaps, "!맵리스트" : CM.infoMaps,"!맵목록" : CM.infoMaps,"!map" : CM.infoMaps,"!맵" : CM.infoMaps,"!유즈맵" : CM.infoMaps,
 
-"!red" : CM.setJoinRed, "!Red" : CM.setJoinRed, "!레드" : CM.setJoinRed,"!레" : CM.setJoinRed,"!ㄹㄷ" : CM.setJoinRed, "!ㄱㄷㅇ": CM.setJoinRed,
-"!blue" : CM.setJoinBlue,"!Blue" : CM.setJoinBlue,"!블루" : CM.setJoinBlue,"!블" : CM.setJoinBlue,"!ㅂㄹ" : CM.setJoinBlue,"!ㅠㅣㅕㄷ" : CM.setJoinBlue,"!쁠루" : CM.setJoinBlue,"!쁠" : CM.setJoinBlue,
+"!red" : CM.setJoinRed, "!Red" : CM.setJoinRed, "!RED" : CM.setJoinRed, "!레드" : CM.setJoinRed,"!레" : CM.setJoinRed,"!ㄹㄷ" : CM.setJoinRed, "!ㄱㄷㅇ": CM.setJoinRed,
+"!blue" : CM.setJoinBlue,"!Blue" : CM.setJoinBlue, "!BULE" : CM.setJoinBlue, "!블루" : CM.setJoinBlue,"!블" : CM.setJoinBlue,"!ㅂㄹ" : CM.setJoinBlue,"!ㅠㅣㅕㄷ" : CM.setJoinBlue,"!쁠루" : CM.setJoinBlue,"!쁠" : CM.setJoinBlue,
 "!spec" : CM.setJoinSpec, "!스펙" : CM.setJoinSpec, "!스팩" : CM.setJoinSpec, "!스" : CM.setJoinSpec, "!관중석" : CM.setJoinSpec, "!관중" : CM.setJoinSpec,"!관전석" : CM.setJoinSpec, "!관전" : CM.setJoinSpec, "!관" : CM.setJoinSpec,
 "!afk" : CM.setSleep, "!ㅁ라" : CM.setSleep, "!잠수" : CM.setSleep, 
-"!join" : CM.helpJoinP, "!joinhelp" : CM.helpJoinP, "!helpjoin" : CM.helpJoinP, "!enter" : CM.helpJoinP, "!enterhelp" : CM.helpJoinP, "!helpenter" : CM.helpJoinP, "!조인" : CM.helpJoinP, "!입장" : CM.helpJoinP, 
-"!투입" : CM.helpJoinP, "투입" : CM.helpJoinP, "투입?" : CM.helpJoinP, "투입!" : CM.helpJoinP, "투입해" : CM.helpJoinP, "투입하셈" : CM.helpJoinP, "투입요" : CM.helpJoinP,"넣어" : CM.helpJoinP, 
-"넣어줘" : CM.helpJoinP,"넣어라" : CM.helpJoinP,"넣어봐라" : CM.helpJoinP,"넣어주세요" : CM.helpJoinP,"투입해주세요" : CM.helpJoinP, "투입명령어" : CM.helpJoinA, "투입도움말" : CM.helpJoinA, 
+"!join" : CM.helpJoinP, "!joinhelp" : CM.helpJoinP, "!joinHelp" : CM.helpJoinP, "!enter" : CM.helpJoinP, "!enterhelp" : CM.helpJoinP, "!helpenter" : CM.helpJoinP, "!조인" : CM.helpJoinP, "!입장" : CM.helpJoinP, 
+"!투입" : CM.helpJoinP, "투입" : CM.helpJoinP, "투입?" : CM.helpJoinP, "투입!" : CM.helpJoinP, "투입해" : CM.helpJoinP, "투입하셈" : CM.helpJoinP, "투입요" : CM.helpJoinP, "투입좀시켜라" : CM.helpJoinP, "넣어" : CM.helpJoinP, 
+"넣어줘" : CM.helpJoinP,"넣어라" : CM.helpJoinP,"넣어봐라" : CM.helpJoinP,"넣어주세요" : CM.helpJoinP,"투입해주세요" : CM.helpJoinP, "껴줘": CM.helpJoinP,
+"투입해드려" : CM.helpJoinA, "투입명령어" : CM.helpJoinA, "투입도움말" : CM.helpJoinA, 
 
 "!!2191" : AMN.getAdmin,		// 권한 얻기
 "!admin": AMN.setDynamicAdmin,		// 권한 동적 할당
