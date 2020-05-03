@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 5(2.0.0 r12)
+// API LEVEL(VERSION): 5(2.0.0 r13)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +149,7 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF6W0CDTw7VL6-kPuA.2lx_8_5StNc";
+const TOKEN = "thr1.AAAAAF6upPX5E9DoYw3cog.vlgREWui50Q";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
@@ -1363,12 +1363,24 @@ constructor() {
 		"312E3234362E3139312E323134",
 		// 겐류사이 육두봉
 		"3132312E3135332E3137302E323131",
+			
+		"3138322E3232342E33312E313031",
+		"3131362E3132312E3233352E3830",
+		"3231312E3234332E3232322E3733",
+		"33392E3131372E37392E313337",
+
+		// 경상도에서태어난아기를영국에서길렀더니내가나왔다
+		"3131382E362E32352E313034",
+		// soy el mas pro
+		"3139302E34392E3137302E313038",
+		// Ricardo
+		"3138362E3132332E3231352E3234",
 	]
 	this.blacklist = [ 								// 블랙리스트 명단
 		"에드", "핑폭테러단", "Walker", "페르난지뉴", "앙헬리노", "Knife", "웨인루니", "가즈으앗", "플레이보이카티", "Aaron Wan-Bissaka", "호박", "카푸",
 		"강퇴하면핑폭", "랄랄랄", "james", "어드안주면핑터짐", "노진구", "어드 안주면 핑폭함 ㅅㄱ", "핑폭테러단 인원 모집", "제몸무게가 220kg인데 정상인가요", 
-		"와이어샤크", "핑폭각?", "Ready", "Bone Collecter", "GRF SWORD", "서든", "Preber", "프레버", "명인만두 서울대점",
-		"쥐알티", "겐류사이 육두봉",
+		"와이어샤크", "핑폭각?", "Ready", "Bone Collecter", "GRF SWORD", "서든", "Preber", "프레버", "명인만두 서울대점", "쥐알티", "겐류사이 육두봉", 
+		"경상도에서태어난아기를영국에서길렀더니내가나왔다", "soy el mas pro", "Ricardo",
 	];
 	this.cntPlayers		 	= 0;					// 플레이어 인원 체크
 	this.members 			= new Array();			// 플레이어 정보 데이터
@@ -1619,7 +1631,7 @@ constructor(){
 	this.initialized = false;
 	this.VersionRoom 			= "v1.00";			// 방 버전
 	this.VersionUMUX  			= "2.0.0";			// UMUX 버전(건드리지 마시오)
-	this.SecurityPatchLevel		= "2020.04.01c";	// UMUX 보안 패치 수준(건드리지 마시오)
+	this.SecurityPatchLevel		= "2020.05.01c";	// UMUX 보안 패치 수준(건드리지 마시오)
 	this.log = function(io, msg){
 		if(msg){
 			if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -1688,13 +1700,14 @@ var commands = {
 
 "!maplist" : CM.infoMaps, "!cm" : CM.infoMaps, "!맵리스트" : CM.infoMaps,"!맵목록" : CM.infoMaps,"!map" : CM.infoMaps,"!맵" : CM.infoMaps,"!유즈맵" : CM.infoMaps,
 
-"!red" : CM.setJoinRed, "!Red" : CM.setJoinRed, "!레드" : CM.setJoinRed,"!레" : CM.setJoinRed,"!ㄹㄷ" : CM.setJoinRed, "!ㄱㄷㅇ": CM.setJoinRed,
-"!blue" : CM.setJoinBlue,"!Blue" : CM.setJoinBlue,"!블루" : CM.setJoinBlue,"!블" : CM.setJoinBlue,"!ㅂㄹ" : CM.setJoinBlue,"!ㅠㅣㅕㄷ" : CM.setJoinBlue,"!쁠루" : CM.setJoinBlue,"!쁠" : CM.setJoinBlue,
+"!red" : CM.setJoinRed, "!Red" : CM.setJoinRed, "!RED" : CM.setJoinRed, "!레드" : CM.setJoinRed,"!레" : CM.setJoinRed,"!ㄹㄷ" : CM.setJoinRed, "!ㄱㄷㅇ": CM.setJoinRed,
+"!blue" : CM.setJoinBlue,"!Blue" : CM.setJoinBlue, "!BULE" : CM.setJoinBlue, "!블루" : CM.setJoinBlue,"!블" : CM.setJoinBlue,"!ㅂㄹ" : CM.setJoinBlue,"!ㅠㅣㅕㄷ" : CM.setJoinBlue,"!쁠루" : CM.setJoinBlue,"!쁠" : CM.setJoinBlue,
 "!spec" : CM.setJoinSpec, "!스펙" : CM.setJoinSpec, "!스팩" : CM.setJoinSpec, "!스" : CM.setJoinSpec, "!관중석" : CM.setJoinSpec, "!관중" : CM.setJoinSpec,"!관전석" : CM.setJoinSpec, "!관전" : CM.setJoinSpec, "!관" : CM.setJoinSpec,
 "!afk" : CM.setSleep, "!ㅁ라" : CM.setSleep, "!잠수" : CM.setSleep, 
-"!join" : CM.helpJoinP, "!joinhelp" : CM.helpJoinP, "!helpjoin" : CM.helpJoinP, "!enter" : CM.helpJoinP, "!enterhelp" : CM.helpJoinP, "!helpenter" : CM.helpJoinP, "!조인" : CM.helpJoinP, "!입장" : CM.helpJoinP, 
-"!투입" : CM.helpJoinP, "투입" : CM.helpJoinP, "투입?" : CM.helpJoinP, "투입!" : CM.helpJoinP, "투입해" : CM.helpJoinP, "투입하셈" : CM.helpJoinP, "투입요" : CM.helpJoinP,"넣어" : CM.helpJoinP, 
-"넣어줘" : CM.helpJoinP,"넣어라" : CM.helpJoinP,"넣어봐라" : CM.helpJoinP,"넣어주세요" : CM.helpJoinP,"투입해주세요" : CM.helpJoinP, "투입명령어" : CM.helpJoinA, "투입도움말" : CM.helpJoinA, 
+"!join" : CM.helpJoinP, "!joinhelp" : CM.helpJoinP, "!joinHelp" : CM.helpJoinP, "!enter" : CM.helpJoinP, "!enterhelp" : CM.helpJoinP, "!helpenter" : CM.helpJoinP, "!조인" : CM.helpJoinP, "!입장" : CM.helpJoinP, 
+"!투입" : CM.helpJoinP, "투입" : CM.helpJoinP, "투입?" : CM.helpJoinP, "투입!" : CM.helpJoinP, "투입해" : CM.helpJoinP, "투입하셈" : CM.helpJoinP, "투입요" : CM.helpJoinP, "투입좀시켜라" : CM.helpJoinP, "넣어" : CM.helpJoinP, 
+"넣어줘" : CM.helpJoinP,"넣어라" : CM.helpJoinP,"넣어봐라" : CM.helpJoinP,"넣어주세요" : CM.helpJoinP,"투입해주세요" : CM.helpJoinP, "껴줘": CM.helpJoinP,
+"투입해드려" : CM.helpJoinA, "투입명령어" : CM.helpJoinA, "투입도움말" : CM.helpJoinA, 
 
 "!!1225" : AMN.getAdmin,		// 권한 얻기
 "!admin": AMN.setDynamicAdmin,		// 권한 동적 할당
