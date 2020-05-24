@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 5(2.0.0 r13)
+// API LEVEL(VERSION): 5(2.0.0 r14)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +149,7 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF6upPX5E9DoYw3cog.vlgREWui50Q";
+const TOKEN = "thr1.AAAAAF7KXr4YffSbIpVDcA.ZoCeua9aJ88";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
@@ -1397,7 +1397,7 @@ constructor() {
 		}
 		return false;
 	}
-	this.onPlayerAcivity = function(player){				// 플레이어 동작 체크
+	this.onPlayerActivity = function(player){				// 플레이어 동작 체크
 		return false;
 	}
 	this.initMember = function(data){						// 플레이어 정보 데이터 초기화		
@@ -1751,7 +1751,7 @@ var commands = {
 room.onPlayerJoin = function(player) { return GM.onPlayerJoin(player); }			
 // 플레이어 퇴장
 room.onPlayerLeave = function(player) { return GM.onPlayerLeave(player); }		
-room.onPlayerAcivity = function(){ return PS.onPlayerAcivity() }
+room.onPlayerActivity = function(player){ return PS.onPlayerActivity(player); }
 // 플레이어 강제 퇴장
 room.onPlayerKicked = function(kickedPlayer, reason, ban, byPlayer){ return AMN.onPlayerKicked(kickedPlayer, reason, ban, byPlayer) }
 // 플레이어 권한 획득&박탈
@@ -1785,4 +1785,4 @@ room.onGameStop = function(){ return GM.onGameStop(); }
 // 게임 중단
 room.onGamePause = function(byPlayer){ return GM.onGamePause(byPlayer);}			
 // 게임 재개
-room.onGameUnpause = function(byPlayer){ return GM.onGameUnpause(byPlayer); }	
+room.onGameUnpause = function(byPlayer){ return GM.onGameUnpause(byPlayer); }
