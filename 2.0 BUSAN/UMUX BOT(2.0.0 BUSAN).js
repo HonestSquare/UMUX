@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 5(2.0.0 r14)
+// API LEVEL(VERSION): 5(2.0.0 r15)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +149,7 @@ const MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const TOKEN = "thr1.AAAAAF7KXr4YffSbIpVDcA.ZoCeua9aJ88";
+const TOKEN = "thr1.AAAAAF7bESMZOix-aUQ4Og.ouTibw8Eg1s";
 const NOPLAYER = false;				// 방장 여부(그대로 두는 걸 권장)
 //=============================================================================
 // 여기서부터 복사
@@ -1363,11 +1363,18 @@ constructor() {
 		"312E3234362E3139312E323134",
 		// 겐류사이 육두봉
 		"3132312E3135332E3137302E323131",
-			
+
+		// 반다이크
+		"3131362E3132342E3137382E3433",
+		
 		"3138322E3232342E33312E313031",
 		"3131362E3132312E3233352E3830",
 		"3231312E3234332E3232322E3733",
 		"33392E3131372E37392E313337",
+
+		// 드록바 drogba
+		"3131382E33322E37372E323531",
+		"3131382E33322E37372E323531",
 
 		// 경상도에서태어난아기를영국에서길렀더니내가나왔다
 		"3131382E362E32352E313034",
@@ -1375,12 +1382,16 @@ constructor() {
 		"3139302E34392E3137302E313038",
 		// Ricardo
 		"3138362E3132332E3231352E3234",
+
+		// HYNN
+		"3231392E3130302E33372E323433",
 	]
 	this.blacklist = [ 								// 블랙리스트 명단
 		"에드", "핑폭테러단", "Walker", "페르난지뉴", "앙헬리노", "Knife", "웨인루니", "가즈으앗", "플레이보이카티", "Aaron Wan-Bissaka", "호박", "카푸",
 		"강퇴하면핑폭", "랄랄랄", "james", "어드안주면핑터짐", "노진구", "어드 안주면 핑폭함 ㅅㄱ", "핑폭테러단 인원 모집", "제몸무게가 220kg인데 정상인가요", 
-		"와이어샤크", "핑폭각?", "Ready", "Bone Collecter", "GRF SWORD", "서든", "Preber", "프레버", "명인만두 서울대점", "쥐알티", "겐류사이 육두봉", 
-		"경상도에서태어난아기를영국에서길렀더니내가나왔다", "soy el mas pro", "Ricardo",
+		"와이어샤크", "핑폭각?", "Ready", "Bone Collecter", "GRF SWORD", "서든", "Preber", "프레버", "명인만두 서울대점", "쥐알티", "겐류사이 육두봉", "반다이크",
+		"경상도에서태어난아기를영국에서길렀더니내가나왔다", "soy el mas pro", "Ricardo", "drogba", "드록바"
+	];서길렀더니내가나왔다", "soy el mas pro", "Ricardo", "drogba", "드록바"
 	];
 	this.cntPlayers		 	= 0;					// 플레이어 인원 체크
 	this.members 			= new Array();			// 플레이어 정보 데이터
@@ -1631,7 +1642,7 @@ constructor(){
 	this.initialized = false;
 	this.VersionRoom 			= "v1.00";			// 방 버전
 	this.VersionUMUX  			= "2.0.0";			// UMUX 버전(건드리지 마시오)
-	this.SecurityPatchLevel		= "2020.05.01c";	// UMUX 보안 패치 수준(건드리지 마시오)
+	this.SecurityPatchLevel		= "2020.06.01c";	// UMUX 보안 패치 수준(건드리지 마시오)
 	this.log = function(io, msg){
 		if(msg){
 			if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
