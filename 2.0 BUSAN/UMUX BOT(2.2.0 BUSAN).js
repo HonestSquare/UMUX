@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r7)
+// API LEVEL(VERSION): 8(2.2.0 r8)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -2043,7 +2043,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.06.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.08.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2104,8 +2104,8 @@ class IoSystem{
 			PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"), PS.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), 
 			PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
 
-			PS.initBlacklist(true, "명인만두 서울대점", "36312E37352E38332E3732"), 
-			PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"), PS.initBlacklist(true, undefined, "312E3234362E3139312E323134"),
+			PS.initBlacklist(true, "명인만두 서울대점", "36312E37352E38332E3732"), PS.initBlacklist(true, "좁밥수비수", "36312E37352E38332E3732"),
+			PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
 			PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
 			PS.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
 			PS.initBlacklist(true, "겐류사이 육두봉", "3132312E3135332E3137302E323131"),
@@ -2126,6 +2126,11 @@ class IoSystem{
 			PS.initBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
 
 			PS.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"),
+
+			PS.initBlacklist(true, "루니", "31342E33362E3231352E3936"),
+
+			PS.initBlacklist(true, "제주스", "6342E36322E3231392E3232"),
+			PS.initBlacklist(true, "네테로", "36342E36322E3231392E3232"),
 			//------------------------------------------------------------블랙리스트 초기화
             // ***여기에 추가적으로 명단을 작성하십시오***  
             //  <예시> PS.initBlacklist(false, "알파고"), 또는 PS.initBlacklist(true, undefined, "12345678901234567890"),
