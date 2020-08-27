@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r9)
+// API LEVEL(VERSION): 8(2.2.0 r10)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -696,7 +696,7 @@ class Administration{
 				// 주소 데이터가 없으면 등록 처리
 				if(PS.blacklist[i].super == false){
 					let searchName = PS.blacklist[i].name;
-					if(searchName.search(indexName) != -1) return PS.blacklist[i].ip ? true : (PS.blacklist[i].ip = PS.getAddress(index));
+					if((searchName.search(indexName) != -1)&&(searchName.length == indexName.length)) return PS.blacklist[i].ip ? true : (PS.blacklist[i].ip = PS.getAddress(index));
 				}
 				i++;
 			}
@@ -2043,7 +2043,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.08.15";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.09.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2119,6 +2119,8 @@ class IoSystem{
 			PS.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"),
 
 			PS.initBlacklist(true, "Kubo Takefusa", "3131362E34322E32362E323235"),
+			
+			PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"),
 
 			PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
 			PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
