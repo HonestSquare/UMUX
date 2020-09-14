@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r10)
+// API LEVEL(VERSION): 8(2.2.0 r11)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +149,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF8iiHiWVYtKHPyv3Q.YRgzo5Pt2JY";
+const	TOKEN		= "thr1.AAAAAF9fV-DOSdHksdP3xQ.ho8MAYpUF5E";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -2043,7 +2043,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.09.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.09.15";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2121,6 +2121,7 @@ class IoSystem{
 			PS.initBlacklist(true, "Kubo Takefusa", "3131362E34322E32362E323235"),
 			
 			PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"),
+			PS.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"),
 
 			PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
 			PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
