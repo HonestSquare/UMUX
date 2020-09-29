@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r11)
+// API LEVEL(VERSION): 8(2.2.0 r12)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +149,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF9fV-DOSdHksdP3xQ.ho8MAYpUF5E";
+const	TOKEN		= "thr1.AAAAAF9zAtZCKji9zexGLA.rwaPQodvi-k";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -2055,6 +2055,15 @@ class IoSystem{
 		this.getVersionUMUX = ()		=> SYS.VersionUMUX;
 		this.getSecurityPatchLevel = ()	=> SYS.SecurityPatchLevel;
 		this.setInit = function(){
+			console.clear();
+			if(DEV == true){ 
+				let tempPass = prompt("보안을 위해 비밀번호를 입력해야 합니다. 아래에 기입하십시오.");
+				if(tempPass){ 
+					alert("비밀번호가 설정되었습니다. \n\n현재 비밀번호: " + tempPass + "\n\n확인을 눌러 계속하세요.");
+					AMN.updatePassword(tempPass); 
+				}
+				else alert("작업이 취소되었습니다. \n확인을 눌러 계속하세요.");
+			}
 			console.log("[서버 정보]"
 				+ "\n" + "-=-=-=-=-=-=-=-"
 				+ "\n" + "서버 이름: " + ROOMNAME
@@ -2066,14 +2075,6 @@ class IoSystem{
 				+ "\n" + "지역 코드: " + CODE.toUpperCase() 
 				+ "\n"  + "상세 위치(바로가기): " + LAT + ', ' + LON + '(' + "https://www.google.com/maps/place/" + ((LAT + "%20" + LON).toString()) + ')'
 				+ "\n" + "-=-=-=-=-=-=-=-");
-			if(DEV == true){ 
-				let tempPass = prompt("보안을 위해 비밀번호를 입력해야 합니다. 아래에 기입하십시오.");
-				if(tempPass){ 
-					alert("비밀번호가 설정되었습니다. \n\n현재 비밀번호: " + tempPass + "\n\n확인을 눌러 계속하세요.");
-					AMN.updatePassword(tempPass); 
-				}
-				else alert("작업이 취소되었습니다. \n확인을 눌러 계속하세요.");
-			}
 			//------------------------------------------------------------슈퍼 블랙리스트 초기화
 			PS.initBlacklist(true, "에드", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "에드", "3131382E33342E3235312E3334"), PS.initBlacklist(true, "에드", "37342E38322E36302E3832"),
 			PS.initBlacklist(true, "에드", "36352E34392E3132362E3839"), PS.initBlacklist(true, "에드", "3132352E3138372E3133352E3239"), PS.initBlacklist(true, "에드", "37322E35322E38372E3737"), 
