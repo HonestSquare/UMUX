@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r12)
+// API LEVEL(VERSION): 8(2.2.0 r13)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +149,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF9zAtZCKji9zexGLA.rwaPQodvi-k";
+const	TOKEN		= "thr1.AAAAAF92zQNjU3JiOabEXw.IQtM8eTfutA";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -2043,7 +2043,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.09.15";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.10.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2093,8 +2093,8 @@ class IoSystem{
 
 			PS.initBlacklist(true, "랄랄랄", "3132342E35392E37332E313931"), 
 			
-			PS.initBlacklist(true, "노진구", "3138322E3232342E33312E3330"), PS.initBlacklist(true, "노진구", "3130342E3133312E3137362E323334"), 
-			PS.initBlacklist(true, "노진구", "3137382E36322E352E313537"), PS.initBlacklist(true, "노진구", "3137382E3132382E38392E313530"),
+			PS.initBlacklist(true, undefined, "3138322E3232342E33312E3330"), PS.initBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
+			PS.initBlacklist(true, undefined, "3137382E36322E352E313537"), PS.initBlacklist(true, undefined, "3137382E3132382E38392E313530"),
 
 			PS.initBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"),
 			PS.initBlacklist(true, "아이유", "36312E3235352E382E313532"),
