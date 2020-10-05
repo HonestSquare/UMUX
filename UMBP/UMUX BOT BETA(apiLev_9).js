@@ -4,11 +4,12 @@
 //	사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)을 보다 빠르게 신버전을 체험해 볼 수 있는 프로그램입니다.
 //	본 베타 프로그램에 참가 및 이용하라면 다음과 같은 조건에 따라야 합니다.
 //
-//	아래와 같은 항목들을 준수한다면 누구나 자유롭게 수정이 가능합니다.
 //	* 원저작자 표기
-//	* UMUX 버전 표기
-//	* 그 외 기타 사항 및 라이센스는 여기서 확인하십시오. 
-//		github.com/HonestSquare/UMUX/blob/master/LICENCE
+//	* 재배포 및 코드 수정 금지
+//	* UMUX 버전 및 기반임을 표기
+//	* UMUX Beta Program임을 확인할 수 있게 방제에도 표기
+//	* 그 외 사항여기서 확인하십시오. 
+//		github.com/HonestSquare/UMUX/wiki/UMUX-Beta-Program
 //============================================================================================
 const c = function(msg, target){
 	if(!target){ 
@@ -156,10 +157,10 @@ maps[0] =
 const	ROOMNAME 	= "[UMBP]새 방";
 const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
-const	PUBLIC 		= false;				// 공개방 여부
+const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
 const	TOKEN		= "thr1.AAAAAF93FyR8voZCuzbmEQ.HRni1CR9p5I";
-const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
+const	NOPLAYER	= true;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도(동적 좌표)
 const CODE	= "kr";	
