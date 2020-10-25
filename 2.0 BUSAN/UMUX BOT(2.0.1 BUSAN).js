@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 6(2.0.1 r19)
+// API LEVEL(VERSION): 6(2.0.1 r20)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -298,13 +298,7 @@ constructor(){
 	}
 	this.onKickRateLimitSet = function(						// 킥 제한 설정
 		min, rate, burst, player){
-			room.setKickRateLimit(min, rate, burst);
-			NC.announce(NC.notice() 
-			+ "최소: " + min + ' '
-			+ "비율: " + rate + ' '
-			+ "burst: " + burst + ' ',
-			null, null, 4, 3);
-			return false;
+
 	}
 	this.getBallPosX = function(){							// 공 X좌표 얻기
 		return room.getBallPosition().x;
