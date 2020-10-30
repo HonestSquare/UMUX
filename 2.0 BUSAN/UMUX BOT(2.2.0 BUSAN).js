@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r13)
+// API LEVEL(VERSION): 8(2.2.0 r14)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +149,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF92zQNjU3JiOabEXw.IQtM8eTfutA";
+const	TOKEN		= "thr1.AAAAAF9fV-DOSdHksdP3xQ.ho8MAYpUF5E";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -213,7 +213,7 @@ class GameManager{
 			SC.initStatus(player.id);				// 전적 초기화
 			SC.initRanking(player.id);				// 랭킹 초기화
 			SC.updateRanking();						// 랭킹 갱신
-			CS.sendMsg("This Room is Supported in Korean Language Only. :", player.id);	
+			CS.sendMsg("This Room is Supported in Korean Language Only. :", player.id);		
 			NC.devCheck(player);								// 개발자 버전 체크		
 			PS.setAddress(player.id, player.conn);				// 공용 주소 부여
 			PS.setNetwork(player.id, player.auth);				// 공용 네트워크 부여
@@ -354,14 +354,8 @@ class GameManager{
 			console.log("SYS.setRequireRecaptcha(false);");
 		}
 		this.onKickRateLimitSet = function(						// 킥 제한 설정
-			min, rate, burst, player){
-				room.setKickRateLimit(min, rate, burst);
-				NC.announce(NC.notice() 
-				+ "최소: " + min + ' '
-				+ "비율: " + rate + ' '
-				+ "burst: " + burst + ' ',
-				null, null, 4, 3);
-				return false;
+			min, rate, burst, player){ 
+				
 		}
 		this.initMapsInfo = function(){							// 맵 정보 초기화
 			for(let i = 0; i < maps.length; i++){
@@ -1258,7 +1252,7 @@ class Commands{
 			NC.announce(NC.help()
 				+ "🌐" 		+ ": 서버 매니저 | "
 				+ PS.mark[0] + ": 관리자 |"
-				+ PS.mark[1] + ": 보조 관리자 |"
+				+ PS.mark[1] + ": 보조 관�������������������자 |"
 				+ PS.mark[2] + ": 일반 |"
 				+ PS.mark[3] + ": 블랙리스트 "
 				+ CM.recommendCom("관련 ", "!chathelp"),
@@ -2043,7 +2037,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.10.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.11.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2075,74 +2069,56 @@ class IoSystem{
 				+ "\n" + "지역 코드: " + CODE.toUpperCase() 
 				+ "\n"  + "상세 위치(바로가기): " + LAT + ', ' + LON + '(' + "https://www.google.com/maps/place/" + ((LAT + "%20" + LON).toString()) + ')'
 				+ "\n" + "-=-=-=-=-=-=-=-");
-			//------------------------------------------------------------슈퍼 블랙리스트 초기화
-			PS.initBlacklist(true, "에드", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "에드", "3131382E33342E3235312E3334"), PS.initBlacklist(true, "에드", "37342E38322E36302E3832"),
-			PS.initBlacklist(true, "에드", "36352E34392E3132362E3839"), PS.initBlacklist(true, "에드", "3132352E3138372E3133352E3239"), PS.initBlacklist(true, "에드", "37322E35322E38372E3737"), 
-			PS.initBlacklist(true, "에드", "31342E34372E3131322E313232"), PS.initBlacklist(true, "에드", "3232312E3136352E3136332E313530"), PS.initBlacklist(true, "에드", "3138322E3232342E33312E313136"), 
-			PS.initBlacklist(true, "에드", "3138332E3130302E3135362E32353"), PS.initBlacklist(true, "에드", "3138332E3130302E3135362E323532"), PS.initBlacklist(true, "에드", "3139382E31362E37342E323035"), 
-			PS.initBlacklist(true, "에드", "37342E38322E36302E313739"), 
-			PS.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), 
-			PS.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), 
-			PS.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
-			PS.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
-
-			PS.initBlacklist(true, "Bone Collecter", "31342E342E3134342E313138"), PS.initBlacklist(true, "GRF SWORD", "31342E342E3134342E313138"),
-			
-			PS.initBlacklist(true, "카푸", "312E3233352E3136332E3730"), PS.initBlacklist(true, "카푸", "3130342E3133312E36362E38"),
-			PS.initBlacklist(true, "호박", "312E3233352E3136332E3730"), PS.initBlacklist(true, "호박", "3130342E3133312E36362E38"),
-
-			PS.initBlacklist(true, "랄랄랄", "3132342E35392E37332E313931"), 
-			
-			PS.initBlacklist(true, undefined, "3138322E3232342E33312E3330"), PS.initBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
-			PS.initBlacklist(true, undefined, "3137382E36322E352E313537"), PS.initBlacklist(true, undefined, "3137382E3132382E38392E313530"),
-
-			PS.initBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"),
-			PS.initBlacklist(true, "아이유", "36312E3235352E382E313532"),
-
-			PS.initBlacklist(true, "와이어샤크", "33392E3132302E3139362E3732"),
-			PS.initBlacklist(true, "Ready", "3138332E39372E3138302E313534"), PS.initBlacklist(true, "Ready", "3138332E39372E3138302E313334"), PS.initBlacklist(true, "Ready", "3132312E3137352E3134372E313236"),
-
-			PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"), PS.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), 
-			PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
-
-			PS.initBlacklist(true, "명인만두 서울대점", "36312E37352E38332E3732"), PS.initBlacklist(true, "좁밥수비수", "36312E37352E38332E3732"),
-			PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
-			PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
-			PS.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
-			PS.initBlacklist(true, "겐류사이 육두봉", "3132312E3135332E3137302E323131"),
-
-			PS.initBlacklist(true, "반다이크", "3131362E3132342E3137382E3433"),
-			PS.initBlacklist(true, "반다이크", "3137352E3139372E3231392E313031"),
-
-			PS.initBlacklist(true, "쁘이훈", "3132342E35332E3137362E3831"),
-			PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"),
-			PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"),
-			PS.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"),
-
-			PS.initBlacklist(true, "Kubo Takefusa", "3131362E34322E32362E323235"),
-			
-			PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"),
-			PS.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"),
-
-			PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
-			PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
-			PS.initBlacklist(true, undefined, "3231312E3234332E3232322E3733"),
-			PS.initBlacklist(true, undefined, "33392E3131372E37392E313337"),
-			
-			PS.initBlacklist(true, "drogba", "3131382E33322E37372E323531"),
-			PS.initBlacklist(true, "드록바", "3131382E33322E37372E323531"),
-
-			PS.initBlacklist(true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"),
-
-			PS.initBlacklist(true, "soy el mas pro", "3139302E34392E3137302E313038"),
-			PS.initBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
-
-			PS.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"),
-
-			PS.initBlacklist(true, "루니", "31342E33362E3231352E3936"),
-
-			PS.initBlacklist(true, "제주스", "6342E36322E3231392E3232"),
-			PS.initBlacklist(true, "네테로", "36342E36322E3231392E3232"),
+				//------------------------------------------------------------슈퍼 블랙리스트 초기화
+				PS.initBlacklist(true, "에드", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "에드", "3131382E33342E3235312E3334"), PS.initBlacklist(true, "에드", "37342E38322E36302E3832"),PS.initBlacklist(true, "에드", "36352E34392E3132362E3839"), PS.initBlacklist(true, "에드", "3132352E3138372E3133352E3239"), PS.initBlacklist(true, "에드", "37322E35322E38372E3737"), PS.initBlacklist(true, "에드", "31342E34372E3131322E313232"), PS.initBlacklist(true, "에드", "3232312E3136352E3136332E313530"), PS.initBlacklist(true, "에드", "3138322E3232342E33312E313136"), PS.initBlacklist(true, "에드", "3138332E3130302E3135362E32353"), PS.initBlacklist(true, "에드", "3138332E3130302E3135362E323532"), PS.initBlacklist(true, "에드", "3139382E31362E37342E323035"), PS.initBlacklist(true, "에드", "37342E38322E36302E313739"), 
+				PS.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
+				PS.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
+	
+				PS.initBlacklist(true, "Bone Collecter", "31342E342E3134342E313138"), PS.initBlacklist(true, "GRF SWORD", "31342E342E3134342E313138"),
+				
+				PS.initBlacklist(true, "랄랄랄", "3132342E35392E37332E313931"), 
+				
+				PS.initBlacklist(true, undefined, "3138322E3232342E33312E3330"), PS.initBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
+				PS.initBlacklist(true, undefined, "3137382E36322E352E313537"), PS.initBlacklist(true, undefined, "3137382E3132382E38392E313530"),
+	
+				PS.initBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"),
+				PS.initBlacklist(true, "아이유", "36312E3235352E382E313532"),
+	
+				PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"), PS.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), 
+				PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
+	
+				PS.initBlacklist(true, "명인만두 서울대점", "36312E37352E38332E3732"), PS.initBlacklist(true, "좁밥수비수", "36312E37352E38332E3732"),
+				PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
+				PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
+				PS.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
+	
+				PS.initBlacklist(true, "반다이크", "3131362E3132342E3137382E3433"), PS.initBlacklist(true, "반다이크", "3137352E3139372E3231392E313031"),
+	
+				PS.initBlacklist(true, "쁘이훈", "3132342E35332E3137362E3831"),
+				PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), PS.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"),
+	
+				PS.initBlacklist(true, "Kubo Takefusa", "3131362E34322E32362E323235"),
+	
+				PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"),
+				PS.initBlacklist(true, "코트", "3131382E3137362E34372E313332"),
+	
+				PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
+				PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
+				PS.initBlacklist(true, undefined, "3231312E3234332E3232322E3733"),
+				PS.initBlacklist(true, undefined, "33392E3131372E37392E313337"),
+				
+				PS.initBlacklist(true, "drogba", "3131382E33322E37372E323531"), PS.initBlacklist(true, "드록바", "3131382E33322E37372E323531"),
+	
+				PS.initBlacklist(true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"),
+	
+				PS.initBlacklist(true, "soy el mas pro", "3139302E34392E3137302E313038"),
+				PS.initBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
+	
+				PS.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"),
+	
+				PS.initBlacklist(true, "루니", "31342E33362E3231352E3936"),
+	
+				PS.initBlacklist(true, "제주스", "36342E36322E3231392E3232"), PS.initBlacklist(true, "네테로", "36342E36322E3231392E3232"),
 			//------------------------------------------------------------블랙리스트 초기화
             // ***여기에 추가적으로 명단을 작성하십시오***  
             //  <예시> PS.initBlacklist(false, "알파고"), 또는 PS.initBlacklist(true, undefined, "12345678901234567890"),
@@ -2311,4 +2287,4 @@ room.onGameStart = function(){ return GM.onGameStart(); }
 room.onGameTick = function(){ return GM.onGameTick(); }							
 room.onGameStop = function(){ return GM.onGameStop(); }							
 room.onGamePause = function(byPlayer){ return GM.onGamePause(byPlayer);}			
-room.onGameUnpause = function(byPlayer){ return GM.onGameUnpause(byPlayer); }
+room.onGameUnpause = function(byPlayer){ return GM.onGameUnpause(byPlayer); }	
