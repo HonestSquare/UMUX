@@ -9,7 +9,7 @@
 ## 누구나 마음대로 쓸 수 있나요?
 예, 아래와 같은 항목들을 준수한다면 누구나 자유롭게 수정이 가능합니다.
 - 원저작자 표기
-- UMUX 버전 표기(예: Powered by UMUX 1.0.0)
+- UMUX 버전 표기(예: Powered by UMUX 2.2.0)
 > `NC.announce(NC.info() + "봇방입니다." + ' | ' + "버전: " + SYS.versionRoom + " (Powered by UMUX " + SYS.versionUMUX + ')')`
 
 그 외 기타 사항 및 라이센스는 [여기서](https://github.com/HonestSquare/UMUX/blob/master/LICENCE) 확인하십시오.
