@@ -3,14 +3,14 @@
 **WARNING: NEVER EDIT IT FOR OTHERS THAN KOREAN LANGUAGE.**
 
 # UMUX란?
-유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로,
+유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
 
 ## 누구나 마음대로 쓸 수 있나요?
 예, 아래와 같은 항목들을 준수한다면 누구나 자유롭게 수정이 가능합니다.
 - 원저작자 표기
-- UMUX 버전 표기(예: Based by UMUX 1.0.0)
-> `n.announce(n.info() + '봇방입니다. | 버전: ' + Roomversion + ' (Based by UMUX ' + UXversion + '))`
+- UMUX 버전 표기(예: Powered by UMUX 1.0.0)
+> `NC.announce(NC.info() + "봇방입니다." + ' | ' + "버전: " + Roomversion + " (Powered by UMUX " + UXversion + "))`
 
 그 외 기타 사항 및 라이센스는 [여기서](https://github.com/HonestSquare/UMUX/blob/master/LICENCE) 확인하십시오.
 
