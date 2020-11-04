@@ -5,4 +5,4 @@
 아래와 같은 항목들을 준수한다면 누구나 자유롭게 수정이 가능합니다.
 * 원저작자 표기
 * UMUX 버전 표기
-* 그 외 기타 사항 및 라이센스는 [여기서](github.com/HonestSquare/UMUX/blob/master/LICENCE) 확인하십시오. 
+* 그 외 기타 사항 및 라이센스는 [여기서](https://github.com/HonestSquare/UMUX/blob/master/LICENCE) 확인하십시오. 
