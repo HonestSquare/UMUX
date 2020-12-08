@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r14)
+// API LEVEL(VERSION): 8(2.2.0 r15)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -149,7 +149,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF9fV-DOSdHksdP3xQ.ho8MAYpUF5E";
+const	TOKEN		= "thr1.AAAAAF-cFnRsC00Ychy9eQ.MUJVOZTj-Xo";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -213,7 +213,7 @@ class GameManager{
 			SC.initStatus(player.id);				// 전적 초기화
 			SC.initRanking(player.id);				// 랭킹 초기화
 			SC.updateRanking();						// 랭킹 갱신
-			CS.sendMsg("This Room is Supported in Korean Language Only. :", player.id);		
+			CS.sendMsg("This Room is Supported in Korean Language Only. :", player.id);	
 			NC.devCheck(player);								// 개발자 버전 체크		
 			PS.setAddress(player.id, player.conn);				// 공용 주소 부여
 			PS.setNetwork(player.id, player.auth);				// 공용 네트워크 부여
@@ -1252,7 +1252,7 @@ class Commands{
 			NC.announce(NC.help()
 				+ "🌐" 		+ ": 서버 매니저 | "
 				+ PS.mark[0] + ": 관리자 |"
-				+ PS.mark[1] + ": 보조 관�������������������자 |"
+				+ PS.mark[1] + ": 보조 관리자 |"
 				+ PS.mark[2] + ": 일반 |"
 				+ PS.mark[3] + ": 블랙리스트 "
 				+ CM.recommendCom("관련 ", "!chathelp"),
@@ -2037,7 +2037,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.11.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2020.12.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2087,7 +2087,6 @@ class IoSystem{
 				PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"), PS.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), 
 				PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
 	
-				PS.initBlacklist(true, "명인만두 서울대점", "36312E37352E38332E3732"), PS.initBlacklist(true, "좁밥수비수", "36312E37352E38332E3732"),
 				PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
 				PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
 				PS.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
@@ -2095,12 +2094,12 @@ class IoSystem{
 				PS.initBlacklist(true, "반다이크", "3131362E3132342E3137382E3433"), PS.initBlacklist(true, "반다이크", "3137352E3139372E3231392E313031"),
 	
 				PS.initBlacklist(true, "쁘이훈", "3132342E35332E3137362E3831"),
-				PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), PS.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"),
+				PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), PS.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
 	
 				PS.initBlacklist(true, "Kubo Takefusa", "3131362E34322E32362E323235"),
 	
 				PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"),
-				PS.initBlacklist(true, "코트", "3131382E3137362E34372E313332"),
+				PS.initBlacklist(true, "코트", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "마샬", "3131382E3137362E34372E313332"),
 	
 				PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
 				PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
@@ -2287,4 +2286,4 @@ room.onGameStart = function(){ return GM.onGameStart(); }
 room.onGameTick = function(){ return GM.onGameTick(); }							
 room.onGameStop = function(){ return GM.onGameStop(); }							
 room.onGamePause = function(byPlayer){ return GM.onGamePause(byPlayer);}			
-room.onGameUnpause = function(byPlayer){ return GM.onGameUnpause(byPlayer); }	
+room.onGameUnpause = function(byPlayer){ return GM.onGameUnpause(byPlayer); }
