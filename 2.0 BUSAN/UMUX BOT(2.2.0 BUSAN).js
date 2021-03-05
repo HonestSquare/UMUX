@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r15)
+// API LEVEL(VERSION): 8(2.2.0 r16)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -2037,7 +2037,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2020.12.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2021.03.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2081,39 +2081,36 @@ class IoSystem{
 				PS.initBlacklist(true, undefined, "3138322E3232342E33312E3330"), PS.initBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
 				PS.initBlacklist(true, undefined, "3137382E36322E352E313537"), PS.initBlacklist(true, undefined, "3137382E3132382E38392E313530"),
 	
-				PS.initBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"),
-				PS.initBlacklist(true, "아이유", "36312E3235352E382E313532"),
+				PS.initBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"), PS.initBlacklist(true, undefined, "36312E3235352E382E313532"),
 	
-				PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"), PS.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), 
-				PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
+				PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"), PS.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
 	
 				PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
 				PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
 				PS.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
 	
-				PS.initBlacklist(true, "반다이크", "3131362E3132342E3137382E3433"), PS.initBlacklist(true, "반다이크", "3137352E3139372E3231392E313031"),
+				PS.initBlacklist(true, "반다이크", "3131362E3132342E3137382E3433"), PS.initBlacklist(true, "반다이크", "3137352E3139372E3231392E313031"), PS.initBlacklist(true, "페르난데스", "3137352E3139372E3231392E313031"), PS.initBlacklist(true, "반다이크", "35392E31362E35342E313631"),
 	
 				PS.initBlacklist(true, "쁘이훈", "3132342E35332E3137362E3831"),
 				PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), PS.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
 	
 				PS.initBlacklist(true, "Kubo Takefusa", "3131362E34322E32362E323235"),
 	
-				PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"),
-				PS.initBlacklist(true, "코트", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "마샬", "3131382E3137362E34372E313332"),
+				PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"), PS.initBlacklist(true, "코트", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "마샬", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "노래하는메시", "3232312E3135312E3132312E313731"), PS.initBlacklist(true, "노래하는메시", "3232302E37362E3230302E35"), PS.initBlacklist(true, "노래하는메시", "3231312E3232342E3232392E313637"), PS.initBlacklist(true, "노래하는메시", "3232302E37352E3230392E3637"),
 	
 				PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
 				PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
 				PS.initBlacklist(true, undefined, "3231312E3234332E3232322E3733"),
 				PS.initBlacklist(true, undefined, "33392E3131372E37392E313337"),
 				
-				PS.initBlacklist(true, "drogba", "3131382E33322E37372E323531"), PS.initBlacklist(true, "드록바", "3131382E33322E37372E323531"),
+				PS.initBlacklist(true, "drogba", "3131382E33322E37372E323531"), PS.initBlacklist(true, "드록바", "3131382E33322E37372E323531"), PS.initBlacklist(true, "드록바", "35382E3134332E37362E3635"),
 	
 				PS.initBlacklist(true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"),
 	
 				PS.initBlacklist(true, "soy el mas pro", "3139302E34392E3137302E313038"),
 				PS.initBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
 	
-				PS.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"),
+				PS.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"), PS.initBlacklist(true, "HYNN", "3232322E3130352E302E313733"), PS.initBlacklist(true, "HYNN", "3231382E35312E31392E3338"),
 	
 				PS.initBlacklist(true, "루니", "31342E33362E3231352E3936"),
 	
