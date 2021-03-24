@@ -23,7 +23,7 @@
 # 모르는 코드가 있어요!
 개발자를 위하여, 소스를 분석하고 해석한 [UMUX 레퍼런스](https://github.com/HonestSquare/UMUX/wiki/UMUX-Reference)를 제공하고 있습니다.
 
-# 사용자 가이드라인
+# 사용자 정책
 소스 코드 및 소프트웨어 [개발 및 사용 정책](https://github.com/HonestSquare/UMUX/wiki/UMUX-User-Guidelines)이 포함되어 있습니다.
 
 # 라이센스
