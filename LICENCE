@@ -1,21 +1,24 @@
-MIT License
+UMUX Licence 3.0
 
 Copyright (c) 2019-2021 HonestSquare
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+0. 정의. 
+"저작권자"는 창작한 저작물의 권리를 가지고 있는 창작자를 의미합니다.
+"사용자"는 저작권자로부터 저작물의 사용 권리를 부여받은 저작물 차용인을 의미합니다. 
+"원시 저작물"은 소스 코드, 구성 파일 등을 저작권자에 의한 최초 창작에 따른 원천이 되는 모든 저작물을 의미합니다. 
+"가공 저작물"은 저작권자 외의 사용자가 원시 저작물을 기반으로 임의 수정한 저작물을 의미합니다.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. 저작물 대여 및 허가. 
+저작권자는 사용자에 대하여 원시 저작물을 제공할 수 있는 권리가 있으며 사용자는 저작권자부터의 승인을 부여받은 직후부터 즉각적으로 원시 저작물의 차용권이 성립됩니다.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. 재배포. 
+사용자는 저작권자로부터 획득된 원시 저작물에 대하여 복제, 재배포 권리가 부여되지 않습니다. 가공 저작물의 경우에 한하여 재배포, 복제, 판매권을 요구할 수 있습니다. 사용자는 가공 저작물에서, 저작권자의 저작권을 명시하지 않으면 가공 저작물의 재배포 권리가 성립되지 않으며 이를 불응하고 재배포를 강행한 경우, 저작권자로부터의 저작물 차용권이 상실됩니다.
+
+3. 수정.
+사용자는 저작권자로부터 획득된 원시 저작물을 수정할 권리가 있습니다. 사용자가 임의 수정한 저작물은 더이상 원시 저작물이 아닌 가공 저작물로 취급 간주됩니다.
+
+4. 보증 및 제한. 
+사용자는 저작권자와 원시 저작물의 상업적 목적의 사용에 대한 승인 신청을 제출할 수 있으며, 저작권자는 이에 대하여 체결을 승인하거나 거부할 수 있는 임대 권한을 가지고 있습니다. 임대 기간은 계약 시종에 따라 성립되고 이에 따른 비용은 사용자의 가공 저작물을 통한 실효 매출과 관계없이 임대 기간에 비례 된 정기 일시에 납부하여야 합니다. 원시 저작물 및 가공 저작물은 모든 경우에서 저작권의 효력이 미치지 않는 외부 저작물과의 병합 권리가 부여되지 않으며 또한 이에 따라서 저작권자로부터의 저작물 차용권이 상실됩니다.
+
+5. 사용자 정책. 
+모든 사용자는 저작권자로부터 정책을 이행 받을 근거가 있으며 불응할 경우 저작권자로부터의 저작물 차용권이 상실됩니다.
