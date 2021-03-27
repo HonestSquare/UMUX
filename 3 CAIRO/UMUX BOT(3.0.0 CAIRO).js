@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r1)
+		//	API LEVEL: 9(3.0.0 r2)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -21,7 +21,7 @@
 		const	HOSTNAME 	= " ";
 		const	PUBLIC 		= true;
 							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGBYos3omkshADnwfA.SbwNPL3aliQ";
+		const	TOKEN		= "thr1.AAAAAGBez8eMMl7BI2G14A.7CCMwW35uf8";
 		const	NOPLAYER	= true;
 							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";	
@@ -1036,7 +1036,7 @@
 					let sPos = msg.indexOf(' ');
 					let chatMsg = msg.substr(sPos + 1, 50)
 					if(target == 0){
-						let mark = PS.getTeamTag(PS.getPlayer(player).team, CS.filterWords(msg));
+						let mark = (CS.filterWords(msg) ? PS.getTeamTag(PS.getPlayer(player).team, true) : PS.getGradeTag(player));
 						CS.sendMsg("외부" + mark + SYS.showPlayerInfo(player, "local") + '→' + '🌐' + "(0)" + "서버 매니저" + ": " + chatMsg, player);
 						SYS.log(false, mark + SYS.showPlayerInfo(player) + ": " +  chatMsg, SYS.LOG_TYPE.BINDING);
 						return false;	//	채팅 창에서 명령어 입력 기록 숨기기
@@ -2046,7 +2046,7 @@
 						);
 					console.groupEnd();
 					AMN.updatePassword(PASSWORD);
-					//---슈퍼 블랙리스트 초기화---
+					//	---슈퍼 블랙리스트 초기화---
 				    AMN.initBlacklist(true, "에드", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "에드", "3131382E33342E3235312E3334"), AMN.initBlacklist(true, "에드", "37342E38322E36302E3832"),AMN.initBlacklist(true, "에드", "36352E34392E3132362E3839"), AMN.initBlacklist(true, "에드", "3132352E3138372E3133352E3239"), AMN.initBlacklist(true, "에드", "37322E35322E38372E3737"), AMN.initBlacklist(true, "에드", "31342E34372E3131322E313232"), AMN.initBlacklist(true, "에드", "3232312E3136352E3136332E313530"), AMN.initBlacklist(true, "에드", "3138322E3232342E33312E313136"), AMN.initBlacklist(true, "에드", "3138332E3130302E3135362E32353"), AMN.initBlacklist(true, "에드", "3138332E3130302E3135362E323532"), AMN.initBlacklist(true, "에드", "3139382E31362E37342E323035"), AMN.initBlacklist(true, "에드", "37342E38322E36302E313739"), 
 				    AMN.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
 				    AMN.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
@@ -2092,10 +2092,10 @@
 				    AMN.initBlacklist(true, "루니", "31342E33362E3231352E3936"),
 
 				    AMN.initBlacklist(true, "제주스", "36342E36322E3231392E3232"), AMN.initBlacklist(true, "네테로", "36342E36322E3231392E3232"),
-					//---블랙리스트 초기화---
+					//	---블랙리스트 초기화---
 					//	아래와 같은 형식으로 명단을 작성할 수 있습니다.
 					//	<예시> AMN.initBlacklist(false, "알파고"), 또는 AMN.initBlacklist(true, undefined, "12345678901234567890"),
-                    
+					
                     //
 					SYS.log(true, "서버 가동 시작", SYS.LOG_TYPE.NOTICE);
 					if(PASSWORD)
