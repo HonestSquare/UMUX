@@ -716,7 +716,7 @@
 					return false;
 				}
 				this.giveAdmin			= function(player){					//						권한 설정 부여
-					if(this.cntAdmins(1) >= maxAdmin) return false;
+					if(this.cntAdmins(2) >= maxAdmin) return false;
 					room.setPlayerAdmin(player, true);
 					return false;
 				}
