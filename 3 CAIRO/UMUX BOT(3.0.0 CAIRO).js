@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r2)
+		//	API LEVEL: 9(3.0.0 r3)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -21,7 +21,7 @@
 		const	HOSTNAME 	= " ";
 		const	PUBLIC 		= true;
 							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGBez8eMMl7BI2G14A.7CCMwW35uf8";
+		const	TOKEN		= "thr1.AAAAAGBxBrb3jRyX1bMozw.UOyn27fqkGU";
 		const	NOPLAYER	= true;
 							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";	
@@ -109,8 +109,8 @@
 				const handleGameStart	= function(){							//	게임 제어 준비
 					gameStats = 1;									//	게임 상태 갱신
 					countMatch++;									//	누적 경기 횟수 반영
-					firstTimeNotified = 0;							//	최초 기록 시간 0으로 초기화
-					lastTimeNotified = 0;							//	최근 기록 시간 0으로 초기화
+					firstTimeNotified = TM.getTime();				//	최초 기록 시간 초기화
+					lastTimeNotified = TM.getTime();				//	최근 기록 시간 초기화
 					timeLimitReached = false;						//	기준 시간에 미도달한 상태로 초기화
 					SC.clearTouchedList();							//	선두자 명단 모두 지우기
 					for(let i = 1; i <= PS.cntPlayers(); i++){		//	마지막 활동 시간 저장
@@ -127,12 +127,14 @@
 						GM.checkAfkPlayer(PS.getPublicId(i), currentTime);		//	장기 무응답 플레이어 판정
 					}
 					if(timeLimit < 1) return false;								//	범위 내 도달 기준 시간이면 처리 종료
-					if(currentTime > lastTimeNotified + timeLimit * 1000){		//	최근 기록 시간에서 도달 기준 시간 이후로 경과된 경우(정기 실행)
+					if(currentTime - lastTimeNotified > timeLimit * 1000){		//	최근 기록 시간에서 도달 기준 시간 이후로 경과된 경우(정기 실행)
 						lastTimeNotified = currentTime;							//	최근 기록 시간을 현재 시간으로 변경
 						return true;
 					}
-					if(!timeLimitReached && (currentTime >= timeLimit * 1000)){	//	0초에서 도달 기준 시간 이후로 경과된 경우(한 번만 실행)
+					if(!timeLimitReached										//	0초에서 도달 기준 시간 이후로 경과된 경우(한 번만 실행)
+						&& (currentTime - lastTimeNotified >= timeLimit * 1000)){
 						timeLimitReached = true;								//	시간 도달하였으므로 값을 참으로 변경
+						return true;
 					}
 					return false;
 				}
@@ -716,7 +718,7 @@
 					return false;
 				}
 				this.giveAdmin			= function(player){					//						권한 설정 부여
-					if(this.cntAdmins(2) >= maxAdmin) return false;
+					if(AMN.cntAdmins(2) >= maxAdmin) return false;
 					room.setPlayerAdmin(player, true);
 					return false;
 				}
