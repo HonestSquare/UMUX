@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r3)
+		//	API LEVEL: 9(3.0.0 r4)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -21,7 +21,7 @@
 		const	HOSTNAME 	= " ";
 		const	PUBLIC 		= true;
 							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGBxBrb3jRyX1bMozw.UOyn27fqkGU";
+		const	TOKEN		= "thr1.AAAAAGCL3phsrL_5UCEa1g.pPPGrRdijXo";
 		const	NOPLAYER	= true;
 							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";	
@@ -139,14 +139,14 @@
 					return false;
 				}
 				let	afkLimitTime			= 300;			//						장기 무응답 플레이어 판정 초단위 최소 시간(5 이하이면 판정 생략)
-				let countMatch				= 0;			//						누적 경기 횟수
-				let gameStats				= 0;			//						0: 정지, 1: 시작, 2: 게임 중, 3: 경기 중단
-				let isRecording				= false;		//						녹화 여부
-				let link					= null;			//						서버 링크
-				let firstTimeNotified		= 0;			//						최초 도달 시간
-				let lastTimeNotified		= 0;			//						최근 도달 시간
-				let timeLimit				= 60;			//						도달 기준 시간(초 단위)
-				let timeLimitReached		= false;		//						시간 도달 여부
+				let	countMatch				= 0;			//						누적 경기 횟수
+				let	gameStats				= 0;			//						0: 정지, 1: 시작, 2: 게임 중, 3: 경기 중단
+				let	isRecording				= false;		//						녹화 여부
+				let	link					= null;			//						서버 링크
+				let	firstTimeNotified		= 0;			//						최초 도달 시간
+				let	lastTimeNotified		= 0;			//						최근 도달 시간
+				let	timeLimit				= 60;			//						도달 기준 시간(초 단위)
+				let	timeLimitReached		= false;		//						시간 도달 여부
 				this.onGamePause		= function(player){ 			//			게임 중단
 					gameStats = 3;
 					SYS.log(true, (player == undefined ? "[경기 중단]" : (SYS.showPlayerInfo(player.id) + "(이)가 게임을 일시 중단함.")), SYS.LOG_TYPE.NOTICE);
@@ -1249,7 +1249,7 @@
 					if(CS.isFreeze() == true) return NC.caution("채팅창이 이미 얼려있습니다.", player, "!unfreeze");
 					if(PS.cntPlayers() < 3) return NC.caution("부적절한 조치입니다.", player,"!mute #ID");
 					CS.freezeChat(true);
-					YS.log(true, SYS.showPlayerInfo(player) + "(이)가 채팅창을 얼림.", SYS.LOG_TYPE.NOTICE);
+					SYS.log(true, SYS.showPlayerInfo(player) + "(이)가 채팅창을 얼림.", SYS.LOG_TYPE.NOTICE);
 					return false;	//	채팅 창에서 명령어 입력 기록 숨기기
 				}
 				this.comKick			= function(player, msg, type){						//	!kick #ID		|	강제 퇴장
@@ -2149,7 +2149,7 @@
 					titleNodes[0][0].style.background = "#244967";	titleNodes[1][1].style.background = "#244967";	titleNodes[0][2].style.background = "#244967";	titleNodes[1][2].style.background = "#244967";	titleNodes[2][2].style.background = "#244967";
 					titleNodes[1][0].style.background = "#111619";	titleNodes[2][0].style.background = "#111619";	titleNodes[0][1].style.background = "#E56E56";	titleNodes[2][1].style.background = "#5689E5";	
 					titleNodes[0][2].style.marginBottom = "-1vw;";	titleNodes[2][2].style.marginBottom = "-1vw;";
-					titleNodes[0][0].style.marginTop = "0vw;";		titleNodes[0][0].style.marginBottom = "0vw;"; 	
+					titleNodes[0][0].style.marginTop = "0vw;";		titleNodes[0][0].style.marginBottom = "0vw;";
 					//	텍스트
 					titleNodes[0][0].innerText = "현재 인원: ";		titleNodes[0][1].innerText = "경기가 시작되면 표시됩니다.";		titleNodes[1][1].innerText = "경기가 시작되면 표시됩니다.";		titleNodes[2][1].innerText = "경기가 시작되면 표시됩니다.";
 					titleNodes[0][2].innerText = "RED";				titleNodes[1][2].innerText = "SPECTATORS";						titleNodes[2][2].innerText = "BLUE";
