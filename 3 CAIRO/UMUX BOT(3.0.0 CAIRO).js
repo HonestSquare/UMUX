@@ -1248,7 +1248,7 @@
 					if(CS.isFreeze() == true) return NC.caution("채팅창이 이미 얼려있습니다.", player, "!unfreeze");
 					if(PS.cntPlayers() < 3) return NC.caution("부적절한 조치입니다.", player,"!mute #ID");
 					CS.freezeChat(true);
-					YS.log(true, SYS.showPlayerInfo(player) + "(이)가 채팅창을 얼림.", SYS.LOG_TYPE.NOTICE);
+					SYS.log(true, SYS.showPlayerInfo(player) + "(이)가 채팅창을 얼림.", SYS.LOG_TYPE.NOTICE);
 					return false;	//	채팅 창에서 명령어 입력 기록 숨기기
 				}
 				this.comKick			= function(player, msg, type){						//	!kick #ID		|	강제 퇴장
@@ -2146,7 +2146,7 @@
 					titleNodes[0][0].style.background = "#244967";	titleNodes[1][1].style.background = "#244967";	titleNodes[0][2].style.background = "#244967";	titleNodes[1][2].style.background = "#244967";	titleNodes[2][2].style.background = "#244967";
 					titleNodes[1][0].style.background = "#111619";	titleNodes[2][0].style.background = "#111619";	titleNodes[0][1].style.background = "#E56E56";	titleNodes[2][1].style.background = "#5689E5";	
 					titleNodes[0][2].style.marginBottom = "-1vw;";	titleNodes[2][2].style.marginBottom = "-1vw;";
-					titleNodes[0][0].style.marginTop = "0vw;";		titleNodes[0][0].style.marginBottom = "0vw;"; 	
+					titleNodes[0][0].style.marginTop = "0vw;";		titleNodes[0][0].style.marginBottom = "0vw;";
 					//	텍스트
 					titleNodes[0][0].innerText = "현재 인원: ";		titleNodes[0][1].innerText = "경기가 시작되면 표시됩니다.";		titleNodes[1][1].innerText = "경기가 시작되면 표시됩니다.";		titleNodes[2][1].innerText = "경기가 시작되면 표시됩니다.";
 					titleNodes[0][2].innerText = "RED";				titleNodes[1][2].innerText = "SPECTATORS";						titleNodes[2][2].innerText = "BLUE";
