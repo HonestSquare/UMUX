@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r5)
+		//	API LEVEL: 9(3.0.0 r6)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -21,7 +21,7 @@
 		const	HOSTNAME 	= " ";
 		const	PUBLIC 		= true;
 							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGBez8eMMl7BI2G14A.7CCMwW35uf8";
+		const	TOKEN		= "thr1.AAAAAGDQV5h1qKeleupE8w.VAfYSXFUhJk";
 		const	NOPLAYER	= true;
 							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";	
@@ -151,6 +151,11 @@
 					gameStats = 3;
 					SYS.log(true, (player == undefined ? "[경기 중단]" : (SYS.showPlayerInfo(player.id) + "(이)가 게임을 일시 중단함.")), SYS.LOG_TYPE.NOTICE);
 					SYS.updateWebGUI();
+					//	게임 미진행 중, 장기 무응답 플레이어 판정
+					setTimeout(() => {
+						for(let i = 1; i <= PS.cntPlayers(); i++)
+							GM.checkAfkPlayer(PS.getPublicId(i), TM.getTime());
+					}, GM.getAfkLimitTime() * 1000);
 				}	
 				this.onGameStart		= function(){					//			게임 시작
 					handleGameStart();		//	게임 제어 준비
@@ -403,7 +408,7 @@
 							if(PS.getLocalId(i) > 0 && PS.getLocalId(i) <= PS.cntPlayers()) indexArray.push(i);
 						}
 					}
-						room.reorderPlayers(indexArray, (moveToTop == true || moveToTop == false ? moveToTop : true));
+					room.reorderPlayers(indexArray, (moveToTop == true || moveToTop == false ? moveToTop : true));
 					for(let i = 1; i <= PS.cntPlayers(); i++){	//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
 						SYS.updateListIndex(PS.getPublicId(i));
 					}
@@ -1288,8 +1293,22 @@
 					return false;	//	채팅 창에서 명령어 입력 기록 숨기기
 				}
 				this.comRecording		= function(player){									//	!rec			|	녹화 시작/종료
-					if(AMN.getAdmin(player) != 1) return NC.acess(player);
+					if(AMN.getAdmin(player) != 2) return NC.acess(player);
 					GM.getStateRecording() ? GM.stopRecording() : GM.startRecording();
+					return false;	//	채팅 창에서 명령어 입력 기록 숨기기
+				}
+				this.comRecaptcha		= function(player, msg, type){						//	!recaptcha		|	reCAPTCHA 설정
+					if(type == 1) return NC.help("reCAPTCHA를 활성화 하려면", "!recaptcha on", player);
+					if(!AMN.getAdmin(player)) return NC.acess(player);
+					switch(msg.toLowerCase()){
+						case "on":	case "온":	case "활성화":	case "ㅐㅜ":	case "dhs":	case "ghkftjdghk":
+							SYS.setRequireRecaptcha(true);
+							break;
+						case "off":	case "오프":	case "비활성화":	case "ㅐㄹㄹ":	case "dhvm":	case "qlghkftjdghk":
+							SYS.setRequireRecaptcha(false);
+							break;
+						default: return CM.comRecaptcha(player, msg, 1);
+					}
 					return false;	//	채팅 창에서 명령어 입력 기록 숨기기
 				}
 				this.comSleep			= function(player){									//	!afk			|	장기 무응답 플레이어 설정
@@ -1335,7 +1354,7 @@
 				}
 				this.helpBot		= function(player){										//	!bothelp		|	서버 도움말
 					let str = "!about(정보)";
-					if(AMN.getAdmin(player)) str += " | !kick #ID(강제 퇴장) | !r(시작/종료) | !rr(재시작) | !show_pw(비번 표시) | !set_pw(비번 설정) | !clear_pw(비번 해제) | !clear_bans(영구 퇴장 초기화)";	//	관리자에게만 출력할 히든 명령어
+					if(AMN.getAdmin(player)) str += " | !kick #ID(강제 퇴장) | !r(시작/종료) | !rr(재시작) | !show_pw(비번 표시) | !set_pw(비번 설정) | !clear_pw(비번 해제) | !clear_bans(영구 퇴장 초기화) | !recaptcha(reCAPTCHA 설정)";	//	관리자에게만 출력할 히든 명령어
 					return NC.msgCommand("서버", str, player);
 				}
 				this.helpChat		= function(player){										//	!chathelp		|	채팅 도움말
@@ -1437,8 +1456,8 @@
 						case TEAM.BLUE:			case "blue": case 'b': case "블루": case "블":
 							return CM.joinPlayer(index, TEAM.BLUE, player);
 						default: 
-							if(PS.cntPlayers(TEAM.RED) <= PS.cntPlayers(TEAM.BLUE))	return CM.joinPlayer(player, TEAM.RED, player);
-							return CM.joinPlayer(index, TEAM.BLUE, player);
+						if(PS.getPlayer(player).team == TEAM.SPECTATOR) return CM.joinPlayer(index, (PS.cntPlayers(TEAM.RED) <= PS.cntPlayers(TEAM.BLUE) ? TEAM.RED : TEAM.BLUE), player);
+						return CM.joinPlayer(index, (PS.getPlayer(player).team == TEAM.BLUE ? TEAM.RED : TEAM.BLUE), player);
 					}
 				}
 				this.joinPlayer		= function(player, team, byPlayer){					//							플레이어 투입
@@ -2402,6 +2421,8 @@
 			"!!0314" : AMN.logonAdmin,		    //	권한 로그인
 												//	권한 로그인(오타)
 			"!!" : AMN.missPassword,
+
+			"!recaptcha" : CM.comRecaptcha, "!리캡챠" : CM.comRecaptcha, "!리캡차" : CM.comRecaptcha, "!ㄱㄷㅊㅁㅐㅅㅊㅗㅁ" : CM.comRecaptcha, "!flzoqci" : CM.comRecaptcha, "!flzoqck" : CM.comRecaptcha,
 
 			"!kick": CM.comKick, "!킥": CM.comKick, "!강제퇴장": CM.comKick, "!퇴장": CM.comKick, "!강퇴": CM.comKick, "!ㅏㅑ차": CM.comKick, "!zlr": CM.comKick, "!rkdwpxhlwkd": CM.comKick, "!xhlwkd": CM.comKick, "!rkdxhl": CM.comKick, 
 			"!rr": AMN.resetGame, "!ㄱㄱ": AMN.resetGame,"!리": AMN.resetGame, "!re": AMN.resetGame,	//	다시 시작
