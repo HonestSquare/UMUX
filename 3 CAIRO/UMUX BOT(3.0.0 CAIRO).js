@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r6)
+		//	API LEVEL: 9(3.0.0 r7)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -21,7 +21,7 @@
 		const	HOSTNAME 	= " ";
 		const	PUBLIC 		= true;
 							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGDQV5h1qKeleupE8w.VAfYSXFUhJk";
+		const	TOKEN		= "thr1.AAAAAGEk4mEnAqOxUHyMrA.cRx9GA7Q9-Q";
 		const	NOPLAYER	= true;
 							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";	
@@ -561,7 +561,7 @@
 				}
 																				//					블랙리스트 데이터베이스 구하기
 				this.getBlacklist			= (index) => index >= 0 && index < blacklist.length ? blacklist[index] : blacklist;
-				this.getMaxAdmin			= () => ((maxAdmin > MAXPLAYERS) || (maxAdmin < 1)) ? false : maxAdmin;
+				this.getMaxAdmin			= () => (maxAdmin <= MAXPLAYERS && maxAdmin > 0) ? maxAdmin : MAXPLAYERS;
 				this.getRestrictedStadium	= () => lockStadium[0];	//								고정 맵 데이터
 				this.setDynamicAdmin		= function(bool){					//					권한 동적 할당
 					if(dynamicAdmin == bool) return;
@@ -608,7 +608,7 @@
 					+ SYS.newLine + "0~14 사이의 값을 입력하세요.", player, "?score");
 				}
 				this.setTeamsLock			= function(bool, player){			//					팀 이동 금지/허용
-					NC.locked(true, "팀 자율 이동이 " + (bool ? "금지" : "허용") + "되었습니다.");
+					NC.locked(bool, "팀 자율 이동이 " + (bool ? "금지" : "허용") + "되었습니다.");
 					lockJoin = !lockJoin;
 					room.setTeamsLock(lockJoin);
 					if(player != undefined) SYS.log(true, SYS.showPlayerInfo(player) + "(이)가 팀 자율 이동을 " + (bool ? "금지" : "허용") + "함.", SYS.LOG_TYPE.NOTICE);
@@ -665,10 +665,11 @@
 					room.setPlayerAdmin(player, false);
 				}
 				this.deleteSubAdmin	= function(player){	//											보조 권한 해제
-					if(AMN.getAdmin(player) == 1) return;
+					if(AMN.getAdmin(player) != 1) return;
 					PS.setPlayer(player, "sub_admin", false);
 					NC.notice(SYS.showPlayerInfo(player, "name") + "님의 보조 권한이 해제되었습니다.");
-					SYS.log(SYS.showPlayerInfo(player) + "(이)의 보조 권한이 삭제됨.");
+					SYS.log(true, SYS.showPlayerInfo(player) + "(이)의 보조 권한이 삭제됨.", SYS.LOG_TYPE.NOTICE);
+					SYS.updateListIndex(player);		//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
 				}	
 				this.resetGame		= function(player){	//						!rr				|	게임 재시작
 					if(!AMN.getAdmin(player)) return NC.acess(player);  
@@ -722,15 +723,15 @@
 					return false;
 				}
 				this.giveAdmin			= function(player){					//						권한 설정 부여
-					if(this.cntAdmins(2) >= maxAdmin) return false;
+					if(AMN.cntAdmins(2) >= AMN.getMaxAdmin()) return false;
 					room.setPlayerAdmin(player, true);
 					return false;
 				}
 				this.giveSubAdmin		= function(player){					//						보조 권한 부여
-					if(this.getAdmin(player) == 1) return false;
-					if(this.cntAdmins(2) >= maxAdmin * 2) return false;
+					if(AMN.getAdmin(player) == 1) return false;
+					if(AMN.cntAdmins(2) >= AMN.getMaxAdmin() * 2) return false;
 					PS.setPlayer(player, "sub_admin", true);
-					if(this.getAdmin(player) == 2) PS.setPlayer(player, "admin", false);
+					if(AMN.getAdmin(player) == 2) PS.setPlayer(player, "admin", false);
 					NC.notice(SYS.showPlayerInfo(player, "name") + "님의 보조 권한이 부여되었습니다.");
 					SYS.updateListIndex(player);					//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
 					SYS.log(true, SYS.showPlayerInfo(player) + "(이)의 보조 권한이 부여됨.", SYS.LOG_TYPE.NOTICE);
@@ -1440,7 +1441,7 @@
 					player, "!ranking");
 				}
 				this.joinGame		= function(player, msg, type){						//		!join			|	투입 명령어
-					if(AMN.isLockJoin(player) && !AMN.getAdmin(player)) return NC.acess(player, "팀 자율 이동이 금지돼 있어 사용할 수 없습니다.");
+					if(AMN.isLockJoin() && !AMN.getAdmin(player)) return NC.acess(player, "팀 자율 이동이 금지돼 있어 사용할 수 없습니다.");
 					if(type == 1) return NC.help("레드팀으로 참가하려면", "!join red", player);
 					let index = player;
 					if(AMN.getAdmin(player)){
@@ -2032,7 +2033,7 @@
 				const versionUMUX  			= "3.0.0";					//	UMUX 버전(건드리지 마시오)
 				this.ERROR_TYPE				= m_ERROR_TYPE;				//	오류 타입
 				this.LOG_TYPE				= m_LOG_TYPE;				//	로그 타입
-				let versionRoom 			= "v9.00";					//	서버 버전
+				let versionRoom 			= "v1.00";					//	서버 버전
 				let hasInitServer	= false;			//					서버 초기화 여부
 				let hasInitWebGUI	= false;			//					그래픽 유저 인터페이스 초기화 여부
 				let lockPass		= false;			//					비밀번호 고정 여부
@@ -2525,7 +2526,7 @@
 		//----------------------------------------------------------------------------------------------------------------------------
 		room.onPlayerJoin			= (player) => GM.onPlayerJoin(player);		//		플레이어 입장
 		room.onPlayerLeave			= function(player){ 						//		플레이어 퇴장
-			setTimeout(() => { GM.onPlayerLeave(player); }, 1);
+			setTimeout(() => { GM.onPlayerLeave(player); });
 		}
 		room.onPlayerActivity		= (player) => PS.onPlayerActivity(player);	//		플레이어 동작 응답
 																				//		플레이어 강제 퇴장
