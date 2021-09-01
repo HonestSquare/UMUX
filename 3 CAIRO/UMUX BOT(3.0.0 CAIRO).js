@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r7)
+		//	API LEVEL: 9(3.0.0 r8)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -21,7 +21,7 @@
 		const	HOSTNAME 	= " ";
 		const	PUBLIC 		= true;
 							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGEk4mEnAqOxUHyMrA.cRx9GA7Q9-Q";
+		const	TOKEN		= "thr1.AAAAAGEvVj9aSBuCiywsTw.x9AUj2-SE94";
 		const	NOPLAYER	= true;
 							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";	
@@ -148,15 +148,16 @@
 				let timeLimit				= 60;			//						도달 기준 시간(초 단위)
 				let timeLimitReached		= false;		//						시간 도달 여부
 				this.onGamePause		= function(player){ 			//			게임 중단
+					let isValid = !(player == undefined);
 					gameStats = 3;
-					SYS.log(true, (player == undefined ? "[경기 중단]" : (SYS.showPlayerInfo(player.id) + "(이)가 게임을 일시 중단함.")), SYS.LOG_TYPE.NOTICE);
+					SYS.log(true, (!isValid ? "[경기 중단]" : (SYS.showPlayerInfo(player.id) + "(이)가 게임을 일시 중단함.")), SYS.LOG_TYPE.NOTICE);
 					SYS.updateWebGUI();
 					//	게임 미진행 중, 장기 무응답 플레이어 판정
 					setTimeout(() => {
 						for(let i = 1; i <= PS.cntPlayers(); i++)
 							GM.checkAfkPlayer(PS.getPublicId(i), TM.getTime());
 					}, GM.getAfkLimitTime() * 1000);
-				}	
+				}		
 				this.onGameStart		= function(){					//			게임 시작
 					handleGameStart();		//	게임 제어 준비
 					SYS.log(true, "[경기 시작]", SYS.LOG_TYPE.NOTICE);
@@ -180,8 +181,9 @@
 					}
 				}
 				this.onGameUnpause		= function(player){				//			게임 재개
+					let isValid = !(player == undefined);
 					gameStats = 2;
-					SYS.log(true, (player == undefined ? "[경기 재개]" : (SYS.showPlayerInfo(player.id) + "(이)가 중단된 게임을 재개함.")), SYS.LOG_TYPE.NOTICE);
+					SYS.log(true, (isValid ? (SYS.showPlayerInfo(player.id) + "(이)가 중단된 게임을 재개함.") : "[경기 재개]"), SYS.LOG_TYPE.NOTICE);
 					SYS.updateWebGUI();
 				}
 				this.onKickRateLimitSet	= function(						//			킥 제한 설정
@@ -454,8 +456,9 @@
 				let maxAdmin			= 2;					//	최고 관리자 상한 인원
 				let pinHost 			= true;					//	방장 팀 이동 허용 여부
 				this.onPlayerAdminChange	= function(player, byPlayer){						//	플레이어 권한 획득&해제
+					let isValidByPlayer = !(byPlayer == undefined);
 					let newAdmin = SYS.showPlayerInfo(player.id, "name");
-					let byAdmin = (byPlayer == undefined ? false : SYS.showPlayerInfo(byPlayer.id, "name"));
+					let byAdmin = (isValidByPlayer ? SYS.showPlayerInfo(byPlayer.id, "name") : false);
 					PS.updateTime(player.id);			//	마지막 활동 시간 저장
 					if(byAdmin != false) PS.updateTime(byPlayer.id);
 					if(player.admin == true){			//	권한 획득(최고 권한 부여)
@@ -468,7 +471,7 @@
 					PS.setPlayer(player.id, "admin", true), PS.setPlayer(player.id, "sub_admin", false);
 					NC.notice(byAdmin == false ? (newAdmin + "님의 최고 권한이 " + procType + "되었습니다.") : (byAdmin + "님이 " + newAdmin + "님의 " + "최고 권한을 " + procType + "했습니다."));
 					SYS.log(true, 
-						(byPlayer == undefined ? (SYS.showPlayerInfo(player.id) + "(이)의 최고 권한이 " + procType + "됨.") : (SYS.showPlayerInfo(byPlayer.id) + "(이)가 " + SYS.showPlayerInfo(player.id) + "(이)의 최고 권한을 " + procType + "함.")),
+						(isValidByPlayer ? (SYS.showPlayerInfo(byPlayer.id) + "(이)가 " + SYS.showPlayerInfo(player.id) + "(이)의 최고 권한을 " + procType + "함.") : (SYS.showPlayerInfo(player.id) + "(이)의 최고 권한이 " + procType + "됨.")),
 						SYS.LOG_TYPE.BELL);
 					SYS.updateListIndex(player.id);		//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
 				}
@@ -776,14 +779,15 @@
 					return false;  //	채팅 창에서 명령어 입력 기록 숨기기
 				}
 				this.unmutePlayer		= function(target, byPlayer){		//						채팅 허용
+					let isValidByPlayer = !(byPlayer == undefined);
 					if(!PS.getPlayer(target).isMute)		//	채금자가 아닐 경우 처리 중단
-						return (byPlayer == undefined ? false : NC.caution(SYS.showPlayerInfo(target, "name") + "님의 채팅은 이미 허용돼 있습니다.", byPlayer));
+						return (isValidByPlayer ? NC.caution(SYS.showPlayerInfo(target, "name") + "님의 채팅은 이미 허용돼 있습니다.", byPlayer) : false);
 					PS.setPlayer(target, "isMute", false);
 					room.setPlayerAvatar(target);			//	등번호 초기화
 					SYS.updateListIndex(target);			//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
 					NC.locked(false, "채팅이 허용되었습니다.", target);
 					return SYS.log(true, 
-						(byPlayer == undefined ? (SYS.showPlayerInfo(target) + "(이)의 금지된 채팅이 허용됨") : (SYS.showPlayerInfo(byPlayer) + "(이)가 " + SYS.showPlayerInfo(target) + "(이)의 금지된 채팅을 허용함.")), 
+						(isValidByPlayer ? (SYS.showPlayerInfo(byPlayer) + "(이)가 " + SYS.showPlayerInfo(target) + "(이)의 금지된 채팅을 허용함.") : (SYS.showPlayerInfo(target) + "(이)의 금지된 채팅이 허용됨")),
 						SYS.LOG_TYPE.NOTICE);
 				}
 			}
@@ -2029,7 +2033,7 @@
 					}
 					SYS.log(true, "전달: " + '[' + destTag +  '] ' + msg, SYS.LOG_TYPE.SEND);
 				}
-				const securityPatchLevel	= "2021.06.01";				//	UMUX 보안 패치 수준(건드리지 마시오)
+				const securityPatchLevel	= "2021.09.01";				//	UMUX 보안 패치 수준(건드리지 마시오)
 				const versionUMUX  			= "3.0.0";					//	UMUX 버전(건드리지 마시오)
 				this.ERROR_TYPE				= m_ERROR_TYPE;				//	오류 타입
 				this.LOG_TYPE				= m_LOG_TYPE;				//	로그 타입
@@ -2071,8 +2075,6 @@
 				    AMN.initBlacklist(true, "에드", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "에드", "3131382E33342E3235312E3334"), AMN.initBlacklist(true, "에드", "37342E38322E36302E3832"),AMN.initBlacklist(true, "에드", "36352E34392E3132362E3839"), AMN.initBlacklist(true, "에드", "3132352E3138372E3133352E3239"), AMN.initBlacklist(true, "에드", "37322E35322E38372E3737"), AMN.initBlacklist(true, "에드", "31342E34372E3131322E313232"), AMN.initBlacklist(true, "에드", "3232312E3136352E3136332E313530"), AMN.initBlacklist(true, "에드", "3138322E3232342E33312E313136"), AMN.initBlacklist(true, "에드", "3138332E3130302E3135362E32353"), AMN.initBlacklist(true, "에드", "3138332E3130302E3135362E323532"), AMN.initBlacklist(true, "에드", "3139382E31362E37342E323035"), AMN.initBlacklist(true, "에드", "37342E38322E36302E313739"), AMN.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
 					AMN.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
 
-				    AMN.initBlacklist(true, "Bone Collecter", "31342E342E3134342E313138"), AMN.initBlacklist(true, "GRF SWORD", "31342E342E3134342E313138"),
-
 				    AMN.initBlacklist(true, "랄랄랄", "3132342E35392E37332E313931"), 
 
 				    AMN.initBlacklist(true, undefined, "3138322E3232342E33312E3330"), AMN.initBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
@@ -2086,12 +2088,13 @@
 				    AMN.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
 				    AMN.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
 
-				    AMN.initBlacklist(true, "반다이크", "3131362E3132342E3137382E3433"), AMN.initBlacklist(true, "반다이크", "3137352E3139372E3231392E313031"), AMN.initBlacklist(true, "페르난데스", "3137352E3139372E3231392E313031"), AMN.initBlacklist(true, "반다이크", "35392E31362E35342E313631"),
+				    AMN.initBlacklist(true, undefined, "3131362E3132342E3137382E3433"), AMN.initBlacklist(true, undefined, "3137352E3139372E3231392E313031"), AMN.initBlacklist(true, undefined, "3137352E3139372E3231392E313031"), AMN.initBlacklist(true, undefined, "35392E31362E35342E313631"),
 
 				    AMN.initBlacklist(true, "쁘이훈", "3132342E35332E3137362E3831"),
 				    AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), AMN.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
 
 				    AMN.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), AMN.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"), AMN.initBlacklist(true, "노래하는메시", "3232312E3135312E3132312E313731"), AMN.initBlacklist(true, "노래하는메시", "3232302E37362E3230302E35"), AMN.initBlacklist(true, "노래하는메시", "3231312E3232342E3232392E313637"), AMN.initBlacklist(true, "노래하는메시", "3232302E37352E3230392E3637"), AMN.initBlacklist(true, "노래하는메시", "3136332E3138302E3131382E313734"), AMN.initBlacklist(true, "노래하는메시", "3231312E3230342E3132352E323430"), AMN.initBlacklist(true, "노래하는메시", "35382E3233332E38302E3532"), AMN.initBlacklist(true, "노래하는메시", "3138332E3130322E34332E313735"), AMN.initBlacklist(true, "노래하는메시", "3132312E3139302E3233332E313635"), AMN.initBlacklist(true, "노래하는메시", "3131392E3139322E3235342E323438"), AMN.initBlacklist(true, "노래하는메시", "3132312E3134332E3133342E3637"), AMN.initBlacklist(true, "노래하는메시", "3232322E3131322E34392E313630"),
+					AMN.initBlacklist(true, "노래하는메시", "3132352E3133322E39392E3338"), AMN.initBlacklist(true, "노래하는메시", "3231302E3132312E3136352E3337"), AMN.initBlacklist(true, "노래하는메시", "3232312E3136352E37392E323338"),
 					AMN.initBlacklist(true, "코트", "3131382E3137362E34372E313332"), AMN.initBlacklist(true, "마샬", "3131382E3137362E34372E313332"), AMN.initBlacklist(true, "페페", "312E3233312E36322E313335"), AMN.initBlacklist(true, "페페", "3232302E37322E39362E3637"), AMN.initBlacklist(true, "사울", "3232302E37322E39362E3637"),
 
 				    AMN.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
@@ -2107,6 +2110,7 @@
 				    AMN.initBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
 
 				    AMN.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"), AMN.initBlacklist(true, "HYNN", "3232322E3130352E302E313733"), AMN.initBlacklist(true, "HYNN", "3231382E35312E31392E3338"),
+					AMN.initBlacklist(true, "Roseanne", "3231392E3130302E33372E323433"), AMN.initBlacklist(true, "Roseanne","33392E3131342E36312E313230"),
 
 				    AMN.initBlacklist(true, "루니", "31342E33362E3231352E3936"),
 
