@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r8)
+		//	API LEVEL: 9(3.0.0 r9)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -780,15 +780,18 @@
 				}
 				this.unmutePlayer		= function(target, byPlayer){		//						채팅 허용
 					let isValidByPlayer = !(byPlayer == undefined);
-					if(!PS.getPlayer(target).isMute)		//	채금자가 아닐 경우 처리 중단
-						return (isValidByPlayer ? NC.caution(SYS.showPlayerInfo(target, "name") + "님의 채팅은 이미 허용돼 있습니다.", byPlayer) : false);
+					if(!PS.getPlayer(target).isMute){		//	채금자가 아닐 경우 처리 중단
+						if(isValidByPlayer) NC.caution(SYS.showPlayerInfo(target, "name") + "님의 채팅은 이미 허용돼 있습니다.", byPlayer);
+						return false;
+					}
 					PS.setPlayer(target, "isMute", false);
 					room.setPlayerAvatar(target);			//	등번호 초기화
 					SYS.updateListIndex(target);			//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
 					NC.locked(false, "채팅이 허용되었습니다.", target);
-					return SYS.log(true, 
+					SYS.log(true, 
 						(isValidByPlayer ? (SYS.showPlayerInfo(byPlayer) + "(이)가 " + SYS.showPlayerInfo(target) + "(이)의 금지된 채팅을 허용함.") : (SYS.showPlayerInfo(target) + "(이)의 금지된 채팅이 허용됨")),
 						SYS.LOG_TYPE.NOTICE);
+					return true;
 				}
 			}
 		}
@@ -1272,7 +1275,7 @@
 					let reason = msg.substr(sPos + 1, 50);
 					if(!index) return false;
 					if(AMN.getAdmin(index) > AMN.getAdmin(player)) return NC.acess(player, "권한이 낮아 처리할 수 없습니다.");	//	보조 권한 → 최고 권한 퇴장 불가
-					AMN.setKick(index, (reason ? (SYS.showPlayerInfo(player, "public") + ': ' + reason) : ("처리자" + ': ' + SYS.showPlayerInfo(player, "public"))));
+					AMN.setKick(index, (index == reason.substr(1) || CS.hasSpace(reason) ? ("처리자" + ': ' + SYS.showPlayerInfo(player, "public")) : (SYS.showPlayerInfo(player, "public") + ': ' + reason)));
 					return false;	//	채팅 창에서 명령어 입력 기록 지우기
 				}
 				this.comMute			= function(player, msg, type){						//	!mute #ID		|	채팅 금지
@@ -1522,7 +1525,7 @@
 				}
 				this.onPlayerInactivity	= function(player){				//						플레이어 동작 무응답 체크
 					PS.updateTime(player.id);		//	마지막 활동 시간 저장
-					AMN.setKick(player.id, NC.ICON.NEGATIVE + "비활동 플레이어");		//	버그
+					AMN.setKick(player.id, NC.ICON.NEGATIVE + "비활동 플레이어");
 				}
 				this.initPlayerList			= function(data){			//						플레이어 데이터베이스 초기화
 					playerList[data.id] = ({ 
@@ -1588,7 +1591,7 @@
 					return NC.notice("등번호가 변경되었습니다.", player);
 				}
 																			//					플레이어 바운스 지정
-				this.setBcoeff			= (player, scale)	=> room.setPlayerDiscProperties(player, {"bcoeff" : scale});
+				this.setBcoeff			= (player, scale)	=> room.setPlayerDiscProperties(player, {"bCoeff" : scale});
 																			//					플레이어 제동 지정
 				this.setDamping			= (player, scale)	=> room.setPlayerDiscProperties(player, {"damping" : scale});
 																			//					플레이어 중력 지정
@@ -1650,6 +1653,7 @@
 							playerList[player].name	= name;
 							playerList[player].team	= TEAM.SPECTATOR;			//	관중으로 초기화
 							playerList[player].id	= player;
+							PS.updateTime(player);								//	시간 동기화
 							SC.getRankList().splice(SC.getRanking(i) - 1, 1);	//	랭킹 복원
 							//	권한 복원(최고 권한 관리자가 이미 있는 경우, 보조 권한 부여)
 							if(AMN.getAdmin(i) == 2) AMN.cntAdmins(2) > 0 ? AMN.giveSubAdmin(player) : AMN.giveAdmin(player);
