@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r17)
+// API LEVEL(VERSION): 8(2.2.0 r18)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -1666,7 +1666,7 @@ class Player{
 																// 플레이어 반지름 지정
 		this.setRadius = (player, r)	=> room.setPlayerDiscProperties(player, {"radius" : r});
 																// 플레이어 바운스 지정
-		this.setBcoeff = (player, b)	=> room.setPlayerDiscProperties(player, {"bcoeff" : b});
+		this.setBcoeff = (player, b)	=> room.setPlayerDiscProperties(player, {"bCoeff" : b});
 																// 플레이어 역질량 지정
 		this.setInvMass = (player, m)	=> room.setPlayerDiscProperties(player, {"invMass" : m});
 																// 플레이어 제동 지정
