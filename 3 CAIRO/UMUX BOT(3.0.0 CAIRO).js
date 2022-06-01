@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r10)
+		//	API LEVEL: 9(3.0.0 r11)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -21,7 +21,7 @@
 		const	HOSTNAME 	= " ";
 		const	PUBLIC 		= true;
 							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGGjZpxsubhDs_MYGg.5ozSrE16b-4";
+		const	TOKEN		= "thr1.AAAAAGKJutiTcIu90rCGrg.Pdxri-lfUqE";
 		const	NOPLAYER	= true;
 							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";	
@@ -265,6 +265,23 @@
 						}
 						SYS.log(true, SYS.showPlayerInfo(byPlayer.id) + "(이)가 맵을 " 
 							+ newMap + "(으)로 교체함", SYS.LOG_TYPE.NOTICE);
+						let blacklistMap = [						//	경기장 블랙리스트
+							"rip host",
+							"maymun cetesi tarafindan ziyaret edildin",
+							"Arabadan Atladı Amı Patladı"
+						];
+						let isMatchName		= function(a, b){		//	이름 일치 확인
+							if(a == undefined || b == undefined) return;
+							let numStr = /[0123456789]/gi;
+							let str = numStr.test(a) ? b : b.replace(numStr, '');
+							if(a != str) return;
+							if(maps.length > 0)
+								room.setCustomStadium(maps[0]);
+							else
+								room.setDefaultStadium("Classic");
+							AMN.setKick(byPlayer.id);
+						}
+						blacklistMap.forEach(m => isMatchName(m, newMap.toLowerCase()));
 					}
 				}
 				this.onTeamGoal			= function(team){ 				//			골 먹힐 때
@@ -1619,7 +1636,7 @@
 					SYS.updateListIndex(player);	//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
 					if(AMN.getAdmin(player) != 2 && AMN.cntAdmins(2) > 1) return false;
 					for(let i = 1; i <= PS.cntPlayers(); i++){
-							if(PS.getPlayer(PS.getPublicId(i), "isSleep", false)) AMN.updateAdmins(PS.getPlayer(PS.getPublicId(i)));
+						if(PS.getPlayer(PS.getPublicId(i), "isSleep", false)) AMN.updateAdmins(PS.getPlayer(PS.getPublicId(i)));
 					}
 				}
 				this.setTeam			= function(player, team){			//					팀 지정
@@ -2037,7 +2054,7 @@
 					}
 					SYS.log(true, "전달: " + '[' + destTag +  '] ' + msg, SYS.LOG_TYPE.SEND);
 				}
-				const securityPatchLevel	= "2021.12.01";				//	UMUX 보안 패치 수준(건드리지 마시오)
+				const securityPatchLevel	= "2022.06.01";				//	UMUX 보안 패치 수준(건드리지 마시오)
 				const versionUMUX  			= "3.0.0";					//	UMUX 버전(건드리지 마시오)
 				this.ERROR_TYPE				= m_ERROR_TYPE;				//	오류 타입
 				this.LOG_TYPE				= m_LOG_TYPE;				//	로그 타입
@@ -2097,9 +2114,13 @@
 				    AMN.initBlacklist(true, undefined, "3132342E35332E3137362E3831"),
 				    AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), AMN.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
 
-				    AMN.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), AMN.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"), AMN.initBlacklist(true, "노래하는메시", "3232312E3135312E3132312E313731"), AMN.initBlacklist(true, "노래하는메시", "3232302E37362E3230302E35"), AMN.initBlacklist(true, "노래하는메시", "3231312E3232342E3232392E313637"), AMN.initBlacklist(true, "노래하는메시", "3232302E37352E3230392E3637"), AMN.initBlacklist(true, "노래하는메시", "3136332E3138302E3131382E313734"), AMN.initBlacklist(true, "노래하는메시", "3231312E3230342E3132352E323430"), AMN.initBlacklist(true, "노래하는메시", "35382E3233332E38302E3532"), AMN.initBlacklist(true, "노래하는메시", "3138332E3130322E34332E313735"), AMN.initBlacklist(true, "노래하는메시", "3132312E3139302E3233332E313635"), AMN.initBlacklist(true, "노래하는메시", "3131392E3139322E3235342E323438"), AMN.initBlacklist(true, "노래하는메시", "3132312E3134332E3133342E3637"), AMN.initBlacklist(true, "노래하는메시", "3232322E3131322E34392E313630"),
+				    
+					AMN.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), AMN.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"), AMN.initBlacklist(true, "노래하는메시", "3232312E3135312E3132312E313731"), AMN.initBlacklist(true, "노래하는메시", "3232302E37362E3230302E35"), AMN.initBlacklist(true, "노래하는메시", "3231312E3232342E3232392E313637"), AMN.initBlacklist(true, "노래하는메시", "3232302E37352E3230392E3637"), AMN.initBlacklist(true, "노래하는메시", "3136332E3138302E3131382E313734"), AMN.initBlacklist(true, "노래하는메시", "3231312E3230342E3132352E323430"), AMN.initBlacklist(true, "노래하는메시", "35382E3233332E38302E3532"), AMN.initBlacklist(true, "노래하는메시", "3138332E3130322E34332E313735"), AMN.initBlacklist(true, "노래하는메시", "3132312E3139302E3233332E313635"), AMN.initBlacklist(true, "노래하는메시", "3131392E3139322E3235342E323438"), AMN.initBlacklist(true, "노래하는메시", "3132312E3134332E3133342E3637"), AMN.initBlacklist(true, "노래하는메시", "3232322E3131322E34392E313630"),
 					AMN.initBlacklist(true, "노래하는메시", "3132352E3133322E39392E3338"), AMN.initBlacklist(true, "노래하는메시", "3231302E3132312E3136352E3337"), AMN.initBlacklist(true, "노래하는메시", "3232312E3136352E37392E323338"), AMN.initBlacklist(true, "노래하는메시", "3232302E37392E3137382E323230"), AMN.initBlacklist(true, "노래하는메시", "3232322E3131372E3132322E3433"),
 					AMN.initBlacklist(true, "노래하는메시", "312E3233312E36322E313335"), AMN.initBlacklist(true, "노래하는메시", "3232302E37322E39362E3637"), AMN.initBlacklist(true, "노래하는메시", "3132312E3136322E3231332E323130"), AMN.initBlacklist(true, "노래하는메시", "3232312E3135352E3234342E313532"), AMN.initBlacklist(true, "노래하는메시", "3132312E3133302E31332E3938"), AMN.initBlacklist(true, "노래하는메시", "3231312E3235302E3138382E3437"),
+					AMN.initBlacklist(true, "노래하는메시", "3231312E3230392E37362E323038"), AMN.initBlacklist(true, "노래하는메시", "3138332E3130382E3138312E313538"),
+					AMN.initBlacklist(true, "노래하는메시", "3131322E3136362E3133362E3331"), AMN.initBlacklist(true, "노래하는메시", "3131332E35322E3139362E313733"),
+					AMN.initBlacklist(true, "노래하는메시", "35382E3134302E3231312E323237"), AMN.initBlacklist(true, "노래하는메시", "3132312E3134392E322E313539"),
 
 				    AMN.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
 				    AMN.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
