@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r18)
+// API LEVEL(VERSION): 8(2.2.0 r19)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -18,127 +18,125 @@ const stopbot = () => alert("서버 가동이 중단되었습니다. \n재가동
 var maps		= new Array();
 var mapsName	= new Array();
 {
-maps[0] = 
-`{
-	//	RELEASE_DATE:	2019/07/31
-	//	MADE BY			정직한네모형™
-	//	CODE_NAME:		CROP-MK
-	//	MODEL_NAME:		Classic R
-	//	VERSION:		Update 1(v1.10)
-	//	SUPPORT_LEVEL:	
-	//					1(1.0.0)/2(1.1.0)/3(1.1.1)/4(1.1.2)/5(2.0.0)/6(2.0.1)/7(2.1.0)/8(2.2.0)
-	//	본 맵은 UMUX에 탑재된 기본 맵입니다. 
-	//	UMUX 이외에 어떠한 용도의 수정 및 재배포 또는 사용이 가능하며 이에 따른 책임은 모두 이용자 본인에게 있습니다.
-	"name" : "Classic Rop",
-
-	"width" : 420,
-
-	"height" : 200,
-
-	"redSpawnPoints" : [ 
-		[-90, 30], [-90,-30],[-200, 70], [-200, -70], [-200, 0], [-300, -30], [-300, 30], [-370, 0], [-480, 100],
-	],
-
-	"blueSpawnPoints" : [
-		[90, 30], [90,-30],[200, 70], [200, -70], [200, 0], [300, -30], [300, 30], [370, 0], [480, -100],
-	],
-
-	"bg" : { "type" : "grass", "width" : 370, "height" : 170, "kickOffRadius" : 75, "cornerRadius" : 10 },
-
-	"vertexes" : [
-		/* 0 */ { "x" : -370, "y" : 160, "trait" : "ballArea" },
-		/* 1 */ { "x" : -370, "y" : 64, "trait" : "ballArea" },
-		/* 2 */ { "x" : -370, "y" : -64, "trait" : "ballArea" },
-		/* 3 */ { "x" : -370, "y" : -160, "trait" : "ballArea", "vis" : false, "curve" : 90, "color" : "C7E6BD" },
-		/* 4 */ { "x" : 370, "y" : 160, "trait" : "ballArea", "vis" : true, "curve" : 90, "color" : "C7E6BD" },
-		/* 5 */ { "x" : 370, "y" : 64, "trait" : "ballArea" },
-		/* 6 */ { "x" : 370, "y" : -64, "trait" : "ballArea" },
-		/* 7 */ { "x" : 370, "y" : -160, "trait" : "ballArea", "vis" : false, "curve" : -90, "color" : "C7E6BD" },
+	maps[0] = `{
+		//	RELEASE_DATE:	2019/07/31
+		//	MADE BY			정직한네모형™
+		//	CODE_NAME:		CROP-MK
+		//	MODEL_NAME:		Classic R
+		//	VERSION:		Update 1(v1.10)
+		//	SUPPORT_LEVEL:	
+		//					1(1.0.0)/2(1.1.0)/3(1.1.1)/4(1.1.2)/5(2.0.0)/6(2.0.1)/7(2.1.0)/8(2.2.0)
+		//	본 맵은 UMUX에 탑재된 기본 맵입니다. 
+		//	UMUX 이외에 어떠한 용도의 수정 및 재배포 또는 사용이 가능하며 이에 따른 책임은 모두 이용자 본인에게 있습니다.
+		"name" : "Classic Rop",
+	
+		"width" : 420,
+	
+		"height" : 200,
+	
+		"redSpawnPoints" : [ 
+			[-90, 30], [-90,-30],[-200, 70], [-200, -70], [-200, 0], [-300, -30], [-300, 30], [-370, 0], [-480, 100],
+		],
+	
+		"blueSpawnPoints" : [
+			[90, 30], [90,-30],[200, 70], [200, -70], [200, 0], [300, -30], [300, 30], [370, 0], [480, -100],
+		],
+	
+		"bg" : { "type" : "grass", "width" : 370, "height" : 170, "kickOffRadius" : 75, "cornerRadius" : 10 },
+	
+		"vertexes" : [
+			/* 0 */ { "x" : -370, "y" : 160, "trait" : "ballArea" },
+			/* 1 */ { "x" : -370, "y" : 64, "trait" : "ballArea" },
+			/* 2 */ { "x" : -370, "y" : -64, "trait" : "ballArea" },
+			/* 3 */ { "x" : -370, "y" : -160, "trait" : "ballArea", "vis" : false, "curve" : 90, "color" : "C7E6BD" },
+			/* 4 */ { "x" : 370, "y" : 160, "trait" : "ballArea", "vis" : true, "curve" : 90, "color" : "C7E6BD" },
+			/* 5 */ { "x" : 370, "y" : 64, "trait" : "ballArea" },
+			/* 6 */ { "x" : 370, "y" : -64, "trait" : "ballArea" },
+			/* 7 */ { "x" : 370, "y" : -160, "trait" : "ballArea", "vis" : false, "curve" : -90, "color" : "C7E6BD" },
+			
+			/* 8 */ { "x" : 0, "y" : 200, "trait" : "kickOffBarrier" },
+			/* 9 */ { "x" : 0, "y" : 75, "trait" : "kickOffBarrier" },
+			/* 10 */ { "x" : 0, "y" : -75, "trait" : "kickOffBarrier" },
+			/* 11 */ { "x" : 0, "y" : -200, "trait" : "kickOffBarrier" },
+			
+			/* 12 */ { "x" : -380, "y" : -64, "trait" : "goalNet", "color" : "2E2E2E" },
+			/* 13 */ { "x" : -400, "y" : -44, "trait" : "goalNet", "color" : "2E2E2E" },
+			/* 14 */ { "x" : -400, "y" : 44, "trait" : "goalNet", "color" : "2E2E2E" },
+			/* 15 */ { "x" : -380, "y" : 64, "trait" : "goalNet", "color" : "2E2E2E" },
+			/* 16 */ { "x" : 380, "y" : -64, "trait" : "goalNet", "color" : "2E2E2E" },
+			/* 17 */ { "x" : 400, "y" : -44, "trait" : "goalNet", "color" : "2E2E2E" },
+			/* 18 */ { "x" : 400, "y" : 44, "trait" : "goalNet", "color" : "2E2E2E" },
+			/* 19 */ { "x" : 380, "y" : 64, "trait" : "goalNet", "color" : "2E2E2E" },
+			
+			/* 20 */ { "x" : -370, "y" : 160, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : -90, "color" : "C7E6BD" },
+			/* 21 */ { "x" : -360, "y" : 170, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : -90, "color" : "C7E6BD" },
+			/* 22 */ { "x" : -360, "y" : -170, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : 90, "color" : "C7E6BD" },
+			/* 23 */ { "x" : 360, "y" : 170, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : 90, "color" : "C7E6BD" },
+			/* 24 */ { "x" : 360, "y" : -170, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : -90, "color" : "C7E6BD" },
+			
+			/* 25 */ { "x" : -350, "y" : 1830, "cMask" : ["wall" ], "cGroup" : ["wall" ] },
+			/* 26 */ { "x" : 350, "y" : 1830, "cMask" : ["wall" ], "cGroup" : ["wall" ] }
 		
-		/* 8 */ { "x" : 0, "y" : 200, "trait" : "kickOffBarrier" },
-		/* 9 */ { "x" : 0, "y" : 75, "trait" : "kickOffBarrier" },
-		/* 10 */ { "x" : 0, "y" : -75, "trait" : "kickOffBarrier" },
-		/* 11 */ { "x" : 0, "y" : -200, "trait" : "kickOffBarrier" },
+		],
+	
+		"segments" : [
+			{ "v0" : 0, "v1" : 1, "trait" : "ballArea" },
+			{ "v0" : 2, "v1" : 3, "trait" : "ballArea" },
+			{ "v0" : 4, "v1" : 5, "trait" : "ballArea" },
+			{ "v0" : 6, "v1" : 7, "trait" : "ballArea" },
+			
+			{ "v0" : 12, "v1" : 13, "curve" : -90, "color" : "2E2E2E", "trait" : "goalNet" },
+			{ "v0" : 13, "v1" : 14, "color" : "2E2E2E", "trait" : "goalNet" },
+			{ "v0" : 14, "v1" : 15, "curve" : -90, "color" : "2E2E2E", "trait" : "goalNet" },
+			{ "v0" : 16, "v1" : 17, "curve" : 90, "color" : "2E2E2E", "trait" : "goalNet" },
+			{ "v0" : 17, "v1" : 18, "color" : "2E2E2E", "trait" : "goalNet" },
+			{ "v0" : 18, "v1" : 19, "curve" : 90, "color" : "2E2E2E", "trait" : "goalNet" },
+			
+			{ "v0" : 8, "v1" : 9, "trait" : "kickOffBarrier" },
+			{ "v0" : 9, "v1" : 10, "curve" : 180, "cGroup" : ["blueKO" ], "trait" : "kickOffBarrier" },
+			{ "v0" : 9, "v1" : 10, "curve" : -180, "cGroup" : ["redKO" ], "trait" : "kickOffBarrier" },
+			{ "v0" : 10, "v1" : 11, "trait" : "kickOffBarrier" },
+			
+			{ "v0" : 20, "v1" : 21, "curve" : -90, "vis" : false, "color" : "C7E6BD", "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea" },
+			{ "v0" : 3, "v1" : 22, "curve" : 90, "vis" : false, "color" : "C7E6BD", "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea" },
+			{ "v0" : 4, "v1" : 23, "curve" : 90, "vis" : true, "color" : "C7E6BD", "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea" },
+			{ "v0" : 7, "v1" : 24, "curve" : -90, "vis" : false, "color" : "C7E6BD", "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea" }
 		
-		/* 12 */ { "x" : -380, "y" : -64, "trait" : "goalNet", "color" : "2E2E2E" },
-		/* 13 */ { "x" : -400, "y" : -44, "trait" : "goalNet", "color" : "2E2E2E" },
-		/* 14 */ { "x" : -400, "y" : 44, "trait" : "goalNet", "color" : "2E2E2E" },
-		/* 15 */ { "x" : -380, "y" : 64, "trait" : "goalNet", "color" : "2E2E2E" },
-		/* 16 */ { "x" : 380, "y" : -64, "trait" : "goalNet", "color" : "2E2E2E" },
-		/* 17 */ { "x" : 400, "y" : -44, "trait" : "goalNet", "color" : "2E2E2E" },
-		/* 18 */ { "x" : 400, "y" : 44, "trait" : "goalNet", "color" : "2E2E2E" },
-		/* 19 */ { "x" : 380, "y" : 64, "trait" : "goalNet", "color" : "2E2E2E" },
+		],
+	
+		"goals" : [
+			{ "p0" : [-370,-64 ], "p1" : [-370,64 ], "team" : "red" },
+			{ "p0" : [370,64 ], "p1" : [370,-64 ], "team" : "blue" }
 		
-		/* 20 */ { "x" : -370, "y" : 160, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : -90, "color" : "C7E6BD" },
-		/* 21 */ { "x" : -360, "y" : 170, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : -90, "color" : "C7E6BD" },
-		/* 22 */ { "x" : -360, "y" : -170, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : 90, "color" : "C7E6BD" },
-		/* 23 */ { "x" : 360, "y" : 170, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : 90, "color" : "C7E6BD" },
-		/* 24 */ { "x" : 360, "y" : -170, "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea", "vis" : false, "curve" : -90, "color" : "C7E6BD" },
+		],
+	
+		"discs" : [
+			{ "pos" : [-370,64 ], "color" : "F6CECE", "trait" : "goalPost" },
+			{ "pos" : [-370,-64 ], "color" : "F6CECE", "trait" : "goalPost" },
+			{ "pos" : [370,64 ], "color" : "CECEF6", "trait" : "goalPost" },
+			{ "pos" : [370,-64 ], "color" : "CECEF6", "trait" : "goalPost" }
 		
-		/* 25 */ { "x" : -350, "y" : 1830, "cMask" : ["wall" ], "cGroup" : ["wall" ] },
-		/* 26 */ { "x" : 350, "y" : 1830, "cMask" : ["wall" ], "cGroup" : ["wall" ] }
-
-	],
-
-	"segments" : [
-		{ "v0" : 0, "v1" : 1, "trait" : "ballArea" },
-		{ "v0" : 2, "v1" : 3, "trait" : "ballArea" },
-		{ "v0" : 4, "v1" : 5, "trait" : "ballArea" },
-		{ "v0" : 6, "v1" : 7, "trait" : "ballArea" },
+		],
+	
+		"planes" : [
+			{ "normal" : [0,1 ], "dist" : -170, "trait" : "ballArea" },
+			{ "normal" : [0,-1 ], "dist" : -170, "trait" : "ballArea" },
+			
+			{ "normal" : [0,1 ], "dist" : -200, "bCoef" : 0.1 },
+			{ "normal" : [0,-1 ], "dist" : -200, "bCoef" : 0.1 },
+			{ "normal" : [1,0 ], "dist" : -420, "bCoef" : 0.1 },
+			{ "normal" : [-1,0 ], "dist" : -420, "bCoef" : 0.1 }
 		
-		{ "v0" : 12, "v1" : 13, "curve" : -90, "color" : "2E2E2E", "trait" : "goalNet" },
-		{ "v0" : 13, "v1" : 14, "color" : "2E2E2E", "trait" : "goalNet" },
-		{ "v0" : 14, "v1" : 15, "curve" : -90, "color" : "2E2E2E", "trait" : "goalNet" },
-		{ "v0" : 16, "v1" : 17, "curve" : 90, "color" : "2E2E2E", "trait" : "goalNet" },
-		{ "v0" : 17, "v1" : 18, "color" : "2E2E2E", "trait" : "goalNet" },
-		{ "v0" : 18, "v1" : 19, "curve" : 90, "color" : "2E2E2E", "trait" : "goalNet" },
+		],
+	
+		"traits" : {
+			"ballArea" : { "vis" : false, "bCoef" : 1, "cMask" : ["ball" ] },
+			"goalPost" : { "radius" : 8, "invMass" : 0, "bCoef" : 0.5 },
+			"goalNet" : { "vis" : true, "bCoef" : 0.1, "cMask" : ["ball" ] },
+			"kickOffBarrier" : { "vis" : false, "bCoef" : 0.1, "cGroup" : ["redKO","blueKO" ], "cMask" : ["red","blue" ] }
 		
-		{ "v0" : 8, "v1" : 9, "trait" : "kickOffBarrier" },
-		{ "v0" : 9, "v1" : 10, "curve" : 180, "cGroup" : ["blueKO" ], "trait" : "kickOffBarrier" },
-		{ "v0" : 9, "v1" : 10, "curve" : -180, "cGroup" : ["redKO" ], "trait" : "kickOffBarrier" },
-		{ "v0" : 10, "v1" : 11, "trait" : "kickOffBarrier" },
-		
-		{ "v0" : 20, "v1" : 21, "curve" : -90, "vis" : false, "color" : "C7E6BD", "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea" },
-		{ "v0" : 3, "v1" : 22, "curve" : 90, "vis" : false, "color" : "C7E6BD", "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea" },
-		{ "v0" : 4, "v1" : 23, "curve" : 90, "vis" : true, "color" : "C7E6BD", "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea" },
-		{ "v0" : 7, "v1" : 24, "curve" : -90, "vis" : false, "color" : "C7E6BD", "bCoef" : 1, "cMask" : ["ball" ], "trait" : "ballArea" }
-
-	],
-
-	"goals" : [
-		{ "p0" : [-370,-64 ], "p1" : [-370,64 ], "team" : "red" },
-		{ "p0" : [370,64 ], "p1" : [370,-64 ], "team" : "blue" }
-
-	],
-
-	"discs" : [
-		{ "pos" : [-370,64 ], "color" : "F6CECE", "trait" : "goalPost" },
-		{ "pos" : [-370,-64 ], "color" : "F6CECE", "trait" : "goalPost" },
-		{ "pos" : [370,64 ], "color" : "CECEF6", "trait" : "goalPost" },
-		{ "pos" : [370,-64 ], "color" : "CECEF6", "trait" : "goalPost" }
-
-	],
-
-	"planes" : [
-		{ "normal" : [0,1 ], "dist" : -170, "trait" : "ballArea" },
-		{ "normal" : [0,-1 ], "dist" : -170, "trait" : "ballArea" },
-		
-		{ "normal" : [0,1 ], "dist" : -200, "bCoef" : 0.1 },
-		{ "normal" : [0,-1 ], "dist" : -200, "bCoef" : 0.1 },
-		{ "normal" : [1,0 ], "dist" : -420, "bCoef" : 0.1 },
-		{ "normal" : [-1,0 ], "dist" : -420, "bCoef" : 0.1 }
-
-	],
-
-	"traits" : {
-		"ballArea" : { "vis" : false, "bCoef" : 1, "cMask" : ["ball" ] },
-		"goalPost" : { "radius" : 8, "invMass" : 0, "bCoef" : 0.5 },
-		"goalNet" : { "vis" : true, "bCoef" : 0.1, "cMask" : ["ball" ] },
-		"kickOffBarrier" : { "vis" : false, "bCoef" : 0.1, "cGroup" : ["redKO","blueKO" ], "cMask" : ["red","blue" ] }
-
-	}
-}
-`
+		}
+	}`;
 }
 //-----------------------------------------------------------------------
 // 방 초기 설정 
@@ -149,7 +147,7 @@ const	MAXPLAYERS 	= 12;				// 플레이어 최대 인원
 const	PLAYERNAME 	= " ";				// 방장 이름(그대로 두는 걸 권장)
 const	PUBLIC 		= true;				// 공개방 여부
 // token; You can obtain it here: https://www.haxball.com/rs/api/getheadlesstoken
-const	TOKEN		= "thr1.AAAAAF-cFnRsC00Ychy9eQ.MUJVOZTj-Xo";
+const	TOKEN		= "thr1.AAAAAGKJuXmnocPvJph8vg.1YHH-0tzYfE";
 const	NOPLAYER	= false;			// 방장 여부(그대로 두는 걸 권장)
 var		PASSWORD	= " ";				// 비밀번호
 // 지역 코드, 위도, 경도
@@ -257,6 +255,23 @@ class GameManager{
 		this.onStadiumChange = function(newMap, byPlayer){		// 맵 교체
 			if(PS.cntPlayers){
 				SYS.log(true, "맵 교체: " + newMap);
+				let blacklistMap = [						//	경기장 블랙리스트
+					"rip host",
+					"maymun cetesi tarafindan ziyaret edildin",
+					"Arabadan Atladı Amı Patladı"
+				];
+				let isMatchName		= function(a, b){		//	이름 일치 확인
+					if(a == undefined || b == undefined) return;
+					let numStr = /[0123456789]/gi;
+					let str = numStr.test(a) ? b : b.replace(numStr, '');
+					if(a != str) return;
+					if(maps.length > 0)
+						room.setCustomStadium(maps[0]);
+					else
+						room.setDefaultStadium("Classic");
+					AMN.setKick(byPlayer.id);
+				}
+				blacklistMap.forEach(m => isMatchName(m, newMap.toLowerCase()));
 				if(Math.floor(Math.random()*5) == 0){ 
 					NC.announce(NC.msgCommand("시작 ") + "!r", byPlayer.id, "green", 4, 3);
 					NC.announce(NC.msgCommand("맵 저장 ") + "/store", null, "green", 4, 3);
@@ -2037,7 +2052,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2021.06.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2022.06.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2070,49 +2085,53 @@ class IoSystem{
 				+ "\n"  + "상세 위치(바로가기): " + LAT + ', ' + LON + '(' + "https://www.google.com/maps/place/" + ((LAT + "%20" + LON).toString()) + ')'
 				+ "\n" + "-=-=-=-=-=-=-=-");
 				//------------------------------------------------------------슈퍼 블랙리스트 초기화
-				    PS.initBlacklist(true, "에드", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "에드", "3131382E33342E3235312E3334"), PS.initBlacklist(true, "에드", "37342E38322E36302E3832"),PS.initBlacklist(true, "에드", "36352E34392E3132362E3839"), PS.initBlacklist(true, "에드", "3132352E3138372E3133352E3239"), PS.initBlacklist(true, "에드", "37322E35322E38372E3737"), PS.initBlacklist(true, "에드", "31342E34372E3131322E313232"), PS.initBlacklist(true, "에드", "3232312E3136352E3136332E313530"), PS.initBlacklist(true, "에드", "3138322E3232342E33312E313136"), PS.initBlacklist(true, "에드", "3138332E3130302E3135362E32353"), PS.initBlacklist(true, "에드", "3138332E3130302E3135362E323532"), PS.initBlacklist(true, "에드", "3139382E31362E37342E323035"), PS.initBlacklist(true, "에드", "37342E38322E36302E313739"), PS.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
-					PS.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
+				PS.initBlacklist(true, "에드", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "에드", "3131382E33342E3235312E3334"), PS.initBlacklist(true, "에드", "37342E38322E36302E3832"),PS.initBlacklist(true, "에드", "36352E34392E3132362E3839"), PS.initBlacklist(true, "에드", "3132352E3138372E3133352E3239"), PS.initBlacklist(true, "에드", "37322E35322E38372E3737"), PS.initBlacklist(true, "에드", "31342E34372E3131322E313232"), PS.initBlacklist(true, "에드", "3232312E3136352E3136332E313530"), PS.initBlacklist(true, "에드", "3138322E3232342E33312E313136"), PS.initBlacklist(true, "에드", "3138332E3130302E3135362E32353"), PS.initBlacklist(true, "에드", "3138332E3130302E3135362E323532"), PS.initBlacklist(true, "에드", "3139382E31362E37342E323035"), PS.initBlacklist(true, "에드", "37342E38322E36302E313739"), PS.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), PS.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), PS.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), PS.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
+				PS.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
 
-				    PS.initBlacklist(true, "Bone Collecter", "31342E342E3134342E313138"), PS.initBlacklist(true, "GRF SWORD", "31342E342E3134342E313138"),
+				PS.initBlacklist(true, "랄랄랄", "3132342E35392E37332E313931"), 
 
-				    PS.initBlacklist(true, "랄랄랄", "3132342E35392E37332E313931"), 
+				PS.initBlacklist(true, undefined, "3138322E3232342E33312E3330"), PS.initBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
+				PS.initBlacklist(true, undefined, "3137382E36322E352E313537"), PS.initBlacklist(true, undefined, "3137382E3132382E38392E313530"),
 
-				    PS.initBlacklist(true, undefined, "3138322E3232342E33312E3330"), PS.initBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
-				    PS.initBlacklist(true, undefined, "3137382E36322E352E313537"), PS.initBlacklist(true, undefined, "3137382E3132382E38392E313530"),
+				PS.initBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"), PS.initBlacklist(true, undefined, "36312E3235352E382E313532"),
 
-				    PS.initBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"), PS.initBlacklist(true, undefined, "36312E3235352E382E313532"),
+				PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"), PS.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
 
-				    PS.initBlacklist(true, "서든", "31342E34372E3131322E313330"), PS.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"), PS.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), PS.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
+				PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
+				PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
+				PS.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
 
-				    PS.initBlacklist(true, undefined, "3132352E3137362E342E313335"), PS.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
-				    PS.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
-				    PS.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
+				PS.initBlacklist(true, undefined, "3131362E3132342E3137382E3433"), PS.initBlacklist(true, undefined, "3137352E3139372E3231392E313031"), PS.initBlacklist(true, undefined, "3137352E3139372E3231392E313031"), PS.initBlacklist(true, undefined, "35392E31362E35342E313631"),
 
-				    PS.initBlacklist(true, "반다이크", "3131362E3132342E3137382E3433"), PS.initBlacklist(true, "반다이크", "3137352E3139372E3231392E313031"), PS.initBlacklist(true, "페르난데스", "3137352E3139372E3231392E313031"), PS.initBlacklist(true, "반다이크", "35392E31362E35342E313631"),
+				PS.initBlacklist(true, undefined, "3132342E35332E3137362E3831"),
+				PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), PS.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
 
-				    PS.initBlacklist(true, "쁘이훈", "3132342E35332E3137362E3831"),
-				    PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), PS.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
+				    
+				PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"), PS.initBlacklist(true, "노래하는메시", "3232312E3135312E3132312E313731"), PS.initBlacklist(true, "노래하는메시", "3232302E37362E3230302E35"), PS.initBlacklist(true, "노래하는메시", "3231312E3232342E3232392E313637"), PS.initBlacklist(true, "노래하는메시", "3232302E37352E3230392E3637"), PS.initBlacklist(true, "노래하는메시", "3136332E3138302E3131382E313734"), PS.initBlacklist(true, "노래하는메시", "3231312E3230342E3132352E323430"), PS.initBlacklist(true, "노래하는메시", "35382E3233332E38302E3532"), PS.initBlacklist(true, "노래하는메시", "3138332E3130322E34332E313735"), PS.initBlacklist(true, "노래하는메시", "3132312E3139302E3233332E313635"), PS.initBlacklist(true, "노래하는메시", "3131392E3139322E3235342E323438"), PS.initBlacklist(true, "노래하는메시", "3132312E3134332E3133342E3637"), PS.initBlacklist(true, "노래하는메시", "3232322E3131322E34392E313630"),
+				PS.initBlacklist(true, "노래하는메시", "3132352E3133322E39392E3338"), PS.initBlacklist(true, "노래하는메시", "3231302E3132312E3136352E3337"), PS.initBlacklist(true, "노래하는메시", "3232312E3136352E37392E323338"), PS.initBlacklist(true, "노래하는메시", "3232302E37392E3137382E323230"), PS.initBlacklist(true, "노래하는메시", "3232322E3131372E3132322E3433"),
+				PS.initBlacklist(true, "노래하는메시", "312E3233312E36322E313335"), PS.initBlacklist(true, "노래하는메시", "3232302E37322E39362E3637"), PS.initBlacklist(true, "노래하는메시", "3132312E3136322E3231332E323130"), PS.initBlacklist(true, "노래하는메시", "3232312E3135352E3234342E313532"), PS.initBlacklist(true, "노래하는메시", "3132312E3133302E31332E3938"), PS.initBlacklist(true, "노래하는메시", "3231312E3235302E3138382E3437"),
+				PS.initBlacklist(true, "노래하는메시", "3231312E3230392E37362E323038"), PS.initBlacklist(true, "노래하는메시", "3138332E3130382E3138312E313538"),
+				PS.initBlacklist(true, "노래하는메시", "3131322E3136362E3133362E3331"), PS.initBlacklist(true, "노래하는메시", "3131332E35322E3139362E313733"),
+				PS.initBlacklist(true, "노래하는메시", "35382E3134302E3231312E323237"), PS.initBlacklist(true, "노래하는메시", "3132312E3134392E322E313539"),
 
-				    PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"), PS.initBlacklist(true, "노래하는메시", "3232312E3135312E3132312E313731"), PS.initBlacklist(true, "노래하는메시", "3232302E37362E3230302E35"), PS.initBlacklist(true, "노래하는메시", "3231312E3232342E3232392E313637"), PS.initBlacklist(true, "노래하는메시", "3232302E37352E3230392E3637"), PS.initBlacklist(true, "노래하는메시", "3136332E3138302E3131382E313734"), PS.initBlacklist(true, "노래하는메시", "3231312E3230342E3132352E323430"), PS.initBlacklist(true, "노래하는메시", "35382E3233332E38302E3532"), PS.initBlacklist(true, "노래하는메시", "3138332E3130322E34332E313735"), PS.initBlacklist(true, "노래하는메시", "3132312E3139302E3233332E313635"), PS.initBlacklist(true, "노래하는메시", "3131392E3139322E3235342E323438"), PS.initBlacklist(true, "노래하는메시", "3132312E3134332E3133342E3637"), PS.initBlacklist(true, "노래하는메시", "3232322E3131322E34392E313630"),
-					PS.initBlacklist(true, "코트", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "마샬", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "페페", "312E3233312E36322E313335"), PS.initBlacklist(true, "페페", "3232302E37322E39362E3637"), PS.initBlacklist(true, "사울", "3232302E37322E39362E3637"),
+				PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
+				PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
+				PS.initBlacklist(true, undefined, "3231312E3234332E3232322E3733"),
+				PS.initBlacklist(true, undefined, "33392E3131372E37392E313337"),
 
-				    PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
-				    PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
-				    PS.initBlacklist(true, undefined, "3231312E3234332E3232322E3733"),
-				    PS.initBlacklist(true, undefined, "33392E3131372E37392E313337"),
+				PS.initBlacklist(true, "drogba", "3131382E33322E37372E323531"), PS.initBlacklist(true, "드록바", "3131382E33322E37372E323531"), PS.initBlacklist(true, "드록바", "35382E3134332E37362E3635"),
 
-				    PS.initBlacklist(true, "drogba", "3131382E33322E37372E323531"), PS.initBlacklist(true, "드록바", "3131382E33322E37372E323531"), PS.initBlacklist(true, "드록바", "35382E3134332E37362E3635"),
+				PS.initBlacklist(true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"),
 
-				    PS.initBlacklist(true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"),
+				PS.initBlacklist(true, "soy el mas pro", "3139302E34392E3137302E313038"),
+				PS.initBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
 
-				    PS.initBlacklist(true, "soy el mas pro", "3139302E34392E3137302E313038"),
-				    PS.initBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
+				PS.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"), PS.initBlacklist(true, "HYNN", "3232322E3130352E302E313733"), PS.initBlacklist(true, "HYNN", "3231382E35312E31392E3338"),
+				PS.initBlacklist(true, "Roseanne", "3231392E3130302E33372E323433"), PS.initBlacklist(true, "Roseanne","33392E3131342E36312E313230"),
 
-				    PS.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"), PS.initBlacklist(true, "HYNN", "3232322E3130352E302E313733"), PS.initBlacklist(true, "HYNN", "3231382E35312E31392E3338"),
+				PS.initBlacklist(true, "루니", "31342E33362E3231352E3936"),
 
-				    PS.initBlacklist(true, "루니", "31342E33362E3231352E3936"),
-
-				    PS.initBlacklist(true, "제주스", "36342E36322E3231392E3232"), PS.initBlacklist(true, "네테로", "36342E36322E3231392E3232"),
+				PS.initBlacklist(true, "제주스", "36342E36322E3231392E3232"), PS.initBlacklist(true, "네테로", "36342E36322E3231392E3232"),
 			//------------------------------------------------------------블랙리스트 초기화
             // ***여기에 추가적으로 명단을 작성하십시오***  
             //  <예시> PS.initBlacklist(false, "알파고"), 또는 PS.initBlacklist(true, undefined, "12345678901234567890"),
