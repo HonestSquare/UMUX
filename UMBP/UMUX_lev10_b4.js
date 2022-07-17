@@ -1343,7 +1343,7 @@
 						if(hasComProp(com)) return;
 					}
 				}
-				if(this.hasMutedChat(player.id, msg)) return;		//	채팅 금지
+				if(this.hasMutedChat(player.id)) return this.sendEmojiChat(player.id, msg);	//	채팅 금지
 				this.updateChatLog(player.id, msg, TS.time);	//	채팅 로그 갱신
 				if(this.hasRepeatedChat(player.id)) return;			//	중복 채팅 확인
 				switch(getPlayerlistById(player.id)._chatmode){			//	채팅 모드 처리
@@ -1370,40 +1370,17 @@
 				}
 				return false;
 			}
-			hasMutedChat(player, msg){	//							채팅 금지 확인
-				if(this._isFreeze == true && AMN.isMute(player) > 0) return false;
-				if(this._isFreeze == false && AMN.isMute(player) == false) return false;
-				let getMsg = function(p){
-					let blockMsg;
-					if(this._isFreeze == true){
-						blockMsg = [
-							"채팅창이 얼려있습니다.",
-							"관리자가 채팅창을 녹여야 합니다.",
-							"권한이 없는 모든 플레이어의 채팅이 금지되었습니다.",
-							"채팅창이 녹아야 합니다."
-						];
-					}
-					else if(AMN.isMute(p)){
-						blockMsg = [
-							"잠시 동안 채팅이 불가합니다.",
-							"현재 채팅이 불가능합니다.",
-							"당분간 채팅이 불가합니다.",
-							"채팅을 이용할 수 없습니다.",
-							"채팅이 금지되었습니다."
-						];
-					}
-					else return false;
-					return blockMsg[Math.floor(Math.random() * blockMsg.length)];
-				}
-				if(!sendEmojiChat(player, msg)) NC.acess(player, getMsg(player));
-				return true;
+			hasMutedChat(player){		//							채팅 금지 확인
+				if(AMN.isMute(player) == true) return true;
+				if(CS._isFreeze == true) return (AMN.getAdmin(player) < 1);
+				return false;
 			}
 			hasRepeatedChat(player){			//							중복 채팅 확인
 				if(this._maxRptCount == false) return false;				//	중복 채팅 감지 비활성
 				if(this._detectorLevel < 1 || PS.cntPlayers() < 2)		//	채팅 필터링이 비활성화 돼 있거나 인원이 2인 미만일 경우
 					return false;
 				let target = getPlayerlistById(player);
-				if(target == undefined) return false;
+				if(target.str == undefined) return false;
 				if(CS.hasForbiddenWord(target.str[0]) == false			//	금지어 분산 입력 감지
 				&& CS.hasForbiddenWord([...target.str].reverse().join('')) == true) NC.alretMsg(player);
 				if(target.str.length < this._maxRptCount) return false;				//	채팅 로그 데이터가 적거나 없는 경우
@@ -1553,7 +1530,7 @@
 						default:				return sendContext(msgCore);
 					}
 				}
-				if(this.hasMutedChat(player, msg)) return false;	//	채팅 금지
+				if(this.hasMutedChat(player)) return this.sendEmojiChat(player, msg);	//	채팅 금지
 				this.sendMsg(title + getContext(this._detectorLevel, msg));
 				PS.getPlayerList().filter(p => {
 					if(p.chatmode != 0)
@@ -1564,16 +1541,33 @@
 			}
 			sendEmojiChat(player, msg){					//				감정 채팅 전송
 				let num = parseInt(msg);
-				if(SYS.hasInRange(num, 1, c_LIST_EMOTION.length)){
+				if(SYS.hasInRange(num, 0, c_LIST_EMOTION.length)){
 					room.setPlayerAvatar(player, c_LIST_EMOTION[num]);
-					return true;
+					return;
 				}
-				let listMsg = '';
+				let msgList = {
+					"mute" : [
+						"잠시 동안 채팅이 불가합니다.",
+						"현재 채팅이 불가능합니다.",
+						"당분간 채팅이 불가합니다.",
+						"채팅을 이용할 수 없습니다.",
+						"채팅이 금지되었습니다."
+					],
+					"freeze" : [
+						"채팅창이 얼려있습니다.",
+						"관리자가 채팅창을 녹여야 합니다.",
+						"권한이 없는 모든 플레이어의 채팅이 금지되었습니다.",
+						"채팅창이 녹아야 합니다."
+					],
+					"emoji" : new Array
+				};
 				for(let i = 0; i < c_LIST_EMOTION.length; i++){
-					listMsg += (c_LIST_EMOTION[i] + i + (i + 1 < c_LIST_EMOTION.length ? " | " : ''));
+					msgList.emoji.push(c_LIST_EMOTION[i] + i);
 				}
-				return NC.locked(true, "아래에 나열된 숫자로 감정만 전달할 수 있습니다" 
-				+ SYS.newLine + listMsg, player);
+				let context = msgList[AMN.getAdmin(player) > 0 ? "mute" : "freeze"];
+				NC.locked(true, "아래에 나열된 숫자로 감정만 전달할 수 있습니다" 
+				+ SYS.newLine + msgList.emoji.join(" | "), player);
+				NC.acess(player, context[Math.floor(Math.random() * context.length)]);
 			}
 			sendMsg(msg, target){						//				일반 메시지 출력
 				return NC.announce(msg, target);
@@ -1583,7 +1577,7 @@
 				if(fromPlayer == 0 && toPlayer > 0)				//	콘솔창에서 게임으로 전달
 					return sendAlert(msg + " (귓속말 답장: !e #0 답할 내용)", toPlayer);
 				if(this._isLockPrivateChat) return NC.acess(fromPlayer, ("(#0)" + HOSTNAME) + " 외에 귓속말 채팅이 금지돼 있어 이용할 수 없습니다.");
-				if(this.hasMutedChat(fromPlayer, msg)) return;	//	채팅 금지
+				if(this.hasMutedChat(fromPlayer)) return this.sendEmojiChat(fromPlayer, msg);	//	채팅 금지
 				let filter = this.hasForbiddenWord(msg);			//	금지어 필터링
 				let title = "개인" + (filter ? PS.getTagTeam(fromPlayer, true) : PS.getTagGrade(fromPlayer));
 				let getContext = function(lev, str){
@@ -1619,7 +1613,7 @@
 					});
 				}
 				if(!PS.isValid(player)) return showMsg(0, msg);
-				if(this.hasMutedChat(player, msg)) return;		//	채팅 금지
+				if(this.hasMutedChat(player)) return this.sendEmojiChat(player, msg);	//	채팅 금지
 				let getContext = function(lev, str){
 					let msgCore = str.substr(0, 70);	//	70자 내외 제한
 					let sendContext = (arg) => ((PS.isValid(player) ? SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.LOCAL) : ("(#0)" + HOSTNAME)) + ": ") + arg;
@@ -2364,8 +2358,7 @@
 					if(GM.afkLimitTime == false) return;
 					//	장기 무응답 플레이어 판정
 					let afkChckTimer = TS.addTimer("afkCheck", () => { 
-						if(!GM.isAfkPlayer(afkChckTimer._player, afkChckTimer._delay)){ 
-							SYS.log(false, SYS.showPlayerInfo(player) + ": 0[타이머 종료]" + (TS.time - PS.getPlayerById(afkChckTimer._player)._time) + " >= " + (afkChckTimer._delay) + "== true");
+						if(!GM.isAfkPlayer(afkChckTimer._player, afkChckTimer._delay)){
 							return;
 						}
 						let showAlretMsg = function(target){					//	경고 메시지 출력
