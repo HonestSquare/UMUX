@@ -454,7 +454,6 @@
 					}, player, MS, true);
 
 					let sendMsg = function(...rd){
-						//tes = rd;
 						if(rd.length < 2) return SYS.sendError(SYS.ERROR_TYPE.E_ETC);
 						let title = PS.getTagTeam(rd[0]) + '➡' + PS.getTagTeam(rd[1]) + ': ' + GM.getTeamName(rd[0]) + ' ' + getGoalType(rd[0], rd[1]) + '(' + getTime(SC.gameTime) + ')';
 						let color = rd[1] == c_TEAM.BLUE ? c_LIST_COLOR.TEAM_RED : c_LIST_COLOR.TEAM_BLUE;
@@ -485,7 +484,6 @@
 						let target = SC.findRankListByPlayer(p);
 						return target == undefined ? SC.initRankList(p) : target;
 					}
-                    tes = getStats(attacker);
 					if(attackTeam == defendTeam) getStats(attacker).addOwnGoal();
 					else getStats(attacker).addGoal();
 					if(PS.isValid(assist)) getStats(assist).addAssist();
