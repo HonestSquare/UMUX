@@ -1,5 +1,5 @@
 		/***
-			API LEVEL: 10(4.0 b6)
+			API LEVEL: 10(4.0 b7)
             ===<README>===
             UMUX Beta Program(이하 UMBP)은 보다 빠르게
             UMUX의 신버전을 체험해 볼 수 있는 프로그램입니다.
@@ -26,18 +26,18 @@
 		const	MAXLIMIT	= 12;
 		const	HOSTNAME 	= "서버 매니저";
 		const	PUBLIC 		= true;
-							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGL0RuVHTwps3wgxtw.Hi4H6Sgww9Q";
+							                //	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
+		const	TOKEN		= "thr1.AAAAAGMEq9dXXdgDpexmRA.nM1-auIICMA";
 		const	NOPLAYER	= true;
-							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
+							                //	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";
 		const	LAT			= 37.566667 + (Math.floor(Math.random() * 4000) - 2000) / 10000;
 		const	LON			= 126.978406 + (Math.floor(Math.random() * 4000) - 2000) / 10000;
 		let		PASSWORD	= " ";
+
 		const MAXPLAYERS 	= (MAXLIMIT < 2 ? 2 : (MAXLIMIT > 30 ? 30 : MAXLIMIT));
-							//	초기 비번 설정, 서버 초기화
-		const INITSERVER	= str => {
-			let isWhiteSpace = s => s.trim().length == 0;		//	공백 문자 확인
+		const INITSERVER	= str => {      //	초기 비번 설정, 서버 초기화
+			let isWhiteSpace = s => s == undefined ? true : s.trim().length == 0;		//	공백 문자 확인
 			return { roomName: ROOMNAME, maxPlayers: MAXPLAYERS, playerName : HOSTNAME, public : PUBLIC, token : TOKEN, noPlayer : NOPLAYER, password: (isWhiteSpace(str) ? null : str), geo: { code: REGION_CODE, lat: LAT, lon: LON} };
 		};
 		/***
@@ -117,9 +117,11 @@
 		const c_TIME_TYPE = Object.freeze({			//			시간 출력 형식
 			CORE: 0, NORMAL: 1, FULL: 2
 		});
-		const c_TAG_TEAM	= Object.freeze([		//			관전, 레드, 블루
-			"ⓢ", "ⓡ", "ⓑ"
-		]);
+		const c_TAG_TEAM	= Object.freeze({		//			관전, 레드, 블루
+			[c_TEAM.SPECTATOR]:	'ⓢ',
+			[c_TEAM.RED]:		'ⓡ',
+			[c_TEAM.BLUE]:		'ⓑ'
+		});
 		const c_TAG_GRADE	= Object.freeze([		//			최고 권한, 보조 권한, 일반, 블랙리스트
 			"ⓧ", "●", "ⓞ", "◯", "㉤",
 		]);
@@ -159,17 +161,15 @@
 		];
 
 		const MS		= 1000;						//			1000ms == 1s
-		const coMark	= '-';
-		const tiMark	= ':';
+
+		let defaultStadiumList	= new Array();
+		let customStadiumList	= new Array();
 		
+		let playerList 			= new Array();			//	플레이어 데이터베이스
 		let playerlist		= new Array();				//			플레이어 데이터베이스
-		let blacklist		= new Array();				//			블랙리스트 명단
-		let rankList		= new Array();				//			전적 데이터베이스
-		let timerList		= new Array();				//			타이머 목록
-		let touchedList		= new Array();				//			선두자 데이터베이스
 
 		let initPlayerlist = function(player){
-			playerlist.push(new PlayerManager(
+			playerlist.push(new PlayerSystem(
 				player.id,
 				player.name,
 				player.team,
@@ -193,9 +193,13 @@
 		ROOM.setScoreLimit(0);
 		ROOM.setTimeLimit(0);
 		/*** 내장 맵 ***/
-		let maps = new Array();
+		defaultStadiumList = [
+			"Classic", "Easy", "Small", "Big", "Rounded", "Hockey",
+			"Big Hockey", "Big Easy", "Big Rounded",
+			"Huge"
+		];
 		{
-			maps.push(`{
+			customStadiumList.push(`{
 				//	BUILD_DATE:		2021/02/16
 				//	MADE BY			정직한네모형™
 				//	CODE_NAME:		CROP-900M
@@ -254,8 +258,8 @@
 				}
 			}`);
 		}
-		ROOM.setCustomStadium(maps[0]);
-		//ROOM.setDefaultStadium("Classic");
+		ROOM.setCustomStadium(customStadiumList[0]);
+		//ROOM.setDefaultStadium(defaultStadiumList[0]);
 		/*** 게임 매니저 클래스 ***/
 		class GameManager{
 			constructor(afkLimitTime, gameLink, timeLimit){
@@ -271,8 +275,8 @@
 			}
 			onGamePause(player){ 			//			게임 중단 이벤트
 				this._gameStats = c_GAME_STATS.PAUSE;
-				if(PS.isValid(player)){
-					PS.updateTime(player.id);	//	마지막 활동 시간 저장
+				if(PM.isValid(player)){
+					PM.updateTime(player.id);	//	마지막 활동 시간 저장
 					SYS.log(true, "%d(이)가 경기를 중단함.", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player.id));
 				}
 				else SYS.log(true, "[경기 중단]", c_LOG_TYPE.NOTICE);
@@ -280,15 +284,15 @@
 			}
 			onGameStart(player){				//			게임 시작 이벤트
 				this.handleGameStart();		//	게임 제어 준비
-				if(PS.isValid(player)) SYS.log(true, "%d(이)가 경기를 시작함.", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player.id));
+				if(PM.isValid(player)) SYS.log(true, "%d(이)가 경기를 시작함.", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player.id));
 				else SYS.log(true, "[경기 시작]", c_LOG_TYPE.NOTICE);
 				console.log("누적 경기 횟수: " + this._countMatch);
 			}
 			onGameStop(player){				//			게임 종료 이벤트
 				this._gameStats = c_GAME_STATS.STOP;
 				SC.clearTouchedList();		//	선두자 명단 모두 지우기
-				if(PS.isValid(player)){
-					PS.updateTime(player.id);		//	마지막 활동 시간 저장
+				if(PM.isValid(player)){
+					PM.updateTime(player.id);		//	마지막 활동 시간 저장
 					SYS.log(true, "%d(이)가 경기를 종료함", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player.id));
 				}
 				else SYS.log(true, "[경기 종료]", c_LOG_TYPE.NOTICE);
@@ -302,8 +306,8 @@
 			}
 			onGameUnpause(player){				//			게임 재개 이벤트
 				this._gameStats = c_GAME_STATS.TICK;
-				if(PS.isValid(player)){
-					PS.updateTime(player.id);		//	마지막 활동 시간 저장
+				if(PM.isValid(player)){
+					PM.updateTime(player.id);		//	마지막 활동 시간 저장
 					SYS.log(true, "%d(이)가 중단된 경기를 재개함.", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player.id));
 				}
 				SYS.log(true, "[경기 재개]", c_LOG_TYPE.NOTICE);
@@ -317,12 +321,12 @@
 				SC.addTouchedList(player);
 			}
 			onPlayerJoin(player){				//			플레이어 입장 이벤트
-				PS.initPlayer(player);						//	플레이어 데이터베이스 초기화
+				PM.initPlayer(player);						//	플레이어 데이터베이스 초기화
 				initPlayerlist(player);						//	플레이어 데이터베이스 초기화
 				SYS.addListIndex(player.id);				//	플레이어 인덱스 추가
 				if(SYS._isDev) NC.caution("이 서버는 개발 중이므로, 게임 플레이가 원활하지 않을 수 있습니다.", player.id);
-				let isUpdate = PS.updateAccount(player.id);	//	계정 데이터베이스 갱신
-				console.log("접속 인원: " + PS.cntPlayers());
+				let isUpdate = PM.updateAccount(player.id);	//	계정 데이터베이스 갱신
+				console.log("접속 인원: " + PM.cntPlayers());
 				let indexBlacklist = (AMN.isBlacklist(player.id, true) ? 2 : AMN.isBlacklist(player.id, false) ? 1 : 0);
 				SYS.log(true, "%d: %d%d", c_LOG_TYPE.BELL, [
 					(isUpdate == true ? "재입장": "입장"),
@@ -338,8 +342,8 @@
 					(isUpdate == true ? "다시 환영합니다" : "안녕하세요") + ", %d님!",
 					player.id, "!help, !join");
 				}
-				if(PS.cntPlayers() < 2){					//	접속자가 2인 미만이면
-					PS.setTeam(player.id, c_TEAM.RED);		//	투입하고
+				if(PM.cntPlayers() < 2){					//	접속자가 2인 미만이면
+					PM.setTeam(player.id, c_TEAM.RED);		//	투입하고
 					room.startGame();						//	게임 시작
 				}
 				AMN.updateAdmins();							//	권한 갱신
@@ -348,20 +352,20 @@
 				return isUpdate;
 			}
 			onPlayerLeave(player){				//			플레이어 퇴장 이벤트
-				if(!PS.getPlayerById(player.id).hasKicked)
+				if(!PM.getPlayerById(player.id).hasKicked)
 					SYS.log(true, "퇴장: %d%d", c_LOG_TYPE.BELL, [
 						SYS.showPlayerInfo(player.id, c_PLAYERINFO_TYPE.PUBLIC),
 						(AMN.isBlacklist(player.id) ? "(블랙리스트)" : '')
 					]);
 				clearPlayerlist(player);	//	플레이어 데이터베이스 지우기
-				PS.clearPlayer(player);		//	플레이어 데이터베이스 지우기
-				if(PS.cntPlayers() == 0){	//	사람이 없으면
+				PM.clearPlayer(player);		//	플레이어 데이터베이스 지우기
+				if(PM.cntPlayers() == 0){	//	사람이 없으면
 					room.stopGame();		//	경기 종료 후
 					AMN.updatePassword();	//	비밀번호 초기화
 				}
 				else						//	사람이 있으면
 					AMN.updateAdmins();		//	권한 갱신
-				console.log("접속 인원: " + PS.cntPlayers());
+				console.log("접속 인원: " + PM.cntPlayers());
 			}
 			onPositionsReset(){		 			//			득실점 판정 직후 참가자 좌표 초기화
 
@@ -386,14 +390,14 @@
 			onStadiumChange(newMap, byPlayer){	//			맵 교체 이벤트
 				let target = this.getStadiumData().indexOf(newMap);
 				if(target != AMN._defaultStadium
-				&& SYS.hasInRange(target, 0, maps.length - 1) == true){		//	맵 고정 설정
+				&& SYS.hasInRange(target, 0, customStadiumList.length - 1) == true){		//	맵 고정 설정
 					if(!AMN._isLockStadium || (AMN._defaultStadium == null))
 						AMN._defaultStadium = target;
 				}
-				if(!PS.isValid(byPlayer)) return SYS.log(true, "맵 교체: %d", c_LOG_TYPE.NOTICE, newMap);
-				PS.updateTime(byPlayer.id);		//	마지막 활동 시간 저장
+				if(!PM.isValid(byPlayer)) return SYS.log(true, "맵 교체: %d", c_LOG_TYPE.NOTICE, newMap);
+				PM.updateTime(byPlayer.id);		//	마지막 활동 시간 저장
 				if(AMN._isLockStadium){		//	맵 고정 확인
-					room.setCustomStadium(maps[AMN._defaultStadium]);
+					room.setCustomStadium(customStadiumList[AMN._defaultStadium]);
 					return NC.acess(byPlayer, "맵이 고정돼 있어 교체할 수 없습니다.");
 				}
 				SYS.log(true, "%d(이)가 맵을 %d(으)로 교체함", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(byPlayer.id), newMap]);
@@ -418,8 +422,7 @@
 				let getAssistant = function(player){
 					if(player == undefined) return 0;
 					if(player._team == team) return SC.findAssist(lastTouchedPlayer);
-
-					for(let tp of touchedList){
+					for(let tp of SC._touchedList){
 						if(team == tp._team){		//	팀이 같아야 어시스트 인정
 							lastTouchedPlayer = tp;
 							return SC.findAssist(tp);
@@ -429,7 +432,7 @@
 				}
 				let assist = getAssistant(lastTouchedPlayer);																//	어시스트
 				let attacker = !lastTouchedPlayer ? 0 : lastTouchedPlayer._id;									//	공격자
-				let attackTeam = PS.isValid(attacker) == true && PS.getLocalId(attacker) > 0 ? lastTouchedPlayer._team : team;	//	공격 팀
+				let attackTeam = PM.isValid(attacker) == true && PM.findLocalId(attacker) > 0 ? lastTouchedPlayer._team : team;	//	공격 팀
 				let defendTeam = team == c_TEAM.RED ? c_TEAM.BLUE : c_TEAM.RED;													//	방어 팀
 				let showGoalRecord = function(attack, defend, player, assist){
 					let getGoalType = (a, d) => (a == d ? "실점" : "득점");	//	득실점 구하기
@@ -438,12 +441,12 @@
 						return setLine(time / 60) + ':' + setLine(time % 60);
 					}
 					//	공격 선수 또는 팀 구하기
-					let getAttacker	= (t, p) => ((!PS.isValid(p) || !PS.getLocalId(p)) ? GM.getTeamName(t) : SYS.showPlayerInfo(p, c_PLAYERINFO_TYPE.NAME) + "님");
+					let getAttacker	= (t, p) => ((!PM.isValid(p) || !PM.findLocalId(p)) ? GM.getTeamName(t) : SYS.showPlayerInfo(p, c_PLAYERINFO_TYPE.NAME) + "님");
 					//	출력
 					let goalTimer = TS.addTimer("goal", () => {
 						let showAvatar = function(order, player, avatar){
-							if(PS.getPlayerList().find(p => p.id == player) == undefined		//	도중 퇴장이나
-							|| PS.getPlayerById(player).team != attack){						//	팀을 옮긴 경우
+							if(PM.findPlayerList().find(p => p._id == player) == undefined		//	도중 퇴장이나
+							|| getPlayerlistById(player)._team != attack){						//	팀을 옮긴 경우
 								room.setPlayerAvatar(player);
 								return;
 							}
@@ -464,7 +467,7 @@
 						let target = tmList.slice(-1)[0];
 						let currentOrder = getCurrentOrder(target._order, 6);
 						showAvatar(currentOrder, goalTimer.player, '⚽');
-						if(PS.isValid(assist)) showAvatar(currentOrder, assist, '👍');
+						if(PM.isValid(assist)) showAvatar(currentOrder, assist, '👍');
 						if(currentOrder > 4){
 							return TS.clearTimerByName(goalTimer._name, goalTimer._player);
 						}
@@ -472,38 +475,38 @@
 
 					let sendMsg = function(...rd){
 						if(rd.length < 2) return SYS.sendError(c_ERROR_TYPE.E_ETC);
-						let title = PS.getTagTeam(rd[0]) + '➡' + PS.getTagTeam(rd[1]) + ': ' + GM.getTeamName(rd[0]) + ' ' + getGoalType(rd[0], rd[1]) + '(' + getTime(SC.gameTime) + ')';
+						let title = PM.findTagTeam(rd[0]) + '➡' + PM.findTagTeam(rd[1]) + ': ' + GM.getTeamName(rd[0]) + ' ' + getGoalType(rd[0], rd[1]) + '(' + getTime(SC.gameTime) + ')';
 						let color = rd[1] == c_TEAM.BLUE ? c_LIST_COLOR.TEAM_RED : c_LIST_COLOR.TEAM_BLUE;
 						switch(rd.length){
 							case 2:		//	공격 팀→방어 팀
 								NC.extMsg(title, "%d이 %d했습니다", null, null, color, null, 0, [getAttacker(rd[0]), getGoalType(rd[0], rd[1])]);
-								return SYS.log(true, "%d➡%d", c_LOG_TYPE.NOTICE, [PS.getTagTeam(rd[0]), PS.getTagTeam(rd[1])]);
+								return SYS.log(true, "%d➡%d", c_LOG_TYPE.NOTICE, [PM.findTagTeam(rd[0]), PM.findTagTeam(rd[1])]);
 							case 3:		//	공격 팀→방어 팀: 득점자
 								NC.extMsg(title, "%d이 %d했습니다", null, null, color, null, 0, [getAttacker(rd[0], rd[2]), getGoalType(rd[0], rd[1])]);
-								return SYS.log(true, "%d➡%d 공격: %d", c_LOG_TYPE.NOTICE, [PS.getTagTeam(rd[0]), PS.getTagTeam(rd[1]), SYS.showPlayerInfo(rd[2])]);
+								return SYS.log(true, "%d➡%d 공격: %d", c_LOG_TYPE.NOTICE, [PM.findTagTeam(rd[0]), PM.findTagTeam(rd[1]), SYS.showPlayerInfo(rd[2])]);
 							case 4:		//	공격 팀→방어 팀: 득점자(어시스트 포함)
 								NC.extMsg(title, "%d이 %d했습니다" + newLine + "(도움: %d)", null, null, color, null, 0,
 								[getAttacker(rd[0], rd[2]), getGoalType(rd[0], rd[1]), SYS.showPlayerInfo(rd[3], c_PLAYERINFO_TYPE.NAME)]);
-								return SYS.log(true, "%d➡%d 공격: %d(도움: %d)", c_LOG_TYPE.NOTICE, [PS.getTagTeam(rd[0]), PS.getTagTeam(rd[1]), SYS.showPlayerInfo(rd[2]), SYS.showPlayerInfo(rd[3])]);
+								return SYS.log(true, "%d➡%d 공격: %d(도움: %d)", c_LOG_TYPE.NOTICE, [PM.findTagTeam(rd[0]), PM.findTagTeam(rd[1]), SYS.showPlayerInfo(rd[2]), SYS.showPlayerInfo(rd[3])]);
 						}
 					}
 
 					//	공격 팀→방어 팀
-					if(!PS.isValid(player)) sendMsg(attack, defend);
+					if(!PM.isValid(player)) sendMsg(attack, defend);
 					//	공격 팀→방어 팀: 득점자
-					else if(!PS.isValid(assist)) sendMsg(attack, defend, player);
+					else if(!PM.isValid(assist)) sendMsg(attack, defend, player);
 					//	공격 팀→방어 팀: 득점자(어시스트 포함)
 					else sendMsg(attack, defend, player, assist);
 				}
 				//	전적 갱신
-				if(PS.isValid(attacker)){
+				if(PM.isValid(attacker)){
 					let getStats = function(p){
 						let target = SC.findRankListByPlayer(p);
 						return target == undefined ? SC.initRankList(p) : target;
 					}
 					if(attackTeam == defendTeam) getStats(attacker).addOwnGoal();
 					else getStats(attacker).addGoal();
-					if(PS.isValid(assist)) getStats(assist).addAssist();
+					if(PM.isValid(assist)) getStats(assist).addAssist();
 				}
 				if(attackTeam != defendTeam) SC.updateGoals(team);	//	득점 데이터 갱신
 				SYS.updateWebGUI();									//	그래픽 유저 인터페이스 갱신
@@ -519,7 +522,7 @@
 					case 3:			//	무승부
 						return;
 				}
-				for(let p of room.getPlayerList().filter(p => p.id > 0).map(p => getPlayerlistById(p.id))){
+				for(let p of PM.findPlayerList()){
 					let rp = SC.findRankListByPlayer(p._id);	//	랭킹 갱신
 					if(rp != undefined){
 						if(p._team == winner) rp.addWin();
@@ -538,9 +541,9 @@
 				this._lastTimeNotified = TS.time;				//	최근 기록 시간 초기화
 				this._timeLimitReached = false;						//	기준 시간에 미도달한 상태로 초기화
 				SC.clearTouchedList();							//	선두자 명단 모두 지우기
-				for(let p of PS.getPlayerList()){				//	마지막 활동 시간 저장
-					if(p.team != c_TEAM.SPECTATOR){
-						PS.updateTime(p.id);
+				for(let p of PM.findPlayerList()){
+					if(p._team != c_TEAM.SPECTATOR){
+						PM.updateTime(p._id);
 					}
 				}
 			}
@@ -550,10 +553,10 @@
 					SYS.updateWebGUI();
 				}
 				//	선두자 명단 갱신
-				PS.getPlayerList().forEach(p => {
-					if(p.team != c_TEAM.SPECTATOR)
-						SC.updateTouchedList(p.id);
-				});
+				for(let p of PM.findPlayerList()){
+					if(p._team != c_TEAM.SPECTATOR)
+						SC.updateTouchedList(p._id);
+				}
 				if(this._timeLimit < 1) return false;								//	범위 내 도달 기준 시간이면 처리 종료
 				if(currentTime - this._lastTimeNotified > this._timeLimit * MS){		//	최근 기록 시간에서 도달 기준 시간 이후로 경과된 경우(정기 실행)
 					this._lastTimeNotified = currentTime;							//	최근 기록 시간을 현재 시간으로 변경
@@ -584,14 +587,14 @@
 				let player = arg[0], nowTime = arg[1], delay = arg[2];
 
 				if(!delay || delay <= 5) return false;		//	5 이하의 값이면 판정 생략
-				if(!PS.getLocalId(player)) return false;	//	미접속자인 경우
+				if(!PM.findLocalId(player)) return false;	//	미접속자인 경우
 				//	경기 도중 관전이면 처리 중단
-				if(this._gameStats == c_GAME_STATS.TICK && PS.getPlayerById(player).team == c_TEAM.SPECTATOR) return false;
+				if(this._gameStats == c_GAME_STATS.TICK && PM.getPlayerById(player).team == c_TEAM.SPECTATOR) return false;
 				//	경기 미진행 상태에서 관리자가 아닌 경우 처리 중단
 				if(this._gameStats != c_GAME_STATS.TICK && AMN.getAdmin(player) < 1) return false;
 				//	장기 대기열 명단에 포함되면 처리 중단
-				if(PS.getPlayerById(player).isSleep) return false;
-				return (Math.abs(nowTime - PS.getPlayerById(player).time) >= delay);
+				if(PM.getPlayerById(player).isSleep) return false;
+				return (Math.abs(nowTime - PM.getPlayerById(player).time) >= delay);
 			}
 			
 			get cntMatch(){				//					누적 경기 횟수
@@ -612,20 +615,22 @@
 				if(this._afkLimitTime == value) return SYS.log(false, "중복된 값으로 접근됨", c_LOG_TYPE.WARNING);
 				this._afkLimitTime = value;
 				//	마지막 활동 시간 저장
-				PS.getPlayerList(true).forEach(p => PS.updateTime(p.id));
+				PM.getPlayerList(true).forEach(p => PM.updateTime(p.id));
 				NC.uniMsg(null, "비활동 상한 시간이 " + this._afkLimitTime + "초로 변경되었습니다.");
 				SYS.log(true, "비활동 상한 시간이 " + this._afkLimitTime + "초로 변경됨.", c_LOG_TYPE.NOTICE);
 			}
 
 			getStadiumData(target){		//					맵 정보 갱신
-				let size = maps.length;
+				let size = customStadiumList.length;
+				if(size < 1) return defaultStadiumList;
 				let getName = function(m){
 					if(!m.hasOwnProperty("name")) return "비어 있음";
 					if(CS.isWhiteSpace(m.name)) return "제목 없음";
 					return m.name;
 				}
-				if(SYS.hasInRange(target, 0, size - 1)) return getName(maps[target]);
-				return maps.map(m => {
+				if(SYS.hasInRange(target, 0, size - 1)) return getName(customStadiumList[target]);
+
+				return customStadiumList.map(m => {
 					let target = Function('"use strict";return (' + m + ')')();
 					return getName(target);
 				});
@@ -642,30 +647,30 @@
 			checkAfkPlayer(player){						//		장기 무응답 플레이어 판정
 				let isAfk = function(index, limit){
 					if(!getAfkLimitTime() || getAfkLimitTime() <= 5) return false;		//	5 이하의 값이면 판정 생략
-					if(!PS.getLocalId(player)) return false;							//	미접속자인 경우
+					if(!PM.findLocalId(player)) return false;							//	미접속자인 경우
 					//	경기 도중 관전이면 처리 중단
-					if(this._gameStats == c_GAME_STATS.TICK && PS.getPlayerById(index).team == c_TEAM.SPECTATOR) return false;
+					if(this._gameStats == c_GAME_STATS.TICK && PM.getPlayerById(index).team == c_TEAM.SPECTATOR) return false;
 					//	경기 미진행 상태에서 관리자가 아닌 경우 처리 중단
 					if(this._gameStats != c_GAME_STATS.TICK && AMN.getAdmin(index) < 1) return false;
 					//	장기 대기열 명단에 포함되면 처리 중단
-					if(PS.getPlayerById(index).isSleep) return false;
-					return (TS.time - PS.getPlayerById(index).time >= limit * MS);
+					if(PM.getPlayerById(index).isSleep) return false;
+					return (TS.time - PM.getPlayerById(index).time >= limit * MS);
 				}
 				if(!isAfk(player, getAfkLimitTime())) return false;
 				//	경고 메시지 출력
 				let showAlretMsg = function(target){
 					if(target == player)
-						return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림", "반응이 없으면 퇴장될 수 있습니다", target, (PS.getPlayerById(target).team == c_TEAM.SPECTATOR ? "!afk" : "!join spec"), c_LIST_COLOR.GRAY);
+						return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림", "반응이 없으면 퇴장될 수 있습니다", target, (PM.getPlayerById(target).team == c_TEAM.SPECTATOR ? "!afk" : "!join spec"), c_LIST_COLOR.GRAY);
 					if(AMN.getAdmin(target) < AMN.getAdmin(player)) return;
-					if(PS.getPlayerById(target).team == c_TEAM.SPECTATOR || PS.getPlayerById(target).team == PS.getPlayerById(player).team)
+					if(PM.getPlayerById(target).team == c_TEAM.SPECTATOR || PM.getPlayerById(target).team == PM.getPlayerById(player).team)
 						return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 안내", "%d님의 반응이 없는 경우, 자동으로 퇴장됩니다", target, ("!join spec " + '#' + player), c_LIST_COLOR.GRAY, null, 0, SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.PUBLIC));
 				}
-				PS.getPlayerList().forEach(p => showAlretMsg(p.id));
+				PM.findPlayerList().forEach(p => showAlretMsg(p._id));
 				//	퇴장 처리
 				let afkTimer = TS.addTimer("afkTimer", () => {
 					if(isAfk(afkTimer._player, afkTimer._delay * 3) == false) return;					//	이미 응답한 경우
-					if(PS.getPlayerList().find(p => p.id == afkTimer._player) == undefined) return;	//	퇴장한 경우
-					PS.onPlayerInactivity(PS.getPlayerById(afkTimer._player));
+					if(PM.findPlayerList().find(p => p._id == afkTimer._player) == undefined) return;	//	퇴장한 경우
+					PM.onPlayerInactivity(PM.getPlayerById(afkTimer._player));
 				}, player, getAfkLimitTime() / 2 * MS);
 				return true;
 			}
@@ -674,43 +679,46 @@
 				let strList = msg.toString().split('\#');
 				if(!CS.isWhiteSpace(strList[0])) return NC.caution("%d를 포함하십시오.", player, null, "\#");
 				let num = parseInt(strList[1]);		//	번호 저장
-				if(!PS.isValid(num)) return num == 0 ? num : NC.caution("범위를 벗어난 ID입니다.", player);
-				if(PS.getLocalId(num) == false && hasAllRange == false) return NC.caution("해당 ID를 가진 플레이어는 미접속자입니다.", player);
+				if(!PM.isValid(num)) return num == 0 ? num : NC.caution("범위를 벗어난 ID입니다.", player);
+				if(PM.findLocalId(num) == false && hasAllRange == false) return NC.caution("해당 ID를 가진 플레이어는 미접속자입니다.", player);
 				return num;
 			}
 
 			loadMap(target, player){				//		맵 불러오기
-				let isValidByPlayer = PS.isValid(player);
-				if(!SYS.hasInRange(target, 0, maps.length)){
+				let isValidByPlayer = PM.isValid(player);
+				let hasCustomStadiums = () => (customStadiumList.length > 0);
+				let size = (hasCustomStadiums() ? customStadiumList : defaultStadiumList).length;
+				if(!SYS.hasInRange(target + 1, 1, size)){
 					if(isValidByPlayer) return NC.caution("맵 ID가 올바르지 않습니다.", player, "?load");
 					return SYS.log(true, "맵 데이터를 불러올 수 없습니다. 잘못된 접근입니다.", c_LOG_TYPE.WARNING);
 				}
 				if(AMN._isLockStadium == true && AMN._defaultStadium != target)	//	맵이 고정된 경우
-					return (isValidByPlayer ? NC.acess(player, "맵이 고정되어 있어 불러올 수 없습니다.") : SYS.log(false, "맵 고정을 해제해야 합니다. 잘못된 접근입니다.", c_LOG_TYPE.WARNING));
-				if(maps[target] == undefined)											//	맵 파일을 찾을 수 없는 경우
+					return (isValidByPlayer ? NC.acess(player, "맵이 고정되어 있어 불러올 수 없습니다.") : SYS.log(false, "맵 고정을 해제해야 합니다. 잘못된 접근입니다.", c_LOG_TYPE.WARNING));				
+				if(hasCustomStadiums() == true && customStadiumList[target] == undefined)											//	맵 파일을 찾을 수 없는 경우
 					return (isValidByPlayer ? NC.caution("맵 데이터를 불러올 수 없습니다.", player) : SYS.sendError(c_ERROR_TYPE.E_ETC));
 				room.stopGame();
 				AMN._defaultStadium = target;										//	맵 데이터 등록
-				room.setCustomStadium(maps[target]);
+				if(hasCustomStadiums()) room.setCustomStadium(customStadiumList[target]);
+				else room.setDefaultStadium(defaultStadiumList[target]);
 				if(isValidByPlayer) SYS.log(true, "%d(이)가 %d번 맵으로 교체함", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(player), target]);
 			}
 			reorderPlayers(indexList, moveToTop){		//	플레이어 데이터베이스 순번 재정렬
 				let indexArray = indexList == undefined ? new Array() : indexList;
 				if(!indexArray){
 					let pushReorderlist = function(player){
-						let localId = PS.getLocalId(player);
-						if(!localId || localId > PS.cntPlayers()) return;
+						let localId = PM.findLocalId(player);
+						if(!localId || localId > PM.cntPlayers()) return;
 						indexArray.push(i);
 					}
-					PS.getPlayerList().forEach(p => pushReorderlist(p.id));
+					PM.findPlayerList().forEach(p => pushReorderlist(p._id));
 				}
 				room.reorderPlayers(indexArray, (moveToTop == true || moveToTop == false ? moveToTop : true));
 				//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
-				PS.getPlayerList().forEach(p => SYS.updateListIndex(p.id));
+				PM.findPlayerList().forEach(p => SYS.updateListIndex(p._id));
 			}
 			runCommand(array, type, player){	//		명령어 실행 처리
 				//	범위 외 및 미접속자인 경우
-				if(PS.isValid(player.id) == false || PS.getLocalId(player.id) == false) return false;
+				if(PM.isValid(player.id) == false || PM.findLocalId(player.id) == false) return false;
 
 				let fn = Function('"use strict";return (' + array + ')')();	//	실행 구문
 				let header = type[0];										//	명령어 유형
@@ -753,7 +761,8 @@
 		}
 		/*** 관리 클래스 ***/
 		class Administration{
-			constructor(dynamicAdmin, isLockJoin, isLockStadium, defaultStadium, maxAdmin, pinHost){
+			constructor(dynamicAdmin, isLockJoin, isLockStadium, defaultStadium, maxAdmin, pinHost){	
+				this._blacklist			= new Array();		//	블랙리스트 명단
 				this._dynamicAdmin 		= dynamicAdmin;	 	//	권한 할당 방식(true: 동적, false: 정적)
 				this._isLockJoin 		= isLockJoin;		//	플레이어 팀 자율 이동 제한 여부
 				this._isLockStadium		= isLockStadium;	//	맵 고정 여부
@@ -762,11 +771,11 @@
 				this._pinHost 			= pinHost;			//	방장 팀 이동 허용 여부
 			}
 			onPlayerAdminChange(player, byPlayer){						//	권한 변경 이벤트
-				let isValidByPlayer = PS.isValid(byPlayer);
+				let isValidByPlayer = PM.isValid(byPlayer);
 				let newAdmin = SYS.showPlayerInfo(player.id, c_PLAYERINFO_TYPE.NAME);
 				let byAdmin = (isValidByPlayer ? SYS.showPlayerInfo(byPlayer.id, c_PLAYERINFO_TYPE.NAME) : false);
-				PS.updateTime(player.id);			//	마지막 활동 시간 저장
-				if(byAdmin != false) PS.updateTime(byPlayer.id);
+				PM.updateTime(player.id);			//	마지막 활동 시간 저장
+				if(byAdmin != false) PM.updateTime(byPlayer.id);
 				if(player.admin == true){			//	권한 획득(최고 권한 부여)
 					switch(this.getAdmin(player.id)){
 						case 0:		//	무권한 → 최고 권한
@@ -790,7 +799,7 @@
 					}
 				}
 				let procType = (player.admin == true ? "부여" : "박탈");
-				PS.setPlayer(player.id, "admin", 2);
+				PM.setPlayer(player.id, "admin", 2);
 				setPlayerlistById(player.id, "admin", 2);
 				if(byAdmin == false) NC.notice("%d님의 최고 권한이 %d 되었습니다.", null, null, [newAdmin, procType]);
 				else NC.notice("%d님이 %d님의 최고 권한을 %d 했습니다.", null, null, [byAdmin, newAdmin, procType]);
@@ -801,19 +810,19 @@
 			}
 			onPlayerKicked(kickedPlayer, reason, ban, byPlayer){	//	플레이어 강제 퇴장 이벤트
 				let banType = ban == true ? "영구" : "강제";
-				PS.setPlayer(kickedPlayer.id, "hasKicked", true);
+				PM.setPlayer(kickedPlayer.id, "hasKicked", true);
 				setPlayerlistById(kickedPlayer.id, "hasKicked", true);
 				if(reason == "Bad actor"){ 
 					SYS.sendError(c_ERROR_TYPE.E_ETC);
 					NC.notice("%d님이 오류 감지 시스템으로 인해 퇴장되었습니다.", null, null, SYS.showPlayerInfo(kickedPlayer, c_PLAYERINFO_TYPE.NAME));
 					return SYS.log(true, "%d(이)가 오류로 인해 %d 퇴장됨.", c_LOG_TYPE.ERROR, [SYS.showPlayerInfo(kickedPlayer.id, c_PLAYERINFO_TYPE.PUBLIC), banType]);
 				}
-				if(!PS.isValid(byPlayer)) return SYS.log(true, "%d(을)를 %d 퇴장함." + (reason ? ('(' + reason + ')') : ''), c_LOG_TYPE.WARNING, [SYS.showPlayerInfo(kickedPlayer.id, c_PLAYERINFO_TYPE.PUBLIC), banType]);
-				PS.updateTime(byPlayer.id);							//	마지막 활동 시간 저장
+				if(!PM.isValid(byPlayer)) return SYS.log(true, "%d(을)를 %d 퇴장함." + (reason ? ('(' + reason + ')') : ''), c_LOG_TYPE.WARNING, [SYS.showPlayerInfo(kickedPlayer.id, c_PLAYERINFO_TYPE.PUBLIC), banType]);
+				PM.updateTime(byPlayer.id);							//	마지막 활동 시간 저장
 				SYS.log(true, "%d(이)가 %d(을)를 %d 퇴장함." + (reason ? ('(' + reason + ')') : ''), c_LOG_TYPE.WARNING, [SYS.showPlayerInfo(byPlayer.id, c_PLAYERINFO_TYPE.PUBLIC), SYS.showPlayerInfo(kickedPlayer.id, c_PLAYERINFO_TYPE.PUBLIC), banType]);
 			}
 			addBlacklist(isSuper, name, conn){			//				블랙리스트 초기화
-				return blacklist.push(new blacklistManager(isSuper, name, conn));
+				return this._blacklist.push(new blacklistManager(isSuper, name, conn));
 			}
 			addBlacklistByPlayer(target, isSuper){
 				return this.addBlacklist((isSuper ? true : false), target._name, target._address);
@@ -821,7 +830,7 @@
 			isBlacklist(player, isSuper){				//				블랙리스트 감지
 				let pName = getPlayerlistById(player)._name;
 				let pAddress = getPlayerlistById(player)._address;
-				if(!PS.isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
+				if(!PM.isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
 				let checkName		= function(s){			//	닉네임 일치 확인
 					let a = s._name;
 					let b = pName;														//	검사할 데이터
@@ -848,7 +857,7 @@
 					if(b._super != isSuper) return false;				//	(슈퍼)블랙리스트 기준으로 따로 처리
 					return true;												//	모두 일치한 경우
 				}
-				for(let b of blacklist.filter(bl => checkDatabase(bl))){
+				for(let b of this._blacklist.filter(bl => checkDatabase(bl))){
 					//	이름 데이터가 비어 있으면 갱신
 					if(b._name == undefined) b._name = pName;
 					//	주소 데이터가 비어 있으면 갱신
@@ -877,37 +886,38 @@
 					let str = numStr.test(a) ? b : b.replace(numStr, '');
 					return (a == str);
 				}
-				while(i < blacklist.length){
+				let bl = this._blacklist;
+				while(i < bl.length){
 					//	포함되면 필터 반환 | 포함되지 않으면 i 증가
-					if(blacklist[i].super == true){
-						if(blacklist[i].name != undefined && isMatchName(blacklist[i].name, PS.getPlayerById(index).name)){ 	//	닉네임이 동일하면
-							if(blacklist[i].ip == undefined) blacklist[i].ip = PS.getAddress(index);			//	주소 원소의 값이 없을 경우 등록
-							else if(blacklist[i].ip != PS.getAddress(index)) this.addBlacklist(true, PS.getPlayerById(index).name, PS.getAddress(index));
+					if(bl[i].super == true){
+						if(bl[i].name != undefined && isMatchName(bl[i].name, PM.getPlayerById(index).name)){ 	//	닉네임이 동일하면
+							if(bl[i].ip == undefined) bl[i].ip = this.findAddress(index);			//	주소 원소의 값이 없을 경우 등록
+							else if(bl[i].ip != this.findAddress(index)) this.addBlacklist(true, PM.getPlayerById(index).name, this.findAddress(index));
 							detected = true; break;
 						}
-						else if(blacklist[i].ip == PS.getAddress(index)){										//	주소가 동일하면
-							if(blacklist[i].name == undefined) blacklist[i].name = PS.getPlayerById(index).name;	//	이름 원소의 값이 없을 경우 등록
-							else if(blacklist[i].name != PS.getPlayerById(index).name) this.addBlacklist(true, PS.getPlayerById(index).name, PS.getAddress(index));
+						else if(bl[i].ip == this.findAddress(index)){										//	주소가 동일하면
+							if(bl[i].name == undefined) bl[i].name = PM.getPlayerById(index).name;	//	이름 원소의 값이 없을 경우 등록
+							else if(bl[i].name != PM.getPlayerById(index).name) this.addBlacklist(true, PM.getPlayerById(index).name, this.findAddress(index));
 							detected = true; break;
 						}
 					}
 					i++;
 				}
-				for(let i = 0; i < blacklist.length; i++){			//	중복 데이터 삭제
-					for(let j = 0; j < blacklist.length; j++){
-						if(blacklist[i].super == true && i != j)
-							if(blacklist[i].name == blacklist[j].name && blacklist[i].ip == blacklist[j].ip) blacklist.splice(j, 1);
+				for(let i = 0; i < bl.length; i++){			//	중복 데이터 삭제
+					for(let j = 0; j < bl.length; j++){
+						if(bl[i].super == true && i != j)
+							if(bl[i].name == bl[j].name && bl[i].ip == bl[j].ip) bl.splice(j, 1);
 					}
 				}
 				if(detected == false) return false;
-				SYS.log(true, "[슈퍼 블랙리스트]%d: " + newLine + "%d", c_LOG_TYPE.WARNING, [SYS.showPlayerInfo(index, c_PLAYERINFO_TYPE.PUBLIC), PS.getAddress(index)]);
+				SYS.log(true, "[슈퍼 블랙리스트]%d: " + newLine + "%d", c_LOG_TYPE.WARNING, [SYS.showPlayerInfo(index, c_PLAYERINFO_TYPE.PUBLIC), this.findAddress(index)]);
 				this.setKick(index, c_LIST_ICON.NEGATIVE_BOLD + "차단된 계정", false);
 				return true;
 			}
 			getAdmin(player){							//				권한 확인
 				if(NOPLAYER == false && player == 0) return room.getPlayer(0).admin ? 2 : 0;
-				if(!PS.isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
-				let stats = PS.getPlayerById(player).admin;
+				if(!PM.isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
+				let stats = PM.getPlayerById(player).admin;
 				switch(stats){
 					case 2: case 1:
 						return stats;
@@ -915,17 +925,23 @@
 						return 0;
 				}
 			}
+			findAddress(target){
+				return getPlayerlistById(target)._address;
+			}
+			findNetwork(target){
+				return getPlayerlistById(target)._network;
+			}
 			findBlacklistByName(str){								//		닉네임으로 블랙리스트 찾기
-				return blacklist.filter(bl => bl._name == str);
+				return this._blacklist.filter(bl => bl._name == str);
 			}
 			findBlacklistByAddress(conn){							//		IP로 블랙리스트 찾기
-				return blacklist.filter(bl => bl._address == conn);
+				return this._blacklist.filter(bl => bl._address == conn);
 			}
 			get maxAdmin(){
 				return (this._maxAdmin <= MAXPLAYERS && this._maxAdmin > 0) ? this._maxAdmin : MAXPLAYERS;
 			}
 			findMutelist(isPublic){						//					채금 명단 구하기
-				return PS.getPlayerList(isPublic).filter(p => p.isMute == true);
+				return PM.findPlayerList(isPublic).filter(p => p._isMute == true);
 			}
 			get restrictedStadium(){					//				고정 맵 데이터
 				return this._defaultStadium;
@@ -937,8 +953,8 @@
 				SYS.log(true, "권한 할당 작동 방식이 %d(으)로 변경됨.", c_LOG_TYPE.BELL, (bool ? "동적" : "정적"));
 			}
 			setKick(kickedPlayer, msg, ban, ...replace){	//					강제 퇴장 처리
-				if(!PS.isValid(kickedPlayer)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
-				if(!PS.getLocalId(kickedPlayer)) return;
+				if(!PM.isValid(kickedPlayer)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
+				if(!PM.findLocalId(kickedPlayer)) return;
 				let reason = msg ? NC.formatString(msg, replace, kickedPlayer) : null;
 				room.kickPlayer(kickedPlayer, reason, ban);
 			}
@@ -964,19 +980,19 @@
 				if(bool == true || bool == false) this._pinHost = bool;
 			}
 			setLockStadium(bool){					//					맵 고정
-				if(maps.length < 1) return SYS.log(false, "저장된 맵 데이터가 존재하지 않음.", c_LOG_TYPE.WARNING);
+				if(customStadiumList.length < 1) return SYS.log(false, "저장된 맵 데이터가 존재하지 않음.", c_LOG_TYPE.WARNING);
 				if(this._defaultStadium == null) return SYS.log(false, "고정 맵 데이터가 존재하지 않음.", c_LOG_TYPE.WARNING);
 				if(this._isLockStadium == bool) return SYS.log(false, "중복된 값으로 접근됨.", c_LOG_TYPE.WARNING);
 				this._isLockStadium = bool;
 				NC.locked(bool, "맵 변경이 %d되었습니다.", null, null, (bool ? "제한" : "허용"));
 				SYS.log(true, "맵 변경이 %d됨.", c_LOG_TYPE.NOTICE, (bool ? "제한" : "허용"));
-				if(this._isLockStadium == true) room.setCustomStadium(maps[this._defaultStadium]);
+				if(this._isLockStadium == true) room.setCustomStadium(customStadiumList[this._defaultStadium]);
 			}
 			setLockTeams(bool, player){			//					팀 이동 금지/허용
 				NC.locked(bool, "팀 자율 이동이 %d되었습니다.", null, null, (bool ? "금지" : "허용"));
 				this._isLockJoin = bool;
 				room.setTeamsLock(this._isLockJoin);
-				if(PS.isValid(player)) SYS.log(true, "%d(이)가 팀 자율 이동을 %d함.", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(player), (bool ? "금지" : "허용")]);
+				if(PM.isValid(player)) SYS.log(true, "%d(이)가 팀 자율 이동을 %d함.", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(player), (bool ? "금지" : "허용")]);
 			}
 			setScore(player, msg, type){		//	!score n	|	점수 변경
 				switch(type){
@@ -1019,8 +1035,8 @@
 				});
 				if(admins.length > 0) return;					//	최고 권한을 가진 플레이어가 이미 있으면 처리 중단
 				players.sort((a, b) => a.id - b.id);			//	공용 ID를 오름차순으로 정렬
-				let target = players.filter(p => PS.getPlayerById(p.id).isSleep == false)[0];
-				if(!PS.isValid(target)) return;
+				let target = players.filter(p => PM.getPlayerById(p.id).isSleep == false)[0];
+				if(!PM.isValid(target)) return;
 				if(AMN.isBlacklist(target.id, false))				//	블랙리스트나 장기 대기열이면 보조 권한 부여
 					return AMN.giveSubAdmin(target.id);
 				AMN.giveAdmin(target.id);
@@ -1033,7 +1049,7 @@
 			}
 			clearBans(player){				//								영구 퇴장 명단 초기화
 				room.clearBans();
-				if(PS.isValid(player)){
+				if(PM.isValid(player)){
 					NC.locked(false, "%d님이 영구 퇴장 명단을 모두 지웠습니다.", null, null, SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME));
 					SYS.log(true, "%d(이)가 영구 퇴장 명단을 모두 지움", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player));
 				}
@@ -1043,7 +1059,7 @@
 				}
 			}
 			clearMuteList(player){				//								채팅 금지 명단 초기화
-				let isValidByPlayer = PS.isValid(player);
+				let isValidByPlayer = PM.isValid(player);
 				let ml = this.findMutelist(true);
 				if(ml.length < 1)
 					return isValidByPlayer ? NC.caution("채팅 금지 명단에 새겨진 기록이 아직 없습니다.", player) : SYS.log(false, "이미 데이터가 초기화 되었으므로 접근할 수 없음.", c_LOG_TYPE.WARNING);
@@ -1078,7 +1094,7 @@
 			}
 			deleteSubAdmin(player, isForce){	//								보조 권한 해제
 				if(this.getAdmin(player) != 1) return;
-				PS.setPlayer(player, "admin", 0);
+				PM.setPlayer(player, "admin", 0);
 				setPlayerlistById(player, "admin", 0);
 				NC.notice("%d님의 보조 권한이 해제되었습니다.", null, null, SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME));
 				SYS.log(true, "%d(이)의 보조 권한이 삭제됨.", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player));
@@ -1113,33 +1129,33 @@
 				}
 			}
 			cntAdmins(level){					//						접속자 인원(권한)
-				let getAmount = l => PS.getPlayerList().filter(p => p.admin == l).length;
+				let getAdmins = l => PM.findPlayerList().filter(p => p._admin == l).length;
 				switch(level){
 					case 1:		//	보조 권한 관리자만
 					case 2:		//	최고 권한 관리자만
-						return getAmount(level);
+						return getAdmins(level);
 					default:
-						return getAmount(2) + getAmount(1);
+						return getAdmins(2) + getAdmins(1);
 				}
 			}
 			filterPlayer(player){					//						사칭 및 중복 필터
-				if(!PS.getLocalId(player)) return false;		//	접속 상태가 아니면 처리 중단
-				if(PS.cntPlayers() < 2) return false;			//	접속자 수가 2인 미만이면 처리 중단
-				for(let target of PS.getPlayerList()){
-					if(!PS.isValid(target.id)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
-					if(player != target.id){
-						if(target.name == PS.getPlayerById(player).name){ 	//	중복 접속 처리
-							if(PS.getNetwork(target.id) == PS.getNetwork(player)){ 				//	중복 접속
-								this.setKick(target.id, c_LIST_ICON.NORMAL + "중복 접속");
-								SYS.log(true, "%d(이)가 %d(으)로 중복 접속함", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(target.id), SYS.showPlayerInfo(player)]);
+				if(!PM.findLocalId(player)) return false;		//	접속 상태가 아니면 처리 중단
+				if(PM.cntPlayers() < 2) return false;			//	접속자 수가 2인 미만이면 처리 중단
+				for(let target of PM.findPlayerList()){
+					if(!PM.isValid(target._id)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
+					if(player != target._id){
+						if(target._name == PM.getPlayerById(player).name){ 	//	중복 접속 처리
+							if(target._network == this.findNetwork(player)){ 				//	중복 접속
+								this.setKick(target._id, c_LIST_ICON.NORMAL + "중복 접속");
+								SYS.log(true, "%d(이)가 %d(으)로 중복 접속함", c_LOG_TYPE.NOTICE, [target.showPlayerInfo(), SYS.showPlayerInfo(player)]);
 							}
 							else this.setKick(player, c_LIST_ICON.NEGATIVE + "사칭 및 다중 접속");		//	사칭
 							return true;
 						}
-						if(PS.getAddress(target.id) == PS.getAddress(player)){					//	다중 접속
+						if(target._address == this.findAddress(player)){					//	다중 접속
 							this.addBlacklistByPlayer(getPlayerlistById(player));
 							this.setKick(player, c_LIST_ICON.NEGATIVE + "사칭 및 다중 접속");
-							SYS.log(true, "%d(와)과 %d(이)의 다중 접속이 감지됨.", c_LOG_TYPE.WARNING, [SYS.showPlayerInfo(target.id), SYS.showPlayerInfo(player)]);
+							SYS.log(true, "%d(와)과 %d(이)의 다중 접속이 감지됨.", c_LOG_TYPE.WARNING, [target.showPlayerInfo(), SYS.showPlayerInfo(player)]);
 							return true;
 						}
 					}
@@ -1153,7 +1169,7 @@
 				if(this.cntAdmins(2) >= this.maxAdmin) return;
 				//	블랙리스트에 포함되는 경우, 보조 권한으로 부여
 				if(this.isBlacklist(player, false)) return this.giveSubAdmin(player);
-				PS.setPlayer(player, "admin", 2);
+				PM.setPlayer(player, "admin", 2);
 				setPlayerlistById(player, "admin", 2);
 				room.setPlayerAdmin(player, true);
 			}
@@ -1163,7 +1179,7 @@
 				//	최대 인원을 초과한 경우
 				if(this.cntAdmins(1) >= this.maxAdmin * 2) return;
 				if(room.getPlayer(player).admin == true) room.setPlayerAdmin(player, false);
-				PS.setPlayer(player, "admin", 1);
+				PM.setPlayer(player, "admin", 1);
 				setPlayerlistById(player, "admin", 1);
 				NC.notice("%d님의 보조 권한이 부여되었습니다.", null, null, SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME));
 				SYS.log(true, "%d(이)의 보조 권한이 부여됨.", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player));
@@ -1175,9 +1191,9 @@
 			}
 			mutePlayer(target, byPlayer){		//					|	채팅 금지
 				// 이미 채팅이 금지돼 있는 경우
-				if(!PS.isValid(target) || PS.getPlayerById(target).isMute) return;
-				let isValidByPlayer = PS.isValid(byPlayer);
-				PS.setPlayer(target, "isMute", true);
+				if(!PM.isValid(target) || PM.getPlayerById(target).isMute) return;
+				let isValidByPlayer = PM.isValid(byPlayer);
+				PM.setPlayer(target, "isMute", true);
 				setPlayerlistById(target, "isMute", true);
 				if(isValidByPlayer){
 					NC.locked(true, "%d님이 %d님의 채팅을 금지하였습니다.", null, null, [SYS.showPlayerInfo(byPlayer, c_PLAYERINFO_TYPE.NAME), SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME)]);
@@ -1192,7 +1208,7 @@
 			logonAdmin(player, msg, type){		//						최고 권한 로그인
 				if(type != 2) return AMN.missPassword(player, msg, type);		//	첫 두 글자가 '!!'로 시작하지 않으면 실패 처리
 				if(AMN.getAdmin(player) == 2) return;							//	이미 권한이 있는 경우
-				if(PS.getPlayerById(player).isSleep) PS.setSleep(player, false);	//	장기 대기열에 있었으면 제거
+				if(PM.getPlayerById(player).isSleep) PM.setSleep(player, false);	//	장기 대기열에 있었으면 제거
 				SYS.log(true, "%d(이)가 최고 권한 로그인을 시도함", c_LOG_TYPE.BELL, SYS.showPlayerInfo(player));
 				AMN.giveAdmin(player);
 			}
@@ -1201,12 +1217,12 @@
 				return room.startGame();
 			}
 			unmutePlayer(target, byPlayer){		//						채팅 허용
-				let isValidByPlayer = PS.isValid(byPlayer);
-				PS.setPlayer(target, "isMute", false);
+				let isValidByPlayer = PM.isValid(byPlayer);
+				PM.setPlayer(target, "isMute", false);
 				setPlayerlistById(target, "isMute", false);
 				room.setPlayerAvatar(target);			//	등번호 초기화
 				SYS.updateListIndex(target);			//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
-				if(!PS.getLocalId(target)) return;		//	미접속자는 별도로 출력하지 않음
+				if(!PM.findLocalId(target)) return;		//	미접속자는 별도로 출력하지 않음
 				if(isValidByPlayer){
 					NC.locked(false, "%d님이 %d님의 채팅을 허용하였습니다.", null, null, [SYS.showPlayerInfo(byPlayer, c_PLAYERINFO_TYPE.NAME), SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME)]);
 					SYS.log(true, "%d(이)가 %d(이)의 금지된 채팅을 허용함.", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(byPlayer), SYS.showPlayerInfo(target)]);
@@ -1254,7 +1270,7 @@
 			formatString(str, rep, target){	
 				let subst = "%d";
 				if(!str.includes(subst)) return str;
-				if(rep == undefined || rep.length < 1) return PS.isValid(target) ? str.replace(subst, SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME)) : str;
+				if(rep == undefined || rep.length < 1) return PM.isValid(target) ? str.replace(subst, SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME)) : str;
 				let vrb = rep;
 				let txt = str.split(subst);
 				let context = txt;
@@ -1268,10 +1284,10 @@
 					room.sendAnnouncement(NC.formatString(msg, replace[0], target), target, NC.getColor(color), NC.getStyle(style), NC.getSound(sound));
 				}
 				TS.addTimer("announcement", () => {
-					if(PS.isValid(Math.abs(target)) && target < 0){		//	ID가 음수이면 해당 ID를 제외한 모든 플레이어에게 전송
-						PS.getPlayerList().forEach(p => {
-							if(Math.abs(target) != p.id) sendMsg(msg, p.id, color, style, sound);
-						});
+					if(PM.isValid(Math.abs(target)) && target < 0){		//	ID가 음수이면 해당 ID를 제외한 모든 플레이어에게 전송
+						for(let p of PM.findPlayerList()){
+							if(Math.abs(target) != p._id) sendMsg(msg, p._id, color, style, sound);
+						}
 					}
 					else
 						sendMsg(msg, target, color, style, sound);
@@ -1291,11 +1307,11 @@
 				return this.extMsg(title, content, target, advCom, c_LIST_COLOR.GREEN, null, delay * MS, replace[0]);
 			}
 			alretMsg(player){	//		금지어 감지 메시지
-				if(!PS.isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
-				PS.setPlayer(player, "detector", PS.getPlayerById(player).detector + 1);
+				if(!PM.isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
+				PM.setPlayer(player, "detector", PM.getPlayerById(player).detector + 1);
 				setPlayerlistById(player, "detector", getPlayerlistById(player)._detector + 1);
-				if(CS._maxFwdCount > 0 && PS.getPlayerById(player).detector >= CS._maxFwdCount){ 
-					PS.setPlayer(player, "detector", 0);
+				if(CS._maxFwdCount > 0 && PM.getPlayerById(player).detector >= CS._maxFwdCount){ 
+					PM.setPlayer(player, "detector", 0);
 					setPlayerlistById(player, "detector", 0);
 					return AMN.setKick(player, c_LIST_ICON.NEGATIVE_BOLD + "금지어 누적 감지");
 				}
@@ -1422,7 +1438,7 @@
 					return null;
 				}
 				let comType = getComType(strList[0]);
-				PS.updateTime(player.id);						//	마지막 활동 시간 저장
+				PM.updateTime(player.id);						//	마지막 활동 시간 저장
 				if(comType != null){
 					let commandsList = [						//	명령어 목록
 						internalCommands, standardCommands, customCommands
@@ -1473,7 +1489,7 @@
 			}
 			hasRepeatedChat(player){			//							중복 채팅 확인
 				if(this._maxRptCount == false) return false;				//	중복 채팅 감지 비활성
-				if(this._detectorLevel < 1 || PS.cntPlayers() < 2)		//	채팅 필터링이 비활성화 돼 있거나 인원이 2인 미만일 경우
+				if(this._detectorLevel < 1 || PM.cntPlayers() < 2)		//	채팅 필터링이 비활성화 돼 있거나 인원이 2인 미만일 경우
 					return false;
 				let target = getPlayerlistById(player);
 				if(target._str == undefined) return false;
@@ -1521,11 +1537,12 @@
 				return true;
 			}
 			isWhiteSpace(str){			//							공백 확인
+				if(str == undefined) return true;
 				return str.trim().length == 0;
 			}
 
 			freezeChat(bool, player){			//					채팅 얼리기/녹이기
-				let isValidByPlayer = PS.isValid(player);
+				let isValidByPlayer = PM.isValid(player);
 				this._isFreeze = bool;
 				if(isValidByPlayer){
 					NC.locked(this._isFreeze, "%d님이 채팅창을 %d", null, null, [SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME), (bool ? "얼렸습니다." : "녹였습니다.")]);
@@ -1537,7 +1554,7 @@
 				}
 			}
 			lockPrivateChat(bool, player){			//					귓속말 채팅 금지/허용
-				let isValidByPlayer = PS.isValid(player);
+				let isValidByPlayer = PM.isValid(player);
 				this._isLockPrivateChat = bool;
 				if(isValidByPlayer){
 					NC.locked(bool, "%d님이 귓속말 채팅을 %d했습니다.", null, null, [SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME), (bool ? "금지" : "허용")]);
@@ -1561,19 +1578,19 @@
 			comPrivateChat(player, msg, type){		//	!e #ID		|	귓속말 명령어
 				switch(type){
 					case 0:			//	!e
-						if(!PS.getPlayerById(player).isDisturb) return NC.caution("귓속말을 사용할 수 없습니다.", player, "?disturb");
+						if(!PM.getPlayerById(player).isDisturb) return NC.caution("귓속말을 사용할 수 없습니다.", player, "?disturb");
 						let target = msg.length > 0 ? GM.checkPublicId(msg[0], player) : -1;
 						let chatMsg = msg.length > 1 ? msg.slice(1).join(' ') : '';
 						if(target == 0){
-							let mark = (CS.hasForbiddenWord(chatMsg) ? PS.getTagTeam(PS.getPlayerById(player).team, true) : PS.getTagGrade(player));
+							let mark = (CS.hasForbiddenWord(chatMsg) ? c_TAG_GRADE[0] : PM.findTagGrade(player));
 							CS.sendMsg("외부" + mark + SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.LOCAL) + '→' + HOSTNAME + ": " + chatMsg, player);
 							SYS.log(false, mark + SYS.showPlayerInfo(player) + ": " +  chatMsg, c_LOG_TYPE.BINDING);
 							return;
 						}
 						if(target == -1) return NC.caution("귓속말을 보낼 대상을 지정하세요", player, "?e");
-						if(!PS.isValid(target)) return false;
+						if(!PM.isValid(target)) return false;
 						if(target == player) return NC.caution("자기 자신에게 귓속말을 보낼 수 없습니다.", player);
-						if(!PS.getPlayerById(target).isDisturb) return NC.caution(SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME) + "님은 채팅 수신을 거부한 상태입니다.", player);
+						if(!PM.getPlayerById(target).isDisturb) return NC.caution(SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME) + "님은 채팅 수신을 거부한 상태입니다.", player);
 						CS.sendPrivateChat(target, player, chatMsg);
 						if(CS.hasForbiddenWord(chatMsg)) NC.alretMsg(player);
 						break;
@@ -1585,7 +1602,7 @@
 			comTeamChat(player, msg, type){		//	!t 			|	팀 채팅 명령어
 				switch(type){
 					case 0:			//	!t
-						return CS.sendTeamChat(PS.getPlayerById(player).team, player, msg.length > 0 ? msg.join(' ') : '');
+						return CS.sendTeamChat(PM.getPlayerById(player).team, player, msg.length > 0 ? msg.join(' ') : '');
 					case 1:			//	?t
 						return NC.help("상대팀이 못 엿듣게 살포시 팀원에게 \'%d\'라고 전하려면",
 						"!t %d", player, "!chathelp", "민트초코 최고야");
@@ -1628,10 +1645,10 @@
 			}
 			sendAllChat(player, msg){					//				전체 채팅 전송
 				let filter = this.hasForbiddenWord(msg);				//	금지어 필터링
-				let title = "전체" + (filter ? PS.getTagTeam(PS.getPlayerById(player).team, true) : PS.getTagGrade(player));
+				let title = "전체" + (filter ? c_TAG_GRADE[0] : PM.findTagGrade(player));
 				let getContext = function(lev, str){
 					let msgCore = str.substr(0, 70);	//	70자 내외 제한
-					let sendContext = (arg) => ((PS.isValid(player) ? SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.LOCAL) : ("(#0)" + HOSTNAME)) + ": ") + arg;
+					let sendContext = (arg) => ((PM.isValid(player) ? SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.LOCAL) : ("(#0)" + HOSTNAME)) + ": ") + arg;
 					switch(lev){
 						case 4: case 5:
 							if(filter == true)	return sendContext("관리자에 의해 삭제된 메시지입니다.");
@@ -1640,10 +1657,9 @@
 				}
 				if(this.hasMutedChat(player)) return this.sendEmojiChat(player, msg);	//	채팅 금지
 				this.sendMsg(title + getContext(this._detectorLevel, msg));
-				PS.getPlayerList().filter(p => {
-					if(p.chatmode != 0)
-						NC.announce("(전체 채팅: !a 답할 내용)", p.id, c_LIST_COLOR.GRAY, c_LIST_STYLE.SMALL, c_LIST_SOUND.MUTED, 1);
-				});
+				for(let p of PM.findPlayerList().filter(p => p._chatmode != 0)){
+					NC.announce("(전체 채팅: !a 답할 내용)", p._id, c_LIST_COLOR.GRAY, c_LIST_STYLE.SMALL, c_LIST_SOUND.MUTED, 1);
+				}
 				SYS.log(true, title + SYS.showPlayerInfo(player) + ": " + msg);
 				if(filter) NC.alretMsg(player);
 			}
@@ -1681,16 +1697,16 @@
 				return NC.announce(msg, target, null, null, null, null, replace);
 			}
 			sendPrivateChat(toPlayer, fromPlayer, msg){		//				귓속말 채팅 전송
-				if(!PS.isValid(toPlayer)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_LID);
+				if(!PM.isValid(toPlayer)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_LID);
 				if(fromPlayer == 0 && toPlayer > 0)				//	콘솔창에서 게임으로 전달
 					return sendAlert(msg + " (귓속말 답장: !e #0 답할 내용)", toPlayer);
 				if(this._isLockPrivateChat) return NC.acess(fromPlayer, ("(#0)" + HOSTNAME) + " 외에 귓속말 채팅이 금지돼 있어 이용할 수 없습니다.");
 				if(this.hasMutedChat(fromPlayer)) return this.sendEmojiChat(fromPlayer, msg);		//	채팅 금지
 				let filter = this.hasForbiddenWord(msg);			//	금지어 필터링
-				let title = "개인" + (filter ? PS.getTagTeam(fromPlayer, true) : PS.getTagGrade(fromPlayer));
+				let title = "개인" + (filter ? c_TAG_GRADE[0] : PM.findTagGrade(fromPlayer));
 				let getContext = function(lev, str){
 					let msgCore = str.substr(0, 70);	//	70자 내외 제한
-					let sendContext = (arg) => (SYS.showPlayerInfo(fromPlayer, c_PLAYERINFO_TYPE.LOCAL) + '→' + PS.getTagGrade(toPlayer) + SYS.showPlayerInfo(toPlayer, c_PLAYERINFO_TYPE.LOCAL) + ": ") + arg;
+					let sendContext = (arg) => (SYS.showPlayerInfo(fromPlayer, c_PLAYERINFO_TYPE.LOCAL) + '→' + PM.findTagGrade(toPlayer) + SYS.showPlayerInfo(toPlayer, c_PLAYERINFO_TYPE.LOCAL) + ": ") + arg;
 					switch(lev){
 						case 4: case 5:
 							if(filter == true)	return sendContext("관리자에 의해 삭제된 메시지입니다.");
@@ -1701,7 +1717,7 @@
 				this.sendMsg(title + context + " (답장: !e " + '#' + fromPlayer + " 답할 내용)", toPlayer);
 				this.sendMsg(title + context, fromPlayer);																								//	입력자 출력
 				SYS.log(true, "%d%d→ %d%d: %d", c_LOG_TYPE.NORMAL, [			//	로그 출력
-					title, SYS.showPlayerInfo(fromPlayer), PS.getTagGrade(toPlayer), SYS.showPlayerInfo(toPlayer), msg
+					title, SYS.showPlayerInfo(fromPlayer), PM.findTagGrade(toPlayer), SYS.showPlayerInfo(toPlayer), msg
 				]);
 				if(filter) NC.alretMsg(fromPlayer);
 			}
@@ -1714,19 +1730,19 @@
 						default:				return SYS.sendError(c_ERROR_TYPE.E_ETC);
 					}
 				}
-				let filter = (PS.isValid(player) ? this.hasForbiddenWord(msg) : false);
-				let title = getTeamToString(teamId) + (PS.isValid(player) ? filter ? PS.getTagTeam(PS.getPlayerById(player).team, true) : PS.getTagGrade(player) : PS.getTagTeam(teamId));
+				let filter = (PM.isValid(player) ? this.hasForbiddenWord(msg) : false);
+				let title = getTeamToString(teamId) + (PM.isValid(player) ? filter ? c_TAG_GRADE[0] : PM.findTagGrade(player) : PM.findTagTeam(teamId));
 				let showMsg = function(player, context){
-					PS.getPlayerList().filter(p => p.team == teamId).forEach(p => {
-						if(!PS.isValid(player)) sendAlert(context, p.id);
-						else CS.sendMsg(context, p.id);
-					});
+					for(let p of PM.findPlayerList().filter(p => p._team == teamId)){
+						if(!PM.isValid(player)) sendAlert(context, p._id);
+						else CS.sendMsg(context, p._id);
+					}
 				}
-				if(!PS.isValid(player)) return showMsg(0, msg);
+				if(!PM.isValid(player)) return showMsg(0, msg);
 				if(this.hasMutedChat(player)) return this.sendEmojiChat(player, msg);	//	채팅 금지
 				let getContext = function(lev, str){
 					let msgCore = str.substr(0, 70);	//	70자 내외 제한
-					let sendContext = (arg) => ((PS.isValid(player) ? SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.LOCAL) : ("(#0)" + HOSTNAME)) + ": ") + arg;
+					let sendContext = (arg) => ((PM.isValid(player) ? SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.LOCAL) : ("(#0)" + HOSTNAME)) + ": ") + arg;
 					switch(lev){
 						case 4: case 5:
 							if(filter == true)	return sendContext("관리자에 의해 삭제된 메시지입니다.");
@@ -1734,10 +1750,9 @@
 					}
 				}
 				showMsg(player, title + getContext(this._detectorLevel, msg));
-				PS.getPlayerList().filter(p => {
-					if(p.team == teamId && p.chatmode != 0)
-						NC.announce("(팀 채팅: !t 답할 내용)", p.id, c_LIST_COLOR.GRAY, c_LIST_STYLE.SMALL, c_LIST_SOUND.MUTED, 1);
-				});
+				for(let p of PM.findPlayerList().filter(p => p._team == teamId && p._chatmode != 0)){
+					NC.announce("(팀 채팅: !t 답할 내용)", p._id, c_LIST_COLOR.GRAY, c_LIST_STYLE.SMALL, c_LIST_SOUND.MUTED, 1);
+				}
 				//	로그 출력
 				SYS.log(true, "%d%d: %d", c_LOG_TYPE.NORMAL, [title, SYS.showPlayerInfo(player), msg]);
 				if(filter) NC.alretMsg(player);
@@ -1757,6 +1772,7 @@
 					case 0:			//	!uniform
 						let comIndex = msg;
 
+						//	인자값 길이 확인
 						if(!SYS.hasInRange(comIndex.length, 4, 6)){
 							let getMsg = function(len){
 								if(!len) return "유니폼을 적용할 팀을 입력하세요.";
@@ -1794,7 +1810,7 @@
 						for(let b of bgList){
 							if(b == null) return NC.caution("색상 코드가 올바르지 않습니다.", player, "?uniform");
 						}
-						PS.setTeamColors(team, angle, bgList[0], bgList.slice(1));
+						PM.setTeamColors(team, angle, bgList[0], bgList.slice(1));
 						NC.uniMsg(c_LIST_ICON.NORMAL_BOLD + "유니폼 변경",
 						"%d님이 %d의 유니폼을 변경했습니다." + newLine + "%d",
 						null, "!uniform", 0, [SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME), GM.getTeamName(team), msg.join(' ')]);
@@ -1819,12 +1835,22 @@
 				}
 			}
 
-			comAdminList(player, msg, type){				//	!admin			|	관리자 목록
+			comAdminList(player, msg, type){				//						관리자 조회 명령어
 				switch(type){
 					case 0:		//	!admin
 						return AMN.showAdminList(player);
 					case 1:		//	?admin
 						break;
+				}
+			}
+			comAvatar(player, msg, type){					//						등번호 명령어
+				switch(type){
+					case 0:		//	!avatar
+						PM.giveAvatar(player, (msg.length > 0? msg[0] : ''));
+						NC.notice("등번호가 변경되었습니다.", player, "!clear_avatar");
+						break;
+					case 1:		//	?avatar
+						return NC.help("등번호를 12로 변경하려면", "!avatar 12", player, "!clear_avatar");
 				}
 			}
 			comChatMode(player, msg, type){					//	!chatmode		|	채팅 모드 설정
@@ -1854,7 +1880,7 @@
 						return NC.help("영구 퇴장 명단을 지우려면", "!clearbans", player, "!unmute #ID");
 				}
 			}
-			comClearTeamColors(player, msg, type){					//	!clear_uniform	|	유니폼 초기화
+			comClearTeamColors(player, msg, type){					//	유니폼 초기화 명령어
 				switch(type){
 					case 0:			//	!clear_uniform
 						let getTeam = function(str){
@@ -1868,8 +1894,10 @@
 						}
 						let team = getTeam(msg.length > 0 ? msg[0] : null);
 						if(!team) return NC.caution("유니폼을 되돌릴 팀을 입력하세요.", player);
+						PM.clearTeamColors(team);
+						NC.notice("%d님이 %의 유니폼을 초기화 했습니다.", null, null, [SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME), GM.getTeamName(team)]);
 						SYS.log(true, "%d(이)가 %d의 유니폼을 초기화함", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(player), GM.getTeamName(team)]);
-						return PS.clearTeamColors(team);
+						break;
 					case 1:			//	?clear_uniform
 						return NC.help("레드팀의 유니폼을 초기화하려면",
 						"!clear_uniform red", player);
@@ -1896,7 +1924,7 @@
 					case 0:		//	!freeze
 						if(!AMN.getAdmin(player)) return NC.acess(player);
 						if(CS._isFreeze == true) return NC.caution("채팅창이 이미 얼려있습니다.", player, "!unfreeze");
-						if(PS.cntPlayers() < 3) return NC.caution("부적절한 조치입니다.", player, "!mute #ID");
+						if(PM.cntPlayers() < 3) return NC.caution("부적절한 조치입니다.", player, "!mute #ID");
 						return CS.freezeChat(true, player);
 					case 1:		//	?freeze
 						return NC.help("채팅창을 얼리려면", "!freeze", player, "!unfreeze");
@@ -1916,7 +1944,7 @@
 					case 0:		//	!kick
 						if(!AMN.getAdmin(player)) return NC.acess(player);			//	권한이 없는 경우
 						let target = msg.length > 0 ? GM.checkPublicId(msg[0], player) : null;
-						if(!PS.isValid(target)) return CM.comKick(player, msg, 1);	//	대상을 잘못 지목한 경우
+						if(!PM.isValid(target)) return CM.comKick(player, msg, 1);	//	대상을 잘못 지목한 경우
 						let reason = msg.length > 1 ? msg.slice(1).join(' ') : null;
 						if(AMN.getAdmin(target) > AMN.getAdmin(player)) return NC.acess(player, "권한이 낮아 처리할 수 없습니다.");	//	보조 권한 → 최고 권한 퇴장 불가
 						let byPlayer = SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.PUBLIC);
@@ -1975,11 +2003,11 @@
 				switch(type){
 					case 0:			//	!mute
 						if(!AMN.getAdmin(player)) return NC.acess(player);			//	권한이 없는 경우
-						if(PS.cntPlayers() < 2) return NC.caution("채팅을 금지할 수 있는 플레이어가 없습니다.", player);
+						if(PM.cntPlayers() < 2) return NC.caution("채팅을 금지할 수 있는 플레이어가 없습니다.", player);
 						let target = msg.length > 0 ? GM.checkPublicId(msg[0], player) : null;
-						if(!PS.isValid(target)) return CM.comMute(player, msg, 1);	//	대상을 잘못 지목한 경우
+						if(!PM.isValid(target)) return CM.comMute(player, msg, 1);	//	대상을 잘못 지목한 경우
 						if(target == player) return NC.caution("자기 자신의 채팅을 금지할 수 없습니다.", player);
-						if(PS.getPlayerById(target).isMute) return NC.caution("%d님의 채팅은 이미 금지돼 있습니다.", player, ("!unmute " + '\#' + target), SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME));
+						if(PM.getPlayerById(target).isMute) return NC.caution("%d님의 채팅은 이미 금지돼 있습니다.", player, ("!unmute " + '\#' + target), SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME));
 						return AMN.mutePlayer(target, player);
 					case 1:			//	?mute
 						return NC.help("공용 ID가 42인 플레이어의 채팅을 금지하려면", "!mute #42", player);
@@ -1992,7 +2020,7 @@
 						if(!AMN.getAdmin(player)) return NC.acess(player);
 						let lockType = AMN.pinHost;
 						AMN.setPinHost(!lockType);
-						if(lockType == false) PS.setTeam(0, c_TEAM.SPECTATOR);
+						if(lockType == false) PM.setTeam(0, c_TEAM.SPECTATOR);
 						NC.locked(!lockType, "호스트 이동이 %d되었습니다.", player, null, (lockType ? "허용" : "금지"));
 						SYS.log(true, "%d(이)가 방장 팀 이동을 %d함.", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(player), (lockType ? "허용" : "금지")]);
 						break;
@@ -2025,6 +2053,16 @@
 						return NC.help("reCAPTCHA를 활성화 하려면", "!recaptcha on", player);
 				}
 			}
+			comResetAvatar(player, msg, type){					//						등번호 초기화 명령어
+				switch(type){
+					case 0:		// !clear_avatar
+						PM.resetAvatar(player);
+						NC.notice("등번호가 초기화되었습니다.", player);
+						break;
+					case 1:		//	?clear_avatar
+						return NC.help("기본 등번호로 되돌리려면", "!clear_avatar", player);
+				}
+			}
 			comResetGame(player, msg, type){					//	!rr				|	게임 재시작 명령어
 				switch(type){
 					case 0:			//	!rr
@@ -2037,10 +2075,18 @@
 			comSleep(player, msg, type){					//	!afk			|	장기 무응답 플레이어 설정
 				switch(type){
 					case 0:		//	!afk
-						return PS.setSleep(player, !PS.getPlayerById(player).isSleep);
+						return PM.setSleep(player, !getPlayerlistById(player)._isSleep);
 					case 1:		//	?afk
-						if(PS.getPlayerById(player).isSleep) return NC.help("자리에 돌아와서 게임에 다시 참여하려면", "!afk", player, "!join");
+						if(PM.getPlayerById(player).isSleep) return NC.help("자리에 돌아와서 게임에 다시 참여하려면", "!afk", player, "!join");
 						return NC.help("게임 도중 자리를 비우려면", "!afk", player, "!join spec");
+				}
+			}
+			comSleepList(player, msg, type){				//						장기 대기열 명단 조회 명령어
+				switch(type){
+					case 0:		//	!afk_list
+						return PM.showSleepList(player);
+					case 1:		//	?afk_list
+						break;
 				}
 			}
 			comSwapGame(player, msg, type){					//	!r				|	게임 자동 시작/종료 명령어
@@ -2068,8 +2114,8 @@
 						if(!AMN.getAdmin(player)) return NC.acess(player);		//	권한이 없는 경우
 						if(msg == "all") return AMN.clearMuteList(player);		//	영구 퇴장 목록 초기화
 						let target = msg.length > 0 ? GM.checkPublicId(msg[0], player) : null;
-						if(PS.isValid(target)){
-							if(!PS.getPlayerById(target).isMute)				//	채금자가 아닐 경우
+						if(PM.isValid(target)){
+							if(!PM.getPlayerById(target).isMute)				//	채금자가 아닐 경우
 								return NC.caution(SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME) + "님의 채팅은 이미 허용돼 있습니다.", player);
 							return AMN.unmutePlayer(target, player);
 						}
@@ -2081,7 +2127,7 @@
 			helpBot(player, msg, type){							//	!bothelp		|	서버 도움말
 				if(type != 0) return;
 				return CS.showHelpCommandList("서버", [
-					["!about(정보)"],
+					["!about(정보)", "!admin_list(관리자 명단)"],
 					["!kick #ID(강제 퇴장)", "!r(시작/종료)", "!rr(재시작)", "!show_pw(비번 표시)", "!set_pw(비번 설정)", "!clear_pw(비번 해제)", "!clear_bans(영구 퇴장 초기화)", "!recaptcha(reCAPTCHA 설정)"]
 				], player);
 			}
@@ -2101,14 +2147,14 @@
 			helpJoin(player, msg, type){ 							//	!joinhelp		|  	참가 도움말
 				if(type != 0) return;
 				return CS.showHelpCommandList("투입", [
-					["!join(자동 참가)", "!afk(잠수)"],
+					["!join(자동 참가)", "!afk(잠수)", "!afk_list(대기열 명단)"],
 					["!lock_join(투입 제한)"]
 				], player);
 			}
 			helpMap(player, msg, type){							//	!maphelp		|	맵 도움말
 				if(type != 0) return;
 				return CS.showHelpCommandList("맵", [
-					["/checksum(정보) | /store(저장)", "!maplist(맵 목록)"],
+					["/checksum(정보) | /store(저장)", "!map_list(맵 목록)"],
 					["!load ID(불러오기)"]
 				], player);
 			}
@@ -2134,27 +2180,20 @@
 			infoMaps(player, msg, type){							//	!maplist		|	맵 정보
 				switch(type){
 					case 0:			//	!maplist
-						let getSize = function(n){
-							if(n - parseInt(n) == 0) return parseInt(n);
-							if(n - parseInt(n) > 0) return parseInt(n + 1);
-							return 1;
-						}
+						let size = (customStadiumList.length > 0 ? customStadiumList : defaultStadiumList).length;
 						let target = parseInt(msg[0]);
-						if(!SYS.hasInRange(target, 1, maps.length)) return CM.infoMaps(player, msg, 1);
-						let searchTarget = target > 2 ? maps.length - target > 2 ? target - 3 : maps.length - 5 : 0;
+						if(!SYS.hasInRange(target, 1, size)) return CM.infoMaps(player, msg, 1);
+						let searchTarget = target > 2 ? size - target > 2 ? target - 3 : size - 5 : 0;
 						let nameList = GM.getStadiumData().slice(searchTarget, searchTarget + 5);
 						let list = new Array();
-						if(maps.length > 0){
-							for(let i = 0; i < nameList.length; i++){
-								let name = nameList[i];
-								let index = searchTarget + i + 1;
-								//	타깃 인덱스이면 표시
-								list.push((index == target ? '▶' : '▷') + '[' + SYS.setLine(index, Math.floor(Math.log10(maps.length) + 1)) + ']' + ' | ' + name);
-							}
+						for(let i = 0; i < nameList.length; i++){
+							let name = nameList[i];
+							let index = searchTarget + i + 1;
+							//	타깃 인덱스이면 표시
+							list.push((index == target ? '▶' : '▷') + '[' + SYS.setLine(index, Math.floor(Math.log10(size) + 1)) + ']' + ' | ' + name);
 						}
-						else list.push("비어 있음");
-						let page = (maps.length < 2 ? '' : ": " + target + '/' + maps.length);
-						NC.uniMsg(c_LIST_ICON.NORMAL + "맵 목록" + page, list.join(newLine), player, (AMN.getAdmin(player) > 0 && maps.length > 0 ? ("!load " + target) : "?maplist"));
+						let page = (size < 2 ? '' : ": " + target + '/' + size);
+						NC.uniMsg(c_LIST_ICON.NORMAL + "맵 목록" + page, list.join(newLine), player, (AMN.getAdmin(player) > 0 && customStadiumList.length > 0 ? ("!load " + target) : "?maplist"));
 						break;
 					case 1:			//	?maplist
 						return NC.help("42번 내장 맵이 포함된 맵 목록을 보려면", "!cm 42", player, "!load ID");
@@ -2202,7 +2241,7 @@
 
 			joinPlayer(player, msg){								//						플레이어 투입
 				if(AMN._isLockJoin == true && AMN.getAdmin(player) == false) return NC.acess(player, "팀 자율 이동이 금지돼 있어 사용할 수 없습니다.");
-				let team = msg.length > 0 ? msg[0] : (PS.getPlayerById(player).team == c_TEAM.SPECTATOR || PS.getPlayerById(player).team == c_TEAM.BLUE ? c_TEAM.RED : c_TEAM.BLUE);
+				let team = msg.length > 0 ? msg[0] : (PM.getPlayerById(player).team == c_TEAM.SPECTATOR || PM.getPlayerById(player).team == c_TEAM.BLUE ? c_TEAM.RED : c_TEAM.BLUE);
 				let target = msg.length > 1 ? msg[1] : null;
 				let index = target != null && AMN.getAdmin(player) ? GM.checkPublicId(target, player) : player;
 				if(AMN.getAdmin(player)){
@@ -2218,443 +2257,468 @@
 						case c_TEAM.BLUE:			case "blue": case 'b': case "블루": case "블":
 							return c_TEAM.BLUE;
 						default: 
-							if(byPlayer == c_TEAM.SPECTATOR) return (PS.cntPlayers(c_TEAM.RED) <= PS.cntPlayers(c_TEAM.BLUE) ? c_TEAM.RED : c_TEAM.BLUE);
+							if(byPlayer == c_TEAM.SPECTATOR) return (PM.cntPlayers(c_TEAM.RED) <= PM.cntPlayers(c_TEAM.BLUE) ? c_TEAM.RED : c_TEAM.BLUE);
 							return (byPlayer == c_TEAM.BLUE ? c_TEAM.RED : c_TEAM.BLUE);
 					}
 				}
-
-				if(!PS.isValid(index)) return NC.help("공용 ID가 42인 플레이어를 블루팀으로 옮기려면", "!join blue #42", player);
-				if(AMN._isLockJoin == true && PS.isValid(player) == false) return NC.acess(index, "팀 자율 이동이 금지되었습니다.");		//	팀 이동 금지 처리
-				let targetTeam = getTargetTeam(team, PS.getPlayerById(player).team);
-				if(PS.getPlayerById(index).team == targetTeam) return NC.caution("중복된 명령어입니다.", (player ? player : index));
-				if(PS.getPlayerById(index).isSleep) return NC.caution("게임 참여 의사가 없어 플레이할 수 없습니다. ", (player ? player : index), "!afk");
-				PS.setTeam(index, targetTeam);
+				if(!PM.isValid(index)) return NC.help("공용 ID가 42인 플레이어를 블루팀으로 옮기려면", "!join blue #42", player);
+				if(AMN._isLockJoin == true && PM.isValid(player) == false) return NC.acess(index, "팀 자율 이동이 금지되었습니다.");		//	팀 이동 금지 처리
+				let targetTeam = getTargetTeam(team, PM.getPlayerById(player).team);
+				if(PM.getPlayerById(index).team == targetTeam) return NC.caution("중복된 명령어입니다.", (player ? player : index));
+				if(getPlayerlistById(index)._isSleep) return NC.caution("게임 참여 의사가 없어 플레이할 수 없습니다. ", (player ? player : index), "!afk");
+				PM.setTeam(index, targetTeam);
 			}
 			loadMap(player, msg, type){							//	!load n			|	맵 불러오기
+				let size = (customStadiumList.length > 0 ? customStadiumList : defaultStadiumList).length;
+				let target = parseInt(msg[0]);
 				switch(type){
 					case 0:			//	!load
 						if(!AMN.getAdmin(player)) return NC.acess(player);		//	권한이 없는 경우
-						if(msg.length > 0) return GM.loadMap(parseInt(msg[0]) - 1, player);
-						return GM.loadMap(player, msg, 1);
+						return GM.loadMap((SYS.hasInRange(target, 1, size) ? target - 1: 0), player);
 					case 1:			//	?load
-						let target = parseInt(msg[0]);
-						if(maps.length < 2)
+						if(size < 2)
 							return NC.help("내장 맵을 불러오려면", "!load 1", player);
-						if(SYS.hasInRange(target, 1, maps.length))
-							return NC.uniMsg(null, "[%d] | %d", player, null, 0, [SYS.setLine(target, Math.floor(Math.log10(maps.length) + 1)), GM.getStadiumData(target - 1)]);
-						let index = Math.floor(Math.random() * maps.length) + 1;
+						if(SYS.hasInRange(target - 1, 0, size))
+							return NC.uniMsg(null, "[%d] | %d", player, null, 0, [SYS.setLine(target, Math.floor(Math.log10(size) + 1)), GM.getStadiumData(target - 1)]);
+						let index = Math.floor(Math.random() * size) + 1;
 						return NC.help("예를 들어 %d번째 내장 맵을 불러오려면", "!load " + index, player, "!maplist n", index);
 				}
 			}
 		}
-		/*** 플레이어 클래스 ***/
-		class Player{
+		/*** 플레이어 매니저 클래스 ***/
+		class PlayerManager{
 			constructor(){
-				const m_TAG_GRADE		= Object.freeze([		//	최고 권한, 보조 권한, 일반, 블랙리스트
-					"ⓧ", "●", "ⓞ", "◯", "㉤",
-				]);
-				const m_TAG_TEAM		= Object.freeze([		//	관전, 레드, 블루
-					"ⓢ", "ⓡ", "ⓑ"
-				]);
-				let addressList 		= new Array();			//	플레이어 공용 주소
-				let networkList 		= new Array();			//	플레이어 공용 네트워크
-				let playerList 			= new Array();			//	플레이어 데이터베이스
+			}
+			onPlayerActivity(player){				//						플레이어 동작 응답 체크
+				this.updateTime(player.id);		//	마지막 활동 시간 저장
+			}
+			onPlayerTeamChange(player, byPlayer){	//						팀 교체
+				if(AMN.pinHost == true && room.getPlayer(0).team != 0) setTeam(0, c_TEAM.SPECTATOR);
+				if(player.id == 0) return;
+				if(this.getPlayerById(player.id).isSleep == true && player.team != 0){
+					setTeam(player.id, 0);					//	장기 대기열 플레이어일 경우 관전석으로 이동
+					if(PM.isValid(byPlayer)){ 
+						PM.updateTime(byPlayer.id);
+						if(byPlayer.id == player.id) return NC.notice("게임에 참가하려면 대기 상태를 해제하세요.", byPlayer.id, "!afk");
+						return NC.notice(SYS.showPlayerInfo(player.id, c_PLAYERINFO_TYPE.PUBLIC) + "님은 자리를 비운 상태입니다.", byPlayer.id);
+					}
+				}
+				SYS.clearListIndex(player.id);
+				PM.updateTime(player.id);						//	투입 시간 저장
+				PM.setPlayer(player.id, "team", player.team);
+				setPlayerlistById(player.id, "team", player.team);
+				SYS.addListIndex(player.id);
+			}
+			onPlayerInactivity(player){				//						플레이어 동작 무응답 체크
+				AMN.setKick(player.id, c_LIST_ICON.NEGATIVE + "비활동 플레이어");
+			}
+			initPlayer(data){			//						플레이어 데이터베이스 초기화
+				playerList.push({ 
+					"id":			data.id,
+					"name":			data.name,
+					"team":			c_TEAM.SPECTATOR,
+					"admin":		false,
+					"time":			TS.time,
+					"stats":		new Array(),
+					"chatmode":		0,
+					"detector":		0,
+					"isDisturb":	true,
+					"isMute":		false,
+					"isSleep":		false,
+					"hasKicked":	false
+				});
+				SC.initRankList(data.id);			//	전적 데이터베이스 초기화
+			}
+			isValid(target){ 							//		유효 플레이어 확인
+				if(this.cntPlayers("public") < 1) return false;
+				if(!Number.isInteger(target)) return target == undefined || target == null ? false : SYS.hasInRange(target.id, 1, this.cntPlayers("public"));
+				return SYS.hasInRange(target, 1, this.cntPlayers("public"));
+			}
+			findTagGrade(player){								//		플레이어 권한 마크 구하기
+				if(!this.isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
+				switch(AMN.getAdmin(player)){
+					case 1:	return c_TAG_GRADE[2];							//	보조 권한
+					case 2:	return c_TAG_GRADE[1];							//	최고 권한
+				}
+				return c_TAG_GRADE[(AMN.isBlacklist(player, false) ? 4 : 3)];		//	블랙리스트에 해당되면 4, 아닐 경우 3을 반환
+			}
+			findLocalId(publicId){							//		플레이어 개인 ID 구하기
+				if(!PM.isValid(publicId)) return false;
+				return getPlayerlistById(publicId).localId;
+			}
+			findPlayerList(isPublic){							//		플레이어 데이터베이스 명단 구하기
+				if(isPublic == true) return playerlist;
+				return playerlist.filter(p => p.localId > 0);
+			}
+			findPlayerById(target){
+				return playerlist.find(p => p._id == target);
+			}
+			getPlayerById(target){							//		플레이어 데이터베이스 구하기
+				return playerList.find(p => p.id == target);
+			}
+			findTagTeam(team){								//		팀 마크 구하기
+				return c_TAG_TEAM[team];
+			}
+			giveAvatar(player, msg){		//	!avatar		|	등번호 설정
+				getPlayerlistById(player).giveAvatar(msg);
+			}
+			setPlayer(player, prop, value){	//					플레이어 데이터베이스 수정
+				let target = this.getPlayerById(player);
+				if(target == undefined) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
+				if(target[prop] == undefined) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
+				target[prop] = value;
 
-				let onPlayerActivity	= function(player){				//						플레이어 동작 응답 체크
-					updateTime(player.id);		//	마지막 활동 시간 저장
+				target = this.findPlayerById(player);
+				if(target == undefined) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
+				if(target.hasOwnProperty('_' + prop) == false) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
+				target['_' + prop] = value;
+			}
+			setSleep(player, bool){			//					장기 대기열 플레이어 설정
+				bool ? this.addSleepPlayer(player) : this.deleteSleepPlayer(player);
+				SYS.updateListIndex(player);	//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
+				if(AMN.getAdmin(player) != 2 && AMN.cntAdmins(2) > 1) return;
+				this.findPlayerList().forEach(p => {
+					if(p.isSleep == false) AMN.updateAdmins();
+				});
+			}
+			setTeam(player, team){			//					팀 지정
+				switch(team){
+					case c_TEAM.SPECTATOR: case c_TEAM.RED: case c_TEAM.BLUE:
+								return room.setPlayerTeam(player, team);
+					default:	return SYS.sendError(c_ERROR_TYPE.E_ETC);		//	팀으로 판정된 값이 아닌 경우 오류 출력
 				}
-				let onPlayerTeamChange	= function(player, byPlayer){	//						팀 교체
-					if(AMN.pinHost == true && room.getPlayer(0).team != 0) setTeam(0, c_TEAM.SPECTATOR);
-					if(player.id == 0) return;
-					if(getPlayerById(player.id).isSleep == true && player.team != 0){
-						setTeam(player.id, 0);					//	장기 대기열 플레이어일 경우 관전석으로 이동
-						if(PS.isValid(byPlayer)){ 
-							updateTime(byPlayer.id);
-							if(byPlayer.id == player.id) return NC.notice("게임에 참가하려면 대기 상태를 해제하세요.", byPlayer.id, "!afk");
-							return NC.notice(SYS.showPlayerInfo(player.id, c_PLAYERINFO_TYPE.PUBLIC) + "님은 자리를 비운 상태입니다.", byPlayer.id);
-						}
+			}
+			setTeamColors(team, angle, textColor, bgColor){		//					팀 유니폼 지정
+				room.setTeamColors(team, angle, textColor, bgColor);
+			}
+			addSleepPlayer(player){			//								장기 대기열 플레이어 추가
+				getPlayerlistById(player).addSleepList();
+			}
+			updateAccount(player){			//								중복 계정 갱신
+				let currentPlayer = JSON.parse(JSON.stringify(PM.getPlayerById(player)));
+				let getIndexByPlayer = function(p){
+					for(let i = 0; i < PM.cntPlayers("public"); i++){
+						if(playerList[i].id == p) return i;
 					}
-					SYS.clearListIndex(player.id);
-					updateTime(player.id);						//	투입 시간 저장
-					setPlayer(player.id, "team", player.team);
-					setPlayerlistById(player.id, "team", player.team);
-					SYS.addListIndex(player.id);
+					return -1;
 				}
-				let onPlayerInactivity	= function(player){				//						플레이어 동작 무응답 체크
-					AMN.setKick(player.id, c_LIST_ICON.NEGATIVE + "비활동 플레이어");
-				}
-				let initPlayer			= function(data){			//						플레이어 데이터베이스 초기화
-					playerList.push({ 
-						"id":			data.id,
-						"name":			data.name,
-						"team":			c_TEAM.SPECTATOR,
-						"admin":		false,
-						"time":			TS.time,
-						"stats":		new Array(),
-						"chatmode":		0,
-						"detector":		0,
-						"isDisturb":	true,
-						"isMute":		false,
-						"isSleep":		false,
-						"hasKicked":	false
-					});
-					SC.initRankList(data.id);			//	전적 데이터베이스 초기화
-					setAddress(data.id, data.conn);		//	공용 주소 부여
-					setNetwork(data.id, data.auth);		//	공용 네트워크 부여
-				}
-				let isValid				= function(target){ 							//		유효 플레이어 확인
-					if(cntPlayers("public") < 1) return false;
-					if(!Number.isInteger(target)) return target == undefined || target == null ? false : SYS.hasInRange(target.id, 1, cntPlayers("public"));
-					return SYS.hasInRange(target, 1, cntPlayers("public"));
-				}
-																						//		플레이어 공용 주소 가져오기
-				let getAddress			= index	=> addressList[index] ? addressList[index] : SYS.sendError(c_ERROR_TYPE.E_PLAYER_CONN);
-				let getGravityX 		= index => getPlayerDiscProp(index).xgravity;	//		플레이어 X 중력 구하기
-				let getGravityY			= index	=> getPlayerDiscProp(index).ygravity;	//		플레이어 Y 중력 구하기
-				let getBcoeff			= index	=> getPlayerDiscProp(index).bCoeff;		//		플레이어 바운스 구하기
-				let getDamping			= index	=> getPlayerDiscProp(index).damping;	//		플레이어 제동 구하기
-				let getTagGrade			= function(player){								//		플레이어 권한 마크 구하기
-					if(!isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
-					switch(AMN.getAdmin(player)){
-						case 1:	return m_TAG_GRADE[2];							//	보조 권한
-						case 2:	return m_TAG_GRADE[1];							//	최고 권한
-					}
-					return m_TAG_GRADE[(AMN.isBlacklist(player, false) ? 4 : 3)];		//	블랙리스트에 해당되면 4, 아닐 경우 3을 반환
-				}
-				let getInvMass			= index	=> getPlayerDiscProp(index).invMass;	//		플레이어 역질량 구하기
-				let getRadius			= index	=> getPlayerDiscProp(index).radius;		//		플레이어 반지름 구하기
-				let getLocalId			= function(publicId){							//		플레이어 개인 ID 구하기
-					let pList = room.getPlayerList().filter(player => player.id != 0);
-					for(let i = 0; i < pList.length; i++){
-						if(pList[i].id == publicId) return i + 1;
-					}
-					return false;
-				}
-																						//		플레이어 공용 네트워크 가져오기
-				let getNetwork			= index	=> networkList[index] ? networkList[index] : SYS.sendError(c_ERROR_TYPE.E_PLAYER_AUTH);
-																						//		플레이어 데이터베이스 구하기
-				let getPlayer			= index => isValid(index) ? JSON.parse(JSON.stringify(playerList[index])) : SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
-				let getPlayerById		= target => playerList.find(p => p.id == target);	//	플레이어 데이터베이스 구하기
-				let getPlayerList		= isPublic => isPublic == true ? playerList : (playerList.filter(p => getLocalId(p.id) > 0)).slice(0);
-				let getPlayerDiscProp	= index => room.getPlayerDiscProperties(index);	//		플레이어 객체 속성 구하기
-																						//		플레이어 좌표 가져오기
-				let getPosition		= index	=> ({"x" : getPlayerDiscProp(index).x, "y" : getPlayerDiscProp(index).y});
-				let getPosX			= index	=> getPosition(index).x;					//		플레이어 X 좌표 가져오기
-				let getPosY			= index	=> getPosition(index).y;					//		플레이어 Y 좌표 가져오기
-																						//		플레이어 공용 ID 가져오기
-				let getPublicId		= privateId => privateId <= cntPlayers() && privateId > 0 ? room.getPlayerList().filter(player => player.id != 0)[privateId - 1].id : false;
-				let getSpeedX		= index	=> getPlayerDiscProp(index).xspeed;			//		플레이어 X 속도 구하기
-				let getSpeedY		= index	=> getPlayerDiscProp(index).yspeed;			//		플레이어 Y 속도 구하기
-				let getTagTeam			= function(team, type){							//		팀 마크 구하기
-					if(!SYS.hasInRange(team, 0, c_TAG_TEAM.length)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
-					return type == true ? c_TAG_GRADE[0] : c_TAG_TEAM[team];
-				}
-				let setAddress			= function(player, addrs){			//					플레이어 공용 주소
-					if(addressList[player] != undefined) return;	//	데이터가 이미 있는 경우 처리 종료
-					addressList[player] = addrs;
-				}
-				let setAvatar			= function(player, msg, type){		//	!avatar		|	등번호 설정
-					switch(type){
-						case 0:			//	!avatar
-							room.setPlayerAvatar(player, (msg.length > 0 ? msg[0] : ''));
-							NC.notice("등번호가 변경되었습니다.", player, "!clear_avatar");
-							break;
-						case 1:			//	?avatar
-							return NC.help("등번호를 12로 변경하려면", "!avatar 12", player, "!clear_avatar");
-					}
-				}
-																			//					플레이어 바운스 지정
-				let setBcoeff			= (player, scale)	=> room.setPlayerDiscProperties(player, {"bCoeff" : scale});
-																			//					플레이어 중력 지정
-				let setGravityX			= (player, scale)	=> room.setPlayerDiscProperties(player, {"xgravity" : scale});
-				let setGravityY			= (player, scale)	=> room.setPlayerDiscProperties(player, {"ygravity" : scale});
-																			//					플레이어 역질량 지정
-				let setInvMass			= (player, amount)	=> room.setPlayerDiscProperties(player, {"invMass" : amount});
-				let setNetwork			= function(player, net){			//					플레이어 공용 네트워크
-					if(networkList[player] != undefined) return;		//	데이터가 이미 있는 경우 처리 종료
-					networkList[player] = net;
-				}
-				let setPlayer			= function(player, prop, value){	//					플레이어 데이터베이스 수정
-					let target = getPlayerById(player);
-					if(target == undefined) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
-					if(target[prop] == undefined) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_INFO);
-					target[prop] = value;
-				}
-																			//					플레이어 좌표 지정
-				let setPosition			= (player, x, y)	=> room.setPlayerDiscProperties(player, {"x" : x, "y" : y});
-				let setPosX				= (player, pos)		=> room.setPlayerDiscProperties(player, {"x" : pos});	//	X 좌표
-				let setPosY				= (player, pos)		=> room.setPlayerDiscProperties(player, {"y" : pos});	//	Y 좌표
-																			//					플레이어 반지름 지정
-				let setRadius			= (player, len)		=> room.setPlayerDiscProperties(player, {"radius" : len});
-				let setSleep			= function(player, bool){			//					장기 대기열 플레이어 설정
-					bool ? addSleepPlayer(player) : deleteSleepPlayer(player);
-					SYS.updateListIndex(player);	//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
-					if(AMN.getAdmin(player) != 2 && AMN.cntAdmins(2) > 1) return;
-					getPlayerList().forEach(p => {
-						if(p.isSleep == false) AMN.updateAdmins();
-					});
-				}
-				let setTeam				= function(player, team){			//					팀 지정
-					switch(team){
-						case c_TEAM.SPECTATOR: case c_TEAM.RED: case c_TEAM.BLUE:
-									return room.setPlayerTeam(player, team);
-						default:	return SYS.sendError(c_ERROR_TYPE.E_ETC);		//	팀으로 판정된 값이 아닌 경우 오류 출력
-					}
-				}
-																			//					팀 유니폼 지정
-				let setTeamColors		= function(team, angle, textColor, bgColor){
-					return room.setTeamColors(team, angle, textColor, bgColor);
-				}
-				let addSleepPlayer	= function(player){			//								장기 대기열 플레이어 추가
-					setPlayer(player, "isSleep", true);
-					setPlayerlistById(player, "isSleep", true);
-					if(getPlayerById(player).team != c_TEAM.SPECTATOR) setTeam(player, c_TEAM.SPECTATOR);
-					AMN.deleteAdmin(player);	//	최고 권한 → 보조 권한으로 격하
-					AMN.updateAdmins();
-					NC.notice(SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME) + "님이 자리를 비웠습니다.", player * -1);
-					NC.uniMsg(c_LIST_ICON.NORMAL + "자리 비움", "게임에 다시 참여하려면 명령어를 한 번 더 입력하세요.", player, "!afk");
-					SYS.log(true, "대기열 추가: " + SYS.showPlayerInfo(player), c_LOG_TYPE.NOTICE);
-				}
-				let updateAccount	= function(player){			//								중복 계정 갱신
-					let currentPlayer = JSON.parse(JSON.stringify(getPlayerById(player)));
-					let getIndexByPlayer = function(p){
-						for(let i = 0; i < cntPlayers("public"); i++){
-							if(playerList[i].id == p) return i;
-						}
-						return -1;
-					}
-					for(let i = cntPlayers("public") - 1; i >= 0; i--){	//	공용 네트워크인 경우
-						let oldPlayer = JSON.parse(JSON.stringify(playerList[i]));
-						let target = getIndexByPlayer(player);
-						if(oldPlayer.id != player && networkList[oldPlayer.id] == networkList[player]){
-							let restoreProp = function(prop, value){				//	데이터 동기화
-								if(prop != 1)
-									playerList[target][prop] = value;
-								else{
-									let temp = value;
-									playerList[target] = temp;
-								}
+				for(let i = PM.cntPlayers("public") - 1; i >= 0; i--){	//	공용 네트워크인 경우
+					let oldPlayer = JSON.parse(JSON.stringify(playerList[i]));
+					let target = getIndexByPlayer(player);
+					if(oldPlayer.id != player && AMN.findNetwork(oldPlayer.id) == AMN.findNetwork(player)){
+						let restoreProp = function(prop, value){				//	데이터 동기화
+							if(prop != 1)
+								playerList[target][prop] = value;
+							else{
+								let temp = value;
+								playerList[target] = temp;
 							}
-							restoreProp(1, oldPlayer);
-							SC.updateAccount(oldPlayer.id, currentPlayer.id);		//	랭킹 동기화
-							restoreProp("id", currentPlayer.id);
-							restoreProp("name", currentPlayer.name);
-							restoreProp("team", currentPlayer.team);
-							restoreProp("time", TS.time);						//	시간 동기화
-							restoreProp("detector", currentPlayer.detector);
-							restoreProp("isSleep", currentPlayer.isSleep);
-							switch(AMN.getAdmin(oldPlayer.id)){						//	권한 복원
-								case 2:
-									if(AMN.cntAdmins(2) < 1){	//	최고 권한 관리자가 이미 있는 경우, 보조 권한 부여
-										AMN.giveAdmin(player);
-										break;
-									}
-								case 1:
-									//AMN.giveSubAdmin(player);
-									break;
-							}
-							return true;
 						}
-					}
-					//	공용 네트워크인 경우
-					let target = playerlist.find(p => p._id != player && p._network == getPlayerlistById(player)._network);
-					if(PS.isValid(target)){
-						let oldPlayer = getPlayerlistById(player);
-						let restoreProp = function(...pr){
-							switch(pr.length){
-								case 2:		
-									setPlayerlistById(target._id, pr[0], pr[1]);
-									break;
-								case 1:
-									let temp = pr;
-									let index = playerlist.map(pl => pl._id).indexOf(target._id);
-									playerlist[index] = temp;
-									break;
-								default:
-									return;
-							}
-						}	
-						restoreProp(oldPlayer);
-						SC.updateAccount(oldPlayer._id, target._id);
-						restoreProp("id",		target._id);
-						restoreProp("name",		target._name);
-						restoreProp("team",		target._team);
-						restoreProp("id",		TS.time);
-						restoreProp("detector", target._detector);
-						restoreProp("isSleep",	target._isSleep);
-						switch(AMN.getAdmin(oldPlayer._id)){
+						restoreProp(1, oldPlayer);
+						SC.updateAccount(oldPlayer.id, currentPlayer.id);		//	랭킹 동기화
+						restoreProp("id", currentPlayer.id);
+						restoreProp("name", currentPlayer.name);
+						restoreProp("team", currentPlayer.team);
+						restoreProp("time", TS.time);						//	시간 동기화
+						restoreProp("detector", currentPlayer.detector);
+						restoreProp("isSleep", currentPlayer.isSleep);
+						switch(AMN.getAdmin(oldPlayer.id)){						//	권한 복원
 							case 2:
-								if(AMN.cntAdmins(2) < 1){	//	최고 권한을 가진 접속자가 이미 있는 경우, 보조 권한 부여
-									AMN.giveAdmin(target._id);
+								if(AMN.cntAdmins(2) < 1){	//	최고 권한 관리자가 이미 있는 경우, 보조 권한 부여
+									AMN.giveAdmin(player);
 									break;
 								}
 							case 1:
-								//AMN.giveSubAdmin(target._id);
+								//AMN.giveSubAdmin(player);
 								break;
 						}
-					};
-					return false;
-				}
-				let updateTime		= function(player){			//								응답 시간 갱신
-					if(isValid(player) == false || getLocalId(player) == false) return;
-					setPlayer(player, "time", TS.time);
-					setPlayerlistById(player, "time", TS.time);
-
-					//	이전 타이머 지우고 새로 갱신
-					TS.clearTimerByName("afkAvatar", player);
-					TS.clearTimerByName("afkTimer", player);
-					TS.clearTimerByName("afkCheck", player);
-					room.setPlayerAvatar(player);
-
-					if(GM.afkLimitTime == false) return;
-					//	장기 무응답 플레이어 판정
-					let afkChckTimer = TS.addTimer("afkCheck", () => { 
-						if(!GM.isAfkPlayer(afkChckTimer._player, afkChckTimer._delay)){ 
-							return;
-						}
-						let showAlretMsg = function(target){					//	경고 메시지 출력
-							if(target == afkChckTimer._player)
-								return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림", "반응이 없으면 퇴장될 수 있습니다", target, (PS.getPlayerById(target).team == c_TEAM.SPECTATOR ? "!afk" : "!join spec"), c_LIST_COLOR.GRAY);
-							if(AMN.getAdmin(target) < AMN.getAdmin(afkChckTimer._player)) return;
-							if(PS.getPlayerById(target).team == c_TEAM.SPECTATOR || PS.getPlayerById(target).team == PS.getPlayerById(afkChckTimer._player).team)
-								return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 안내", SYS.showPlayerInfo(afkChckTimer._player, c_PLAYERINFO_TYPE.PUBLIC) + "님의 반응이 없는 경우, 자동으로 퇴장됩니다", target, ("!join spec " + '#' + afkChckTimer._player), c_LIST_COLOR.GRAY);
-						}
-						PS.getPlayerList().forEach(p => showAlretMsg(p.id));
-						let afkTimer = TS.addTimer("afkTimer", () => {			//	퇴장 처리
-							if(GM.isAfkPlayer(afkTimer._player, afkTimer._delay * 3) == false){ 
-								return;					//	이미 응답한 경우
-							}
-							if(PS.getPlayerList().find(p => p.id == afkTimer._player) == undefined) return;	//	퇴장한 경우
-							PS.onPlayerInactivity(PS.getPlayerById(afkTimer._player));
-						}, afkChckTimer._player, GM.afkLimitTime / 2 * MS);
-						let avatarTimer = TS.addTimer("afkAvatar", () => {		//	등번호 알림
-							let tmList = avatarTimer.findTimerByName();
-							if(!tmList.length) return;
-							let getCurrentOrder = function(to, m){
-								let min = m > 2 ? m : 2
-								let max = to;
-								let pos = Math.floor(max / min);
-								return max - pos * min;
-							}
-							let target = tmList.slice(-1)[0];
-							let currentOrder = getCurrentOrder(target._order, 2);
-							switch(currentOrder){
-								case 0:
-									room.setPlayerAvatar(avatarTimer._player, "잠수");
-									break;
-								case 1:
-									room.setPlayerAvatar(avatarTimer._player);
-									break;
-							}
-						}, afkChckTimer._player, MS, true);
-
-					}, player, GM.afkLimitTime * MS);
-				}
-
-				let clearPlayer		= function(data){					//						플레이어 데이터베이스 지우기
-					let target = playerList.find(p => p.id == data.id);
-					if(target == undefined) return;
-					SYS.clearListIndex(data.id);					//	리스트 지우기
-					SC.clearTouchedPlayer(data.id);					//	선두자 데이터베이스 지우기
-					TS.clearTimerByPlayer(data.id);					//	타이머 지우기
-					target.team			= c_TEAM.SPECTATOR;
-					target.time			= TS.time;
-					target.chatmode		= 0;
-					target.isDisturb	= true;
-					target.isSleep		= false;
-					if(target.hasKicked){
-						target.admin = 0;
-						target.hasKicked = false;
+						return true;
 					}
 				}
-				let clearTeamColors	= function(team){					//						팀 유니폼 초기화
-					room.setTeamColors(team, 0, 0xFFFFFF, [(team == c_TEAM.RED ? 0xE46E4C : 0x5688E4)]);
-					NC.notice(GM.getTeamName(team) + "의 유니폼이 초기화되었습니다.");
-				}
-				let deleteSleepPlayer	= function(player){					//					장기 대기열 플레이어 제거
-					setPlayer(player, "isSleep", false);
-					setPlayerlistById(player, "isSleep", false);
-					AMN.updateAdmins();
-					NC.notice("게임에 바로 참여할 준비가 되었습니다! ", player, "!join");
-					SYS.log(true, "대기열 제거: " + SYS.showPlayerInfo(player), c_LOG_TYPE.NOTICE);
-				}
-				let resetAvatar		= function(player, msg, type){		//	!clear_avatar	|	등번호 초기화
-					switch(type){
-						case 0:			//	!clear_avatar
-							room.setPlayerAvatar(player);
-							NC.notice("등번호가 초기화되었습니다.", player);
+				//	공용 네트워크인 경우
+				let target = playerlist.find(p => p._id != player && p._network == getPlayerlistById(player)._network);
+				if(PM.isValid(target)){
+					let oldPlayer = getPlayerlistById(player);
+					let restoreProp = function(...pr){
+						switch(pr.length){
+							case 2:		
+								setPlayerlistById(target._id, pr[0], pr[1]);
+								break;
+							case 1:
+								let temp = pr;
+								let index = playerlist.map(pl => pl._id).indexOf(target._id);
+								playerlist[index] = temp;
+								break;
+							default:
+								return;
+						}
+					}	
+					restoreProp(oldPlayer);
+					SC.updateAccount(oldPlayer._id, target._id);
+					restoreProp("id",		target._id);
+					restoreProp("name",		target._name);
+					restoreProp("team",		target._team);
+					restoreProp("id",		TS.time);
+					restoreProp("detector", target._detector);
+					restoreProp("isSleep",	target._isSleep);
+					switch(AMN.getAdmin(oldPlayer._id)){
+						case 2:
+							if(AMN.cntAdmins(2) < 1){	//	최고 권한을 가진 접속자가 이미 있는 경우, 보조 권한 부여
+								AMN.giveAdmin(target._id);
+								break;
+							}
+						case 1:
+							//AMN.giveSubAdmin(target._id);
 							break;
-						case 1:			//	?clear_avatar
-							return NC.help("기본 등번호로 되돌리려면", "!clear_avatar", player);
 					}
-				}
-				let cntPlayers		= function(team){						//					접속자 인원 구하기
-					let pList = room.getPlayerList().filter(player => player.id != 0);
-					switch(team){
-						case "public":
-							return playerList.length;							//	전체 데이터베이스
-						case c_TEAM.RED:	case c_TEAM.BLUE:	case c_TEAM.SPECTATOR:	//	팀별 접속자
-							return pList.filter(player => player.team == team).length;
-						default:												//	모든 접속자
-							return pList.length;
+				};
+				return false;
+			}
+			updateTime(player){			//								응답 시간 갱신
+				if(this.isValid(player) == false || this.findLocalId(player) == false) return;
+				this.setPlayer(player, "time", TS.time);
+				setPlayerlistById(player, "time", TS.time);
+				//	이전 타이머 지우고 새로 갱신
+				TS.clearTimerByName("afkAvatar", player);
+				TS.clearTimerByName("afkTimer", player);
+				TS.clearTimerByName("afkCheck", player);
+				room.setPlayerAvatar(player);
+				if(GM.afkLimitTime == false) return;
+				//	장기 무응답 플레이어 판정
+				let afkChckTimer = TS.addTimer("afkCheck", () => {
+					if(!GM.isAfkPlayer(afkChckTimer._player, afkChckTimer._delay)){
+						return;
 					}
+					let showAlretMsg = function(target){					//	경고 메시지 출력
+						if(target == afkChckTimer._player)
+							return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림", "반응이 없으면 퇴장될 수 있습니다", target, (PM.getPlayerById(target).team == c_TEAM.SPECTATOR ? "!afk" : "!join spec"), c_LIST_COLOR.GRAY);
+						if(AMN.getAdmin(target) < AMN.getAdmin(afkChckTimer._player)) return;
+						if(PM.getPlayerById(target).team == c_TEAM.SPECTATOR || PM.getPlayerById(target).team == PM.getPlayerById(afkChckTimer._player).team)
+							return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 안내", SYS.showPlayerInfo(afkChckTimer._player, c_PLAYERINFO_TYPE.PUBLIC) + "님의 반응이 없는 경우, 자동으로 퇴장됩니다", target, ("!join spec " + '#' + afkChckTimer._player), c_LIST_COLOR.GRAY);
+					}
+					PM.findPlayerList().forEach(p => showAlretMsg(p._id));
+					let afkTimer = TS.addTimer("afkTimer", () => {			//	퇴장 처리
+						if(GM.isAfkPlayer(afkTimer._player, afkTimer._delay * 3) == false){
+							return;					//	이미 응답한 경우
+						}
+						if(PM.findPlayerList().find(p => p._id == afkTimer._player) == undefined) return;	//	퇴장한 경우
+						PM.onPlayerInactivity(PM.getPlayerById(afkTimer._player));
+					}, afkChckTimer._player, GM.afkLimitTime / 2 * MS);
+					let avatarTimer = TS.addTimer("afkAvatar", () => {		//	등번호 알림
+						let tmList = avatarTimer.findTimerByName();
+						if(!tmList.length) return;
+						let getCurrentOrder = function(to, m){
+							let min = m > 2 ? m : 2
+							let max = to;
+							let pos = Math.floor(max / min);
+							return max - pos * min;
+						}
+						let target = tmList.slice(-1)[0];
+						let currentOrder = getCurrentOrder(target._order, 2);
+						switch(currentOrder){
+							case 0:
+								room.setPlayerAvatar(avatarTimer._player, "잠수");
+								break;
+							case 1:
+								room.setPlayerAvatar(avatarTimer._player);
+								break;
+						}
+					}, afkChckTimer._player, MS, true);
+				}, player, GM.afkLimitTime * MS);
+			}
+			clearPlayer(data){					//						플레이어 데이터베이스 지우기
+				let target = playerList.find(p => p.id == data.id);
+				if(target == undefined) return;
+				SYS.clearListIndex(data.id);					//	리스트 지우기
+				SC.clearTouchedPlayer(data.id);					//	선두자 데이터베이스 지우기
+				TS.clearTimerByPlayer(data.id);					//	타이머 지우기
+				target.team			= c_TEAM.SPECTATOR;
+				target.time			= TS.time;
+				target.chatmode		= 0;
+				target.isDisturb	= true;
+				target.isSleep		= false;
+				if(target.hasKicked){
+					target.admin = 0;
+					target.hasKicked = false;
 				}
-
-				this.onPlayerActivity		= player => onPlayerActivity(player);		//						플레이어 동작 응답 체크
-				this.onPlayerTeamChange		= (player, byPlayer) => onPlayerTeamChange(player, byPlayer);	//	팀 교체
-				this.onPlayerInactivity 	= player => onPlayerInactivity(player);		//						플레이어 동작 무응답 체크
-
-				this.initPlayer			= data => initPlayer(data);			//								플레이어 데이터베이스 초기화
-				this.isValid			= index => isValid(index);			//								유효 플레이어 확인
-
-				this.getAddress			= index	=> getAddress(index);		//								플레이어 공용 주소 가져오기
-				this.getGravityX 		= index => getGravityX(index);		//								플레이어 X 중력 구하기
-				this.getGravityY		= index	=> getGravityY(index);		//								플레이어 Y 중력 구하기
-				this.getBcoeff			= index	=> getBcoeff(index);		//								플레이어 바운스 구하기
-				this.getDamping			= index	=> getDamping(index);		//								플레이어 제동 구하기
-				this.getTagGrade		= player => getTagGrade(player);	//								플레이어 권한 마크 구하기
-				this.getInvMass			= index	=> getInvMass(index);		//								플레이어 역질량 구하기
-				this.getRadius			= index	=> getRadius(index);		//								플레이어 반지름 구하기
-				this.getLocalId			= publicId => getLocalId(publicId);	//								플레이어 개인 ID 구하기
-				this.getNetwork 		= index => getNetwork(index);		//								플레이어 공용 네트워크 가져오기
-				this.getPlayer 			= index => getPlayer(index);		//								플레이어 데이터베이스 구하기
-				this.getPlayerById		= target => getPlayerById(target);	//								플레이어 데이터베이스 구하기
-				this.getPlayerList		= isPublic => getPlayerList(isPublic);	//							플레이어 데이터베이스 구하기
-				this.getPlayerDiscProp	= index => getPlayerDiscProp(index);	//							플레이어 객체 속성 구하기
-				this.getPosition		= index => getPosition(index);			//							플레이어 좌표 가져오기
-				this.getPosX			= index => getPosX(index);				//							플레이어 X 좌표 가져오기
-				this.getPosY			= index => getPosY(index);				//							플레이어 Y 좌표 가져오기
-				this.getPublicId		= privateId => getPublicId(privateId);	//							플레이어 공용 ID 가져오기
-				this.getSpeedX			= index => getSpeedX(index);			//							플레이어 X 속도 구하기
-				this.getSpeedY			= index => getSpeedY(index);			//							플레이어 Y 속도 구하기
-				this.getTagTeam			= (team, type) => getTagTeam(team, type);	//						팀 마크 구하기
-
-				this.setAddress		= (player, addrs) => setAddress(player, addrs);			//				플레이어 공용 주소
-				this.setAvatar		= (player, msg, type) => setAvatar(player, msg, type);	//	!avatar	|	등번호 설정
-				this.setBcoeff		= (player, scale)	=> setBcoeff(player, scale);		//				플레이어 바운스 지정
-				this.setGravityX	= (player, scale)	=> setGravityX(player, scale);		//				플레이어 중력 지정
-				this.setGravityY	= (player, scale)	=> setGravityY(player, scale);
-				this.setInvMass		= (player, amount)	=> setInvMass(player, amount);		//				플레이어 역질량 지정
-				this.setNetwork		= (player, net) => setNetwork(player, net);				//				플레이어 공용 네트워크
-				this.setPlayer		= (player, prop, value) => setPlayer(player, prop, value);	//		플레이어 데이터베이스 수정
-				this.setPosition	= (player, x, y)	=> setPosition(player, x, y);		//				플레이어 좌표 지정
-				this.setPosX		= (player, pos)		=> setPosX(player, pos);			//				플레이어 X 좌표 지정
-				this.setPosY		= (player, pos)		=> setPosY(player, pos);			//				플레이어 Y 좌표 지정
-				this.setRadius		= (player, len)		=> setRadius(player, len);			//				플레이어 반지름 지정
-				this.setSleep		= (player, bool) => setSleep(player, bool);				//				장기 대기열 플레이어 설정
-				this.setTeam 	 	= (player, team) => setTeam(player, team);				//				팀 지정
-																							//				팀 유니폼 지정
-				this.setTeamColors = (team, angle, textColor, bgColor) => setTeamColors(team, angle, textColor, bgColor);
-				this.addSleepPlayer	= player => addSleepPlayer(player);		//								장기 대기열 플레이어 추가
-				this.updateAccount		= player => updateAccount(player);		//							중복 계정 갱신
-				this.updateTime			= player => updateTime(player);			//							응답 시간 갱신
-
-				this.clearPlayer				= data => clearPlayer(data);		//						플레이어 데이터베이스 지우기
-				this.clearTeamColors			= team => clearTeamColors(team);	//						플레이어 데이터베이스 지우기
-				this.deleteSleepPlayer			= player => deleteSleepPlayer(player);	//					장기 대기열 플레이어 제거
-																					//	!clear_avatar	|	등번호 초기화
-				this.resetAvatar = (player, msg, type) => resetAvatar(player, msg, type);
-				this.cntPlayers			= team => cntPlayers(team);				//							접속자 인원 구하기
+			}
+			clearTeamColors(team){					//						팀 유니폼 초기화
+				this.setTeamColors(team, 0, 0xFFFFFF, [(team == c_TEAM.RED ? 0xE46E4C : 0x5688E4)]);
+			}
+			deleteSleepPlayer(player){					//					장기 대기열 플레이어 제거
+				getPlayerlistById(player).deleteSleepPlayer();
+			}
+			resetAvatar(player){						//	등번호 초기화
+				getPlayerlistById(player).resetAvatar();
+			}
+			showSleepList(player, isPublic){				//					장기 대기열 명단 출력
+				let getAfks = function(pub){
+					return playerlist.filter(p => {
+						if(!p._isSleep) return false;
+						if(pub == true) return true;
+						return (p.localId > 0);
+					});
+				}
+				let afkList = getAfks(isPublic);
+				let msg = afkList.length > 0 ? afkList.map(p => p.showPlayerInfo(c_PLAYERINFO_TYPE.PUBLIC)).join(" | ") : "비어 있음";
+				NC.uniMsg(c_LIST_ICON.NORMAL + "장기 대기열 명단", msg, player);
+			}
+			cntPlayers(team){						//					접속자 인원 구하기
+				let pl = room.getPlayerList().filter(p => p.id != 0);
+				switch(team){
+					case "public":
+						return playerlist.length;							//	전체 데이터베이스
+					case c_TEAM.RED:	case c_TEAM.BLUE:	case c_TEAM.SPECTATOR:	//	팀별 접속자
+						return pl.filter(p => p.team == team).length;
+					default:												//	모든 접속자
+						return pl.length;
+				}
+			}
+		}
+		/*** 플레이어 시스템 클래스 ***/
+		class PlayerSystem{
+			constructor(id, name, team, admin, conn, auth){
+				Object.freeze(this._id		= id);
+				Object.freeze(this._name	= name);
+				Object.freeze(this._address	= conn);
+				Object.freeze(this._network	= auth);
+				this._team			= team;
+				this._admin			= admin;
+				this._time			= TS.time;
+				this._stats			= new Array();
+				this._chatmode		= 0;
+				this._detector		= 0;
+				this._isDisturb		= true;
+				this._isMute		= false;
+				this._isSleep		= false;
+				this._hasKicked		= false;
+				
+				this._str			= new Array();
+				this._timeList		= new Array();
+				this._time			= TS.time;
+				this._repeated		= 0;
+				this._count			= 0;
+			}
+			get chatmode(){
+				return this._chatmode;
+			}
+			get isDisturb(){
+				return this._isDisturb;
+			}
+			get discProp(){			//		플레이어 객체 속성 구하기
+				return room.getPlayerDiscProperties(this._id);
+			}
+			get dpPosition(){
+				return ({
+					'x' : this.discProp.x,
+					'y' : this.discProp.y
+				});
+			}
+			get dpSpeedVector(){
+				return ({
+					'x' : this.discProp.xspeed,
+					'y' : this.discProp.yspeed
+				});
+			}
+			get dpGravityVector(){
+				return ({
+					'x' : this.discProp.xgravity,
+					'y' : this.discProp.ygravity
+				});
+			}
+			get localId(){
+				let pl = room.getPlayerList().filter(p => p.id != 0);
+				for(let i = 0; i < pl.length; i++){
+					if(pl[i].id == this._id) return i + 1;
+				}
+				return false;
+			}
+			set chatmode(value){	//		채팅 모드 설정
+				let titleList = ["전체", "팀"];
+				this._chatmode = value;
+				NC.notice("채팅 기본 모드가 " + titleList[value] + " 채팅으로 변경되었습니다.", this._id);
+			}
+			set isDisturb(value){	//		채팅 수신 설정
+				switch(value){
+					case 0:
+						NC.notice("채팅 수신이 금지되었습니다. 따라서 귓속말 기능을 사용할 수 없습니다.", this._id);
+						break;
+					case 1:
+						NC.notice("채팅 수신이 허용되었습니다.", this._id);
+						break;
+					default: return;	
+				}
+				this._isDisturb = value;
+			}
+			set discProp(value){	//		플레이어 객체 속성 구하기
+				room.setPlayerDiscProperties(this._id, value);
+			}
+			giveAvatar(str){			//		등번호 지정
+				room.setPlayerAvatar(this._id, str);
+			}
+			addSleepList(){
+				this._isSleep = true;
+				if(this._team != c_TEAM.SPECTATOR){
+					this._team = c_TEAM.SPECTATOR;
+					PM.setTeam(this._id, this._team);
+				}
+				AMN.deleteAdmin(this._id);	//	최고 권한 → 보조 권한으로 격하
+				AMN.updateAdmins();
+				NC.notice(this.showPlayerInfo(c_PLAYERINFO_TYPE.NAME) + "님이 자리를 비웠습니다.", this._id * -1);
+				NC.uniMsg(c_LIST_ICON.NORMAL + "자리 비움", "게임에 다시 참여하려면 명령어를 한 번 더 입력하세요.", this._id, "!afk");
+				SYS.log(true, "대기열 추가: " + this.showPlayerInfo(), c_LOG_TYPE.NOTICE);
+			}
+			updateTime(){			//		시간 갱신
+				this._timeList.push(TS.time);
+			}
+			clearPlayer(){			//		플레이어 데이터베이스 지우기
+				SYS.clearListIndex(this._id);			//	리스트 지우기
+				CS.deletePlayer(this._id);				//	채팅 데이터베이스 지우기
+				SC.clearTouchedPlayer(this._id);			//	선두자 데이터베이스 지우기
+				TS.clearTimerByPlayer(this._id);			//	타이머 지우기
+				this._team			= c_TEAM.SPECTATOR;
+				this._time			= TS.time;
+				this._chatmode		= 0;
+				this._isDisturb		= true;
+				this._isSleep		= false;
+				if(this._hasKicked){
+					this._admin		= 0;
+					this._hasKicked	= false;
+				}
+			}
+			deleteSleepPlayer(){	//		장기 대기열 플레이어 제거
+				this._isSleep = false;
+				SYS.log(true, "대기열 제거: " + this.showPlayerInfo(), c_LOG_TYPE.NOTICE);
+				AMN.updateAdmins();
+				NC.notice("게임에 바로 참여할 준비가 되었습니다! ", this._id, "!join");
+			}
+			movePosition(dx, dy){			//	플레이어 좌표 이동(상대 좌표)
+				this.discProp(this._id, {'x' : this.dpPosition.x + dx, 'y' : this.dpPosition.y + dy});
+			}
+			teleportPosition(x, y){			//	플레이어 좌표 변경(절대 좌표)
+				this.discProp(this._id, {'x' : x, 'y' : y});
+			}
+			adjustSpeedVector(x, y){		//	플레이어 속도 벡터 변경
+				this.discProp(this._id, {"xspeed" : x, "yspeed" : y });
+			}
+			adjustGravityVector(x, y){		//	플레이어 중력 벡터 변경
+				this.discProp(this._id, {"xgravity" : x, "ygravity" : y });
+			}
+			resetAvatar(){			//		등번호 초기화
+				this.giveAvatar();
+			}
+			showPlayerInfo(type){	//		플레이어 정보 출력
+				let name = (CS.isWhiteSpace(this._name) ? "공백" : this._name);
+				switch(type){
+					case c_PLAYERINFO_TYPE.LOCAL:
+						return ('(' + ((PM.cntPlayers() >= 10) ? SYS.setLine(this.localId, 2) : this.localId) + ')' + name);
+					case c_PLAYERINFO_TYPE.PUBLIC:
+						return ('(' + '#' + this._id + ')' + name);
+					case c_PLAYERINFO_TYPE.NAME:
+						return name;
+					default:
+						return (this._id + '(' + ((PM.cntPlayers() >= 10) ? SYS.setLine(this.localId, 2) : this.localId) + ')' + name);
+				}
 			}
 		}
 		/*** 점수 클래스 ***/
@@ -2665,22 +2729,24 @@
 					[c_TEAM.RED] : 0,
 					[c_TEAM.BLUE] : 0
 				};
+				this._touchedList		= new Array();		//	선두자 데이터베이스
+				this._rankList			= new Array();		//	전적 데이터베이스
 			}
 			
 			onPositionsReset(){						//	득실점 판정 직후 참가자 좌표 초기화
 				this.clearTouchedList();		//	선두자 명단 모두 지우기
 			}
 			onPlayerTeamChange(player, byPlayer){		//	팀 교체 이벤트
-				if(!PS.getLocalId(player.id)) return;	//	미접속이면
-				let target = touchedList.filter(t => t._id == player.id);
+				if(!PM.findLocalId(player.id)) return;	//	미접속이면
+				let target = this._touchedList.filter(t => t._id == player.id);
 				if(target.length > 0) this.clearTouchedPlayer(player.id);
 			}
 
 			initRankList(player){
-				return rankList.push(new StatusManager(player));
+				return this._rankList.push(new StatusManager(player));
 			}
 			initTouchedList(player){		//			선두자 전적 데이터베이스 초기화
-				touchedList.unshift(new TouchedPlayer(player.id));
+				this._touchedList.unshift(new TouchedPlayer(player.id));
 				SYS.updateListIndex(player.id);
 			}
 
@@ -2704,17 +2770,17 @@
 
 			hasCommonRange(ball, player, range){ 			//		충돌 여부 구하기
 				let d = this.calcDiscProp(ball);							//	디스크 속성
-				let t = PS.getPlayerDiscProp(player);			//	플레이어 속성
+				let t = getPlayerlistById(player).discProp;			//	플레이어 속성
 				if(d == null || t == null) return -1;			//	객체를 구할 수 없는 경우
 				let r = range >= 1 ? range : this._collisionRange;	//	판정 범위
 				//	공(D)과 플레이어(T) 사이의 충돌 판정 == (Dx-Tx)^2+(Dy-Ty)^2 <= (Dr+Tr)^2
 				return (this.calcDistance(d, t) <= Math.pow(Math.round((d.radius + t.radius) * r), 2));
 			}
 			findAssist(target){							//		득점자 인식률 조정 및 어시스트 구하기
-				let tl = touchedList.length > 5 ? touchedList.slice(0, 5) : touchedList;
+				let tl = SC._touchedList.slice(0, this._touchedList.length > 5 ? 5 : this._touchedList.length);
 				if(tl.length < 2) return false;			//		선두자 명단이 한 명이면 어시스트를 계산하지 않음
-				if(!PS.isValid(target._id)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
-				if(PS.cntPlayers(target._team) < 2) return false;		//	팀원이 2명 이상이면 처리
+				if(!PM.isValid(target._id)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
+				if(PM.cntPlayers(target._team) < 2) return false;		//	팀원이 2명 이상이면 처리
 				return tl.find(tp => target._team == tp._team && tp._id != target._id);
 			}
 
@@ -2747,7 +2813,7 @@
 				return this.scores.time;
 			}
 			get lastTouchedPlayer(){										//		최근 선두자 구하기
-				return touchedList.length == 0 ? null : touchedList[0];
+				return this._touchedList.length == 0 ? null : this._touchedList[0];
 			}
 			get limitScore(){
 				return !this.scores ? 0 : this.scores.scoreLimit;
@@ -2759,13 +2825,13 @@
 				return room.getScores();
 			}
 			findRankListByPlayer(target){			//	전적 데이터베이스 플레이어로 찾기
-				return rankList.find(r => r._id == target);
+				return this._rankList.find(r => r._id == target);
 			}
 			findRankListByGrade(grade){				//	전적 데이터베이스 순위로 찾기
-				return rankList.sort((a, b) => b.scores - a.scores).at(grade);
+				return this._rankList.sort((a, b) => b.scores - a.scores).at(grade);
 			}
 			findTouchedListByPlayer(target){
-				return touchedList().find(p => p._id == target);
+				return this._touchedList().find(p => p._id == target);
 			}
 			findWinner(scores){						//		승리 팀 판정
 				if(scores.red > scores.blue) return c_TEAM.RED; 	//	레드팀 승
@@ -2773,7 +2839,7 @@
 				return 3;										//	무승부
 			}
 			addTouchedList(player){							//		선두자 데이터베이스 추가
-				let hasNull = (touchedList.length == 0);
+				let hasNull = (this._touchedList.length == 0);
 				this.initTouchedList(player);	//	0번째 요소로 초기화
 				if(!hasNull){
 					let target = player.id;
@@ -2791,16 +2857,16 @@
 								SYS.updateListIndex(target);
 						}
 					}, target, 5 * MS);
-					if(touchedList.length > 1)	//	데이터베이스 갱신
-						SYS.updateListIndex(touchedList[1]._id);
+					if(this._touchedList.length > 1)	//	데이터베이스 갱신
+						SYS.updateListIndex(this._touchedList[1]._id);
 				}
 				return !hasNull;
 				
 			}
 			updateAccount(op, cp){					//			랭킹 동기화
-				for(let i = 0; i < rankList.length; i++){	//	기존 데이터 삭제
-					if(rankList[i]._id == cp){
-						rankList.splice(i, 1);
+				for(let i = 0; i < this._rankList.length; i++){	//	기존 데이터 삭제
+					if(this._rankList[i]._id == cp){
+						this._rankList.splice(i, 1);
 						break;
 					}
 				}
@@ -2819,8 +2885,8 @@
 			}
 			updateTouchedList(target){					//			선두자 갱신
 				if(this.hasCommonRange(0, target)){
-					if(touchedList[0] != null && touchedList[0]._id == target) return;
-					this.addTouchedList(PS.getPlayerById(target));
+					if(this._touchedList[0] != null && this._touchedList[0]._id == target) return;
+					this.addTouchedList(PM.getPlayerById(target));
 				}
 			}
 			
@@ -2828,20 +2894,20 @@
 				return initRankList(data);
 			}
 			clearTouchedList(){			//						선두자 데이터베이스 지우기
-				touchedList.splice(0);
+				this._touchedList.splice(0);
 			}
 			clearTouchedPlayer(player){		//						특정 플레이어의 선두자 데이터베이스 지우기
-				for(let i = 0; i < touchedList.length; i++){
-					if(touchedList[i]._id == player){
-						touchedList.splice(i, 1);
+				for(let i = 0; i < this._touchedList.length; i++){
+					if(this._touchedList[i]._id == player){
+						this._touchedList.splice(i, 1);
 						i--;
 					}
 				}
 				SYS.updateListIndex(player);
 			}
 			sendRanking(target, player){	//					랭킹 메시지 보내기
-				if(!PS.isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
-				let searchTarget = PS.isValid(target) ? target : player;
+				if(!PM.isValid(player)) return SYS.sendError(c_ERROR_TYPE.E_PLAYER_PID);
+				let searchTarget = PM.isValid(target) ? target : player;
 				NC.info("플레이어 순위",
 				this.findRankListByPlayer(searchTarget).records.join(newLine),
 				player, "!stats #ID");
@@ -2858,6 +2924,7 @@
 		class StatusManager{
 			constructor(id){
 				Object.freeze(this._id	= id);
+				//this._grade	= 0;
 				this._win		= 0;
 				this._lost		= 0;
 				this._goal		= 0;
@@ -2873,17 +2940,17 @@
 				);
 			}
 			get grade(){
-				return rankList.map(rl => rl._id).indexOf(this._id);
+				return SC._rankList.map(rl => rl._id).indexOf(this._id);
 			}
 			get records(){				//	순위 정보 구하기
-				rankList.sort((a, b) => b.scores - a.scores);		//	점수 내림차순으로 정렬
+				SC._rankList.sort((a, b) => b.scores - a.scores);		//	점수 내림차순으로 정렬
 
 				let searchIndex = this.grade;
-				let startIndex = SYS.hasInRange(searchIndex, 2, rankList.length - 1) ? searchIndex - 2 : 0;
-				let endIndex = SYS.hasInRange(searchIndex, 0, rankList.length - 3) ? searchIndex + 2 : rankList.length - 1;
+				let startIndex = SYS.hasInRange(searchIndex, 2, SC._rankList.length - 1) ? searchIndex - 2 : 0;
+				let endIndex = SYS.hasInRange(searchIndex, 0, SC._rankList.length - 3) ? searchIndex + 2 : SC._rankList.length - 1;
 
 				let recordList = new Array();
-				for(let target of rankList.slice(startIndex, endIndex - startIndex + 1)){
+				for(let target of SC._rankList.slice(startIndex, endIndex - startIndex + 1)){
 					recordList.push((target._id == this._id ? '▶' : '▷') + target.status);
 				}
 				return recordList;
@@ -2955,7 +3022,7 @@
 				this._proc		= proc;				//			타이머 함수
 				this._order 	= (order.length < 1 ? 0 : order[order.length - 1]._order + 1);
 				this._isRepeat	= (preId ? true : false);	//	반복 여부
-				let overloaded = timerList.filter(tm => checkFunc(tm));
+				let overloaded = TS._timerList.filter(tm => checkFunc(tm));
 				if(overloaded.length > 0) overloaded.forEach(tm => this.clearTimer());
 			}
 			
@@ -2982,8 +3049,10 @@
 		/*** 시간 시스템 클래스 ***/
 		class TimeSystem{
 			constructor(timeType){
-				this._timeType = timeType;
-				
+				this._c_coMark		= Object.freeze('-');
+				this._c_tiMark		= Object.freeze(':');
+				this._timeType		= timeType;
+				this._timerList		= new Array();				//			타이머 목록
 			}
 			
 			get fullDate(){
@@ -3029,11 +3098,11 @@
 
 			addTimer(name, func, player, delay, isRepeat){	//		타이머 추가
 				if(name == undefined || name == null) return SYS.log("타이머는 고유의 이름을 가져야 합니다.", c_LOG_TYPE.ERROR);
-				if(timerList == undefined)			//			데이터베이스가 없으면 초기화
-					timerList.splice(0);
-				let startId = this.time + '-' + (timerList.filter(tm => tm.length > 0 && tm._id.split('-')[0] == this.time)).length;
+				if(this._timerList == undefined)			//			데이터베이스가 없으면 초기화
+					this._timerList.splice(0);
+				let startId = this.time + '-' + (this._timerList.filter(tm => tm.length > 0 && tm._id.split('-')[0] == this.time)).length;
 				let repeatId = startId + 'r';
-				let initTimer = (name, id, func, delay, preId, target) => timerList.push(new TimeManager(name, id, func, delay, preId, target));
+				let initTimer = (name, id, func, delay, preId, target) => this._timerList.push(new TimeManager(name, id, func, delay, preId, target));
 				initTimer(name, startId, func, delay, (isRepeat ? startId : null), player);
 				if(isRepeat == true){
 					if(!delay || delay < 100)
@@ -3053,7 +3122,7 @@
 					if(t._id == startId && t._isRepeat == true) return;
 					TS.clearTimer(t._id);
 				}
-				timerList.forEach(t => resetTimer(t));		//	이미 처리한 타이머 지우기
+				this._timerList.forEach(t => resetTimer(t));		//	이미 처리한 타이머 지우기
 				//	타이머 ID로 반환
 				return (!delay || delay < 100 ? false : this.findTimerById(startId));
 			}
@@ -3061,41 +3130,42 @@
 			showCurrentTime(type){		//							시간 출력
 				switch(type){
 					case c_TIME_TYPE.CORE:		return this.showNormalTime();
-					case c_TIME_TYPE.NORMAL:	return this.showDate().split(coMark)[1] + coMark + this.showDate().split(coMark)[2] + '| ' + this.showTime();
+					case c_TIME_TYPE.NORMAL:	return this.showDate().split(this._c_coMark)[1] + this._c_coMark + this.showDate().split(this._c_coMark)[2] + '| ' + this.showTime();
 					case c_TIME_TYPE.FULL:		return this.showDate() + '| ' + this.showTime();
 					default:					return this.showCurrentTime(this._timeType);
 				}
 			}
 			showDate(){ 			//							날짜 및 시간 출력
-				return [this.year, SYS.setLine(this.month, 2), SYS.setLine(this.day, 2)].join(coMark);
+				return [this.year, SYS.setLine(this.month, 2), SYS.setLine(this.day, 2)].join(this._c_coMark);
 			}
 			showNormalTime(){			//							Windows 작업 표시줄 형식으로 출력
 				let hourStr = this.hours - (this.meridiem == 2 ? 12 : 0);	//	0시 → 12시로 교정
-				return ((hourStr == 0 ? 12 : hourStr) + tiMark + SYS.setLine(this.minutes, 2) + ' ' + (this.meridiem == 2 ? "PM" : this.meridiem == 1 ? "AM" : ''));
+				return ((hourStr == 0 ? 12 : hourStr) + this._c_tiMark + SYS.setLine(this.minutes, 2) + ' ' + (this.meridiem == 2 ? "PM" : this.meridiem == 1 ? "AM" : ''));
 			}
 			showTime(){ 			//							시간 출력
-				return [SYS.setLine(this.hours, 2), SYS.setLine(this.minutes, 2), SYS.setLine(this.secs, 2)].join(tiMark);
+				return [SYS.setLine(this.hours, 2), SYS.setLine(this.minutes, 2), SYS.setLine(this.secs, 2)].join(this._c_tiMark);
 			}
 
 			findTimerById(findId){				//	타이머 ID로 찾기
-				if(timerList == undefined) return undefined;
-				return timerList.find(tm => tm._id == findId);
+				if(this._timerList == undefined) return undefined;
+				return this._timerList.find(tm => tm._id == findId);
 			}
 			findTimerByName(name, player){				//	타이머 이름으로 찾기
-				let tmList = PS.isValid(player) ? this.findTimerByPlayer(player) : timerList;
+				let tmList = PM.isValid(player) ? this.findTimerByPlayer(player) : this._timerList;
 				if(tmList == undefined) return undefined;
 				return tmList.filter(tm => tm._name == name);
 			}
 			findTimerByPlayer(target){			//	타이머 플레이어로 찾기
-				if(timerList == undefined) return undefined;
-				return timerList.filter(tm => tm._player == target);
+				if(this._timerList == undefined) return undefined;
+				return this._timerList.filter(tm => tm._player == target);
 			}
 
 			findTimers(target, hasTarget){	//	타이머 목록 구하기
-				if(timerList == undefined) return undefined;
+				let tl = TS._timerList;
+				if(tl == undefined) return undefined;
 				let isEquals = (a, b) => a.toString() === b.toString();
 				let getEqualTimers = function(tt){
-					return timerList.filter(tm => {
+					return tl.filter(tm => {
 						if(tm.length > 0 && isEquals(tt._func, tm._func) == false)
 							return false;
 						return hasTarget == true ? true : tm._id != tt._id;
@@ -3112,10 +3182,10 @@
 			clearTimer(findId){		//						타이머 지우기(ID)
 				let timer = this.findTimerById(findId);
 				if(timer == undefined) return;			//	없으면 처리 종료
-				for(let i = 0; i < timerList.length; i++){
-					if(timerList[i]._id == timer._id){
+				for(let i = 0; i < this._timerList.length; i++){
+					if(this._timerList[i]._id == timer._id){
 						clearTimeout(timer._proc);		//	타이머 제거
-						timerList.splice(i, 1);		//	대기열 제거		
+						this._timerList.splice(i, 1);		//	대기열 제거		
 					}
 				}
 			}
@@ -3137,11 +3207,11 @@
 			}
 			
 			resetTimers(){			//						타이머 초기화
-				timerList.forEach(tm => this.clearTimer(tm._id));
+				this._timerList.forEach(tm => this.clearTimer(tm._id));
 			}
 		}
 		/*** 시스템 클래스 ***/
-		class IoSystem{
+		class GameSystem{
 			constructor(versionRoom, releaseDate, isDev, lockPass){																		//	기본 글꼴
 				this._defaultFontFamily		= Object.freeze("Noto Sans Mono CJK KR, D2Coding, Consolas, \"맑은 고딕\", \"나눔고딕\";");
 				this._isDev					= Object.freeze(isDev == true);					//	개발자 버전
@@ -3163,7 +3233,7 @@
 			}
 			onKeyDownSend(e){			//		키 입력 이벤트
 				if(e.keyCode == 13)	//	enter
-					return this.onClickBtnSend();
+					return SYS.onClickBtnSend();
 				return;
 			}
 			
@@ -3201,7 +3271,7 @@
 			}
 			printMsg(msg, target){								//	서버 메시지 출력
 				let getDestType = function(target){
-					if(PS.isValid(target)) return 3;	//	개인
+					if(PM.isValid(target)) return 3;	//	개인
 					switch(target){
 						case "레드": case "red": case 'r':
 							return c_TEAM.RED;
@@ -3268,7 +3338,7 @@
 						+ newLine + "const ROOMNAME: \"[UMUX BETA] 핫휴 3ㄷ3\""
 						+ newLine + newLine + "*_isDev의 값은 항상 true로 설정해두기*"
 						+ newLine + "설정: "
-						+ newLine + "new IoSystem(\"v10.0\", \"2021.03.23\", >>>true<<<, false);"
+						+ newLine + "new GameSystem(\"v10.0\", \"2021.03.23\", >>>true<<<, false);"
 						+ newLine + newLine + "*외국어 번역*"
 						+ newLine + "소스 코드를 한국어 이외의 다른 언어로 번역해서 방을 열거나 배포하는 행위는 일절 금지합니다."
 						+ newLine + newLine + "*UMUX 버전*"
@@ -3301,72 +3371,71 @@
 					+ newLine + "UMUX 버전: " + this._versionUMUX
 					+ newLine + "보안 패치 수준: " + this._securityPatchLevel
 					+ newLine + "지역 코드: " 		+ REGION_CODE.toUpperCase() 
-					+ newLine  + "상세 위치(바로가기): " + LAT + ', ' + LON + '(' + "https://www.google.com/maps/place/" + ((LAT + "%20" + LON).toString()) + ')'
+					+ newLine  + "상세 위치(바로가기): " + LAT + ', ' + LON + '(' + "https://www.google.com/customStadiumList/place/" + ((LAT + "%20" + LON).toString()) + ')'
 					);
 				console.groupEnd();
 				AMN.updatePassword(PASSWORD);
-				//	---슈퍼 블랙리스트 초기화---
-				    AMN.addBlacklist(true, "에드", "34392E3137342E3133332E3131"), AMN.addBlacklist(true, "에드", "3131382E33342E3235312E3334"), AMN.addBlacklist(true, "에드", "37342E38322E36302E3832"),AMN.addBlacklist(true, "에드", "36352E34392E3132362E3839"), AMN.addBlacklist(true, "에드", "3132352E3138372E3133352E3239"), AMN.addBlacklist(true, "에드", "37322E35322E38372E3737"), AMN.addBlacklist(true, "에드", "31342E34372E3131322E313232"), AMN.addBlacklist(true, "에드", "3232312E3136352E3136332E313530"), AMN.addBlacklist(true, "에드", "3138322E3232342E33312E313136"), AMN.addBlacklist(true, "에드", "3138332E3130302E3135362E32353"), AMN.addBlacklist(true, "에드", "3138332E3130302E3135362E323532"), AMN.addBlacklist(true, "에드", "3139382E31362E37342E323035"), AMN.addBlacklist(true, "에드", "37342E38322E36302E313739"), AMN.addBlacklist(true, "Walker", "34392E3137342E3133332E3131"), AMN.addBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), AMN.addBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), AMN.addBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), AMN.addBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.addBlacklist(true, "Knife", "34392E3137342E3133332E3131"), AMN.addBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), AMN.addBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.addBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
-					AMN.addBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
-
-				    AMN.addBlacklist(true, "랄랄랄", "3132342E35392E37332E313931"), 
-
-				    AMN.addBlacklist(true, undefined, "3138322E3232342E33312E3330"), AMN.addBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
-				    AMN.addBlacklist(true, undefined, "3137382E36322E352E313537"), AMN.addBlacklist(true, undefined, "3137382E3132382E38392E313530"),
-
-				    AMN.addBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"), AMN.addBlacklist(true, undefined, "36312E3235352E382E313532"),
-
-				    AMN.addBlacklist(true, "서든", "31342E34372E3131322E313330"), AMN.addBlacklist(true, "프레버", "31342E34372E3131322E313330"), AMN.addBlacklist(true, "Preber", "31342E34372E3131322E313330"), AMN.addBlacklist(true, "Preber", "37322E35322E38372E3937"), AMN.addBlacklist(true, "Preber", "36352E34392E3132362E3931"), AMN.addBlacklist(true, "Preber", "37322E35322E38372E3937"),
-
-				    AMN.addBlacklist(true, undefined, "3132352E3137362E342E313335"), AMN.addBlacklist(true, undefined, "3137352E3231342E392E3834"),
-				    AMN.addBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
-				    AMN.addBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
-
-				    AMN.addBlacklist(true, undefined, "3131362E3132342E3137382E3433"), AMN.addBlacklist(true, undefined, "3137352E3139372E3231392E313031"), AMN.addBlacklist(true, undefined, "3137352E3139372E3231392E313031"), AMN.addBlacklist(true, undefined, "35392E31362E35342E313631"),
-
-				    AMN.addBlacklist(true, undefined, "3132342E35332E3137362E3831"),
-				    AMN.addBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), AMN.addBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), AMN.addBlacklist(true, "농협신", "3131382E3137362E34372E313233"), AMN.addBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), AMN.addBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
-
-				    
-					AMN.addBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), AMN.addBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"), AMN.addBlacklist(true, "노래하는메시", "3232312E3135312E3132312E313731"), AMN.addBlacklist(true, "노래하는메시", "3232302E37362E3230302E35"), AMN.addBlacklist(true, "노래하는메시", "3231312E3232342E3232392E313637"), AMN.addBlacklist(true, "노래하는메시", "3232302E37352E3230392E3637"), AMN.addBlacklist(true, "노래하는메시", "3136332E3138302E3131382E313734"), AMN.addBlacklist(true, "노래하는메시", "3231312E3230342E3132352E323430"), AMN.addBlacklist(true, "노래하는메시", "35382E3233332E38302E3532"), AMN.addBlacklist(true, "노래하는메시", "3138332E3130322E34332E313735"), AMN.addBlacklist(true, "노래하는메시", "3132312E3139302E3233332E313635"), AMN.addBlacklist(true, "노래하는메시", "3131392E3139322E3235342E323438"), AMN.addBlacklist(true, "노래하는메시", "3132312E3134332E3133342E3637"), AMN.addBlacklist(true, "노래하는메시", "3232322E3131322E34392E313630"),
-					AMN.addBlacklist(true, "노래하는메시", "3132352E3133322E39392E3338"), AMN.addBlacklist(true, "노래하는메시", "3231302E3132312E3136352E3337"), AMN.addBlacklist(true, "노래하는메시", "3232312E3136352E37392E323338"), AMN.addBlacklist(true, "노래하는메시", "3232302E37392E3137382E323230"), AMN.addBlacklist(true, "노래하는메시", "3232322E3131372E3132322E3433"),
-					AMN.addBlacklist(true, "노래하는메시", "312E3233312E36322E313335"), AMN.addBlacklist(true, "노래하는메시", "3232302E37322E39362E3637"), AMN.addBlacklist(true, "노래하는메시", "3132312E3136322E3231332E323130"), AMN.addBlacklist(true, "노래하는메시", "3232312E3135352E3234342E313532"), AMN.addBlacklist(true, "노래하는메시", "3132312E3133302E31332E3938"), AMN.addBlacklist(true, "노래하는메시", "3231312E3235302E3138382E3437"),
-					AMN.addBlacklist(true, "노래하는메시", "3231312E3230392E37362E323038"), AMN.addBlacklist(true, "노래하는메시", "3138332E3130382E3138312E313538"),
-					AMN.addBlacklist(true, "노래하는메시", "3131322E3136362E3133362E3331"), AMN.addBlacklist(true, "노래하는메시", "3131332E35322E3139362E313733"),
-					AMN.addBlacklist(true, "노래하는메시", "35382E3134302E3231312E323237"), AMN.addBlacklist(true, "노래하는메시", "3132312E3134392E322E313539"),
-					AMN.addBlacklist(true, "노래하는메시", "35382E3134302E3231302E3730"),
-					AMN.addBlacklist(true, "노래하는메시", "3231312E3235302E3138382E313035"),
-					AMN.addBlacklist(true, "노래하는메시", "3132342E352E31332E323237"),
-					AMN.addBlacklist(true, "노래하는메시", "33392E3131382E3132302E3534"),
-					AMN.addBlacklist(true, "노래하는메시", "3138302E38332E39312E323139"),
-					AMN.addBlacklist(true, "노래하는메시", "35382E3134332E3138312E313035"),
-					AMN.addBlacklist(true, "노래하는메시", "3132342E352E392E313331"),
-					AMN.addBlacklist(true, "노래하는메시", "3131382E3234312E3131382E3236"),
-					AMN.addBlacklist(true, "노래하는메시", "3231312E3230332E3235352E3634"),
-					AMN.addBlacklist(true, "노래하는메시", "3136382E3132362E38392E313335"),
-
-				    AMN.addBlacklist(true, undefined, "3138322E3232342E33312E313031"),
-				    AMN.addBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
-				    AMN.addBlacklist(true, undefined, "3231312E3234332E3232322E3733"),
-				    AMN.addBlacklist(true, undefined, "33392E3131372E37392E313337"),
-
-				    AMN.addBlacklist(true, "drogba", "3131382E33322E37372E323531"), AMN.addBlacklist(true, "드록바", "3131382E33322E37372E323531"), AMN.addBlacklist(true, "드록바", "35382E3134332E37362E3635"),
-
-				    AMN.addBlacklist(true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"),
-
-				    AMN.addBlacklist(true, "soy el mas pro", "3139302E34392E3137302E313038"),
-				    AMN.addBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
-
-				    AMN.addBlacklist(true, "HYNN", "3231392E3130302E33372E323433"), AMN.addBlacklist(true, "HYNN", "3232322E3130352E302E313733"), AMN.addBlacklist(true, "HYNN", "3231382E35312E31392E3338"),
-					AMN.addBlacklist(true, "Roseanne", "3231392E3130302E33372E323433"), AMN.addBlacklist(true, "Roseanne","33392E3131342E36312E313230"),
-
-				    AMN.addBlacklist(true, "루니", "31342E33362E3231352E3936"),
-
-				    AMN.addBlacklist(true, undefined, "36342E36322E3231392E3232"),
-					//	---블랙리스트 초기화---
-					//	아래와 같은 형식으로 명단을 작성할 수 있습니다.
-					//	<예시> AMN.addBlacklist(false, "알파고"), 또는 AMN.addBlacklist(true, undefined, "12345678901234567890"),
-					//------------------------------------------------------------
+                let bl = [
+				    /***
+                        슈퍼 블랙리스트 초기화
+						-아래와 같은 형식으로 명단을 작성할 수 있습니다.
+						-<예시> [true, "알파고"], 또는 [true, undefined, "12345678901234567890"],
+                    ***/
+				    [true, "에드", "34392E3137342E3133332E3131"], [true, "에드", "3131382E33342E3235312E3334"], [true, "에드", "37342E38322E36302E3832"],[true, "에드", "36352E34392E3132362E3839"], [true, "에드", "3132352E3138372E3133352E3239"], [true, "에드", "37322E35322E38372E3737"], [true, "에드", "31342E34372E3131322E313232"], [true, "에드", "3232312E3136352E3136332E313530"], [true, "에드", "3138322E3232342E33312E313136"], [true, "에드", "3138332E3130302E3135362E32353"], [true, "에드", "3138332E3130302E3135362E323532"], [true, "에드", "3139382E31362E37342E323035"], [true, "에드", "37342E38322E36302E313739"], [true, "Walker", "34392E3137342E3133332E3131"], [true, "페르난지뉴", "34392E3137342E3133332E3131"], [true, "앙헬리노", "34392E3137342E3133332E3131"], [true, "Man from Wuhan", "34392E3137342E3133332E3131"], [true, undefined, "34392E3137342E3133332E3131"], [true, "Knife", "34392E3137342E3133332E3131"], [true, "웨인 루니", "34392E3137342E3133332E3131"], [true, undefined, "34392E3137342E3133332E3131"], [true, "가즈으앗", "34392E3137342E3133332E3131"], 
+				    [true, "어둠의 악마", "3231392E3234382E3230332E313430"],
+				    [true, "랄랄랄", "3132342E35392E37332E313931"], 
+				    [true, undefined, "3138322E3232342E33312E3330"], [true, undefined, "3130342E3133312E3137362E323334"], 
+				    [true, undefined, "3137382E36322E352E313537"], [true, undefined, "3137382E3132382E38392E313530"],
+				    [true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"], [true, undefined, "36312E3235352E382E313532"],
+				    [true, "서든", "31342E34372E3131322E313330"], [true, "프레버", "31342E34372E3131322E313330"], [true, "Preber", "31342E34372E3131322E313330"], [true, "Preber", "37322E35322E38372E3937"], [true, "Preber", "36352E34392E3132362E3931"], [true, "Preber", "37322E35322E38372E3937"],
+				    [true, undefined, "3132352E3137362E342E313335"], [true, undefined, "3137352E3231342E392E3834"],
+				    [true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"], 
+				    [true, "쥐알티", "312E3234362E3139312E323134"],
+				    [true, undefined, "3131362E3132342E3137382E3433"], [true, undefined, "3137352E3139372E3231392E313031"], [true, undefined, "3137352E3139372E3231392E313031"], [true, undefined, "35392E31362E35342E313631"],
+				    [true, undefined, "3132342E35332E3137362E3831"],
+				    [true, "농협신", "3132352E3137392E3231312E3330"], [true, "농협신", "3132352E3137392E3231312E3331"], [true, "농협신", "3131382E3137362E34372E313233"], [true, "농협신", "3132352E3137392E3231312E3232"], [true, "농협신", "3132352E3137392E3231312E3533"],
+                
+				    [true, "노래하는메시", "3131382E3137362E34372E313332"], [true, "노래하는메시", "3132352E3139312E37302E313031"], [true, "노래하는메시", "3232312E3135312E3132312E313731"], [true, "노래하는메시", "3232302E37362E3230302E35"], [true, "노래하는메시", "3231312E3232342E3232392E313637"], [true, "노래하는메시", "3232302E37352E3230392E3637"], [true, "노래하는메시", "3136332E3138302E3131382E313734"], [true, "노래하는메시", "3231312E3230342E3132352E323430"], [true, "노래하는메시", "35382E3233332E38302E3532"], [true, "노래하는메시", "3138332E3130322E34332E313735"], [true, "노래하는메시", "3132312E3139302E3233332E313635"], [true, "노래하는메시", "3131392E3139322E3235342E323438"], [true, "노래하는메시", "3132312E3134332E3133342E3637"], [true, "노래하는메시", "3232322E3131322E34392E313630"],
+				    [true, "노래하는메시", "3132352E3133322E39392E3338"], [true, "노래하는메시", "3231302E3132312E3136352E3337"], [true, "노래하는메시", "3232312E3136352E37392E323338"], [true, "노래하는메시", "3232302E37392E3137382E323230"], [true, "노래하는메시", "3232322E3131372E3132322E3433"],
+				    [true, "노래하는메시", "312E3233312E36322E313335"], [true, "노래하는메시", "3232302E37322E39362E3637"], [true, "노래하는메시", "3132312E3136322E3231332E323130"], [true, "노래하는메시", "3232312E3135352E3234342E313532"], [true, "노래하는메시", "3132312E3133302E31332E3938"], [true, "노래하는메시", "3231312E3235302E3138382E3437"],
+				    [true, "노래하는메시", "3231312E3230392E37362E323038"], [true, "노래하는메시", "3138332E3130382E3138312E313538"],
+				    [true, "노래하는메시", "3131322E3136362E3133362E3331"], [true, "노래하는메시", "3131332E35322E3139362E313733"],
+				    [true, "노래하는메시", "35382E3134302E3231312E323237"], [true, "노래하는메시", "3132312E3134392E322E313539"],
+				    [true, "노래하는메시", "35382E3134302E3231302E3730"],
+				    [true, "노래하는메시", "3231312E3235302E3138382E313035"],
+				    [true, "노래하는메시", "3132342E352E31332E323237"],
+				    [true, "노래하는메시", "33392E3131382E3132302E3534"],
+				    [true, "노래하는메시", "3138302E38332E39312E323139"],
+				    [true, "노래하는메시", "35382E3134332E3138312E313035"],
+				    [true, "노래하는메시", "3132342E352E392E313331"],
+				    [true, "노래하는메시", "3131382E3234312E3131382E3236"],
+				    [true, "노래하는메시", "3231312E3230332E3235352E3634"],
+				    [true, "노래하는메시", "3136382E3132362E38392E313335"],
+				    [true, undefined, "3138322E3232342E33312E313031"],
+				    [true, undefined, "3131362E3132312E3233352E3830"],
+				    [true, undefined, "3231312E3234332E3232322E3733"],
+				    [true, undefined, "33392E3131372E37392E313337"],
+				    [true, "drogba", "3131382E33322E37372E323531"], [true, "드록바", "3131382E33322E37372E323531"], [true, "드록바", "35382E3134332E37362E3635"],
+				    [true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"],
+				    [true, "soy el mas pro", "3139302E34392E3137302E313038"],
+				    [true, "Ricardo", "3138362E3132332E3231352E3234"],
+				    [true, "HYNN", "3231392E3130302E33372E323433"], [true, "HYNN", "3232322E3130352E302E313733"], [true, "HYNN", "3231382E35312E31392E3338"],
+				    [true, "Roseanne", "3231392E3130302E33372E323433"], [true, "Roseanne","33392E3131342E36312E313230"],
+				    [true, "루니", "31342E33362E3231352E3936"],
+				    [true, undefined, "36342E36322E3231392E3232"],
+					/***
+					 	블랙리스트 초기화
+						-아래와 같은 형식으로 명단을 작성할 수 있습니다.
+						-<예시> [false, "알파고"], 또는 [false, undefined, "12345678901234567890"],
+					***/
+                ];
+				//------------------------------------------------------------
+				for(let e of bl.filter(e => this.hasInRange(e.length, 2, 3) == true)){
+					let isSuper = (e[0] == true);
+					let name = CS.isWhiteSpace(e[1]) ? undefined : e[1];
+					let conn = e.length > 2 ? e[2] : null;
+					if(name != undefined || conn != null) AMN.addBlacklist(isSuper, name, conn);
+				}
 				this.log(true, "서버 가동 시작", c_LOG_TYPE.NOTICE);
 				if(PASSWORD)	//	reCAPTCHA 활성화
 					if(this._isDev == true|| PUBLIC == false) this.setRequireRecaptcha(true);
@@ -3427,7 +3496,7 @@
 						"overflow:auto",
 						"display: table",
 						"margin: auto auto 8px",
-						"background: #1A2125",
+						"background: #1B2328",
 						"color: #FFF",
 						"font-size: 0.8rem",
 						"border: 4px",
@@ -3457,6 +3526,8 @@
 						"width: 16vw",
 						"min-width: 192px",
 						"height: 18px",
+						"border: 1px solid #1A2125",
+						"border-radius: 4px",
 						"font-size: 0.75rem",
 						"text-shadow: #000000 1px 0px, #000000 0px 1px, #000000 1px 0px, #000000 0px 1px",
 						"font-family: " + this._defaultFontFamily
@@ -3614,7 +3685,7 @@
 				}
 				titleNodes[1][0].innerText = ' ';
 				titleNodes[1][0].style.height = "18px";
-				titleNodes[2][0].innerText = Array(MAXPLAYERS - PS.cntPlayers() + 1).join('□');
+				titleNodes[2][0].innerText = Array(MAXPLAYERS - PM.cntPlayers() + 1).join('□');
 				titleNodes[2][0].style.height = "18px";
 				this.addWebElement(this._framebody, dataScoreTable);	this.addWebElement(this._framebody, dataTeamTable);		//	적용
 				let logDiv = document.createElement("div");
@@ -3670,7 +3741,7 @@
 			}
 			setRequireRecaptcha(isActive, player){		//	reCAPTCHA 지정
 				room.setRequireRecaptcha(isActive);
-				let isValidByPlayer = PS.isValid(player);
+				let isValidByPlayer = PM.isValid(player);
 				NC.locked(isActive, isValidByPlayer ? (SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME) + "님이 reCAPTCHA를 " + (isActive == true ? "활성화" : "비활성화") + "했습니다.") : ("reCAPTCHA가 " + (isActive == true ? "설정" : "해제") + "되었습니다."));
 				this.log(true, isValidByPlayer ? (SYS.showPlayerInfo(player) + "(이)가 reCAPTCHA를 " + (isActive == true ? "활성화" : "비활성화") + "함") : ("reCAPTCHA가 " + (isActive == true ? "활성화" : "비활성화") + "됨"), c_LOG_TYPE.NOTICE);
 			}
@@ -3683,10 +3754,10 @@
 				obj.onclick = ev;
 			}
 			addListIndex(player){			//		플레이어 리스트 추가
-				if(!PS.isValid(player)) return this.sendError(c_ERROR_TYPE.E_PLAYER_PID);
-				if(!PS.getLocalId(player)) return this.sendError(c_ERROR_TYPE.E_PLAYER_LID);
+				if(!PM.isValid(player)) return this.sendError(c_ERROR_TYPE.E_PLAYER_PID);
+				if(!PM.findLocalId(player)) return this.sendError(c_ERROR_TYPE.E_PLAYER_LID);
 				let parentsObj, teamStr;
-				switch(PS.getPlayerById(player).team){
+				switch(PM.getPlayerById(player).team){
 					case c_TEAM.RED:			parentsObj = iframeEle.getElementById("redTd");		teamStr = 'r';	break;
 					case c_TEAM.BLUE:			parentsObj = iframeEle.getElementById("blueTd");	teamStr = 'b';	break;
 					case c_TEAM.SPECTATOR:	parentsObj = iframeEle.getElementById("specTd");	teamStr = 's';	break;
@@ -3697,7 +3768,7 @@
 				let addNode = function(e, t, p){
 					if(e == false) return;
 					e[0].id = (t + String(p));
-					e[0].innerText = (PS.getTagGrade(p) + getPlayerlistById(p).showPlayerInfo());
+					e[0].innerText = (PM.findTagGrade(p) + getPlayerlistById(p).showPlayerInfo());
 					e[0].style.visibility = "visible";
 					e[0].style.height = "18px";
 				}
@@ -3705,8 +3776,8 @@
 				this.updateListIndex(player);	//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
 			}
 			updateListIndex(player){	//			플레이어 리스트 갱신
-				if(!PS.isValid(player)) return this.sendError(c_ERROR_TYPE.E_PLAYER_PID);
-				if(!PS.getLocalId(player)) return this.clearListIndex(player);
+				if(!PM.isValid(player)) return this.sendError(c_ERROR_TYPE.E_PLAYER_PID);
+				if(!PM.findLocalId(player)) return this.clearListIndex(player);
 				let parentsObj;
 				let target = getPlayerlistById(player);
 				switch(target._team){
@@ -3728,9 +3799,9 @@
 						}
 						checkStat(p._isSleep, "😴");		//	상태: 잠수
 						checkStat(p._isMute, "🤬");		//	상태: 채팅 금지
-						return PS.getTagGrade(p._id) + (msg ? msg : '') + p.showPlayerInfo();
+						return PM.findTagGrade(p._id) + (msg ? msg : '') + p.showPlayerInfo();
 					}
-					pn.innerText = getMsgStats(p) + (touchedList.length > 0 && SC.lastTouchedPlayer._id == p._id ? '⚽' : '');
+					pn.innerText = getMsgStats(p) + (SC._touchedList.length > 0 && SC.lastTouchedPlayer._id == p._id ? '⚽' : '');
 					pn.style.visibility = "visible";
 				}
 				updateNode(nodeList.filter(n => n.innerText), target);
@@ -3745,8 +3816,8 @@
 				//	접속자 정보 계산
 				let seatList = [iframeEle.getElementById("seatFull"), iframeEle.getElementById("seatEmpty")];
 				GM.reorderPlayers();			//	플레이어 데이터베이스 순번 정렬
-				seatList[0].innerText = PS.cntPlayers() > 0 ? Array(PS.cntPlayers() + 1).join(LIST_STATUS.SEAT_FULL) : ' ';								//	접속 칸
-				seatList[1].innerText = PS.cntPlayers() >= MAXPLAYERS ? "MAX" : Array(MAXPLAYERS - PS.cntPlayers() + 1).join(LIST_STATUS.SEAT_EMPTY);	//	미접속 칸
+				seatList[0].innerText = PM.cntPlayers() > 0 ? Array(PM.cntPlayers() + 1).join(LIST_STATUS.SEAT_FULL) : ' ';								//	접속 칸
+				seatList[1].innerText = PM.cntPlayers() >= MAXPLAYERS ? "MAX" : Array(MAXPLAYERS - PM.cntPlayers() + 1).join(LIST_STATUS.SEAT_EMPTY);	//	미접속 칸
 				//	점수 정보 - 현재 경기 판정 골(누적 경기 판정 골)
 				let scoreList = [iframeEle.getElementById("scoreCore"), iframeEle.getElementById("scoreRed"), iframeEle.getElementById("scoreBlue")];
 				let getGoalText = function(team){
@@ -3778,9 +3849,9 @@
 				return false;
 			}
 			clearListIndex(player){		//			플레이어 리스트 제거
-				if(!PS.isValid(player)) return this.sendError(c_ERROR_TYPE.E_PLAYER_PID);
+				if(!PM.isValid(player)) return this.sendError(c_ERROR_TYPE.E_PLAYER_PID);
 				let parentsObj, teamStr;
-				switch(PS.getPlayerById(player).team){
+				switch(PM.getPlayerById(player).team){
 					case c_TEAM.RED:			parentsObj = iframeEle.getElementById("redTd");		teamStr = 'r';	break;
 					case c_TEAM.BLUE:			parentsObj = iframeEle.getElementById("blueTd");	teamStr = 'b';	break;
 					case c_TEAM.SPECTATOR:	parentsObj = iframeEle.getElementById("specTd");	teamStr = 's';	break;
@@ -3863,152 +3934,9 @@
 				[arr[a], arr[b]] = [arr[b], arr[a]];	//	구조 분해 할당(a, b를 b, a로 자리 교체)
 			}
 		}
-		/*** 플레이어 클래스 ***/
-		class PlayerManager{
-			constructor(id, name, team, admin, conn, auth){
-				Object.freeze(this._id		= id);
-				Object.freeze(this._name	= name);
-				Object.freeze(this._address	= conn);
-				Object.freeze(this._network	= auth);
-				this._team			= team;
-				this._admin			= admin;
-				this._time			= TS.time;
-				this._stats			= new Array();
-				this._chatmode		= 0;
-				this._detector		= 0;
-				this._isDisturb		= true;
-				this._isMute		= false;
-				this._isSleep		= false;
-				this._hasKicked		= false;
-				
-				this._str			= new Array();
-				this._timeList		= new Array();
-				this._time			= TS.time;
-				this._repeated		= 0;
-				this._count			= 0;
-			}
-			get chatmode(){
-				return this._chatmode;
-			}
-			get isDisturb(){
-				return this._isDisturb;
-			}
-			get discProp(){			//		플레이어 객체 속성 구하기
-				return room.getPlayerDiscProperties(this._id);
-			}
-			get dpPosition(){
-				return ({
-					'x' : this.discProp.x,
-					'y' : this.discProp.y
-				});
-			}
-			get dpSpeedVector(){
-				return ({
-					'x' : this.discProp.xspeed,
-					'y' : this.discProp.yspeed
-				});
-			}
-			get dpGravityVector(){
-				return ({
-					'x' : this.discProp.xgravity,
-					'y' : this.discProp.ygravity
-				});
-			}
-			get localId(){
-				let pList = room.getPlayerList().filter(p => p.id != 0);
-				for(let i = 0; i < pList.length; i++){
-					if(pList[i].id == this._id) return i + 1;
-				}
-				return false;
-			}
-			set chatmode(value){	//		채팅 모드 설정
-				let titleList = ["전체", "팀"];
-				this._chatmode = value;
-				NC.notice("채팅 기본 모드가 " + titleList[value] + " 채팅으로 변경되었습니다.", this._id);
-			}
-			set isDisturb(value){	//		채팅 수신 설정
-				switch(value){
-					case 0:
-						NC.notice("채팅 수신이 금지되었습니다. 따라서 귓속말 기능을 사용할 수 없습니다.", this._id);
-						break;
-					case 1:
-						NC.notice("채팅 수신이 허용되었습니다.", this._id);
-						break;
-					default: return;	
-				}
-				this._isDisturb = value;
-			}
-			set discProp(value){	//		플레이어 객체 속성 구하기
-				room.setPlayerDiscProperties(this._id, value);
-			}
-			setAvatar(str){			//		등번호 지정
-				room.setPlayerAvatar(this._id, str);
-			}
-			addSleeplist(){
-				this._isSleep = true;
-				this._team = c_TEAM.SPECTATOR;
-				AMN.deleteAdmin(player);	//	최고 권한 → 보조 권한으로 격하
-				AMN.updateAdmins();
-				NC.notice(this.showPlayerInfo(c_PLAYERINFO_TYPE.NAME) + "님이 자리를 비웠습니다.", this._id * -1);
-				NC.uniMsg(c_LIST_ICON.NORMAL + "자리 비움", "게임에 다시 참여하려면 명령어를 한 번 더 입력하세요.", this._id, "!afk");
-				SYS.log(true, "대기열 추가: " + this.showPlayerInfo(), c_LOG_TYPE.NOTICE);
-			}
-			updateTime(){			//		시간 갱신
-				this._timeList.push(TS.time);
-			}
-			clearPlayer(){			//		플레이어 데이터베이스 지우기
-				SYS.clearListIndex(this._id);			//	리스트 지우기
-				CS.deletePlayer(this._id);				//	채팅 데이터베이스 지우기
-				SC.clearTouchedPlayer(this._id);			//	선두자 데이터베이스 지우기
-				TS.clearTimerByPlayer(this._id);			//	타이머 지우기
-				this._team			= c_TEAM.SPECTATOR;
-				this._time			= TS.time;
-				this._chatmode		= 0;
-				this._isDisturb		= true;
-				this._isSleep		= false;
-				if(this._hasKicked){
-					this._admin		= 0;
-					this._hasKicked	= false;
-				}
-			}
-			deleteSleepPlayer(){	//		장기 대기열 플레이어 제거
-				this._isSleep = false;
-				AMN.updateAdmins();
-				NC.notice("게임에 바로 참여할 준비가 되었습니다! ", this._id, "!join");
-				SYS.log(true, "대기열 제거: " + this.showPlayerInfo(), c_LOG_TYPE.NOTICE);
-			}
-			movePosition(dx, dy){			//	플레이어 좌표 이동(상대 좌표)
-				this.discProp(this._id, {'x' : this.dpPosition.x + dx, 'y' : this.dpPosition.y + dy});
-			}
-			teleportPosition(x, y){			//	플레이어 좌표 변경(절대 좌표)
-				this.discProp(this._id, {'x' : x, 'y' : y});
-			}
-			adjustSpeedVector(x, y){		//	플레이어 속도 벡터 변경
-				this.discProp(this._id, {"xspeed" : x, "yspeed" : y });
-			}
-			adjustGravityVector(x, y){		//	플레이어 중력 벡터 변경
-				this.discProp(this._id, {"xgravity" : x, "ygravity" : y });
-			}
-			resetAvatar(){			//		등번호 초기화
-				return this.setAvatar();
-			}
-			showPlayerInfo(type){	//		플레이어 정보 출력
-				let name = (CS.isWhiteSpace(this._name) ? "공백" : this._name);
-				switch(type){
-					case c_PLAYERINFO_TYPE.LOCAL:
-						return ('(' + ((PS.cntPlayers() >= 10) ? SYS.setLine(this.localId, 2) : this.localId) + ')' + name);
-					case c_PLAYERINFO_TYPE.PUBLIC:
-						return ('(' + '#' + this._id + ')' + name);
-					case c_PLAYERINFO_TYPE.NAME:
-						return name;
-					default:
-						return (this._id + '(' + ((PS.cntPlayers() >= 10) ? SYS.setLine(this.localId, 2) : this.localId) + ')' + name);
-				}
-			}
-		}
 		const TM 	= new TimeManager();					//	시간 관리 클래스
 		const TS	= new TimeSystem(c_TIME_TYPE.NORMAL);	//	시간 관리 클래스
-		const SYS	= new IoSystem(							//	시스템 클래스
+		const SYS	= new GameSystem(						//	시스템 클래스
 			"v10.0", "2021.03.23", true, false
 		);
 		const GM 	= new GameManager(						//	게임 매니저 클래스
@@ -4022,8 +3950,9 @@
 			false, false, 2, 0, 3
 		);
 		const CM 	= new Commands();						//	명령어 클래스
-		const PS 	= new Player();							//	플레이어 클래스
+		const PM 	= new PlayerManager();					//	플레이어 매니저 클래스
 		const SC	= new ScoreManager();					//	점수 관리 클래스
+		const PS	= new PlayerSystem();					//	플레이어 시스템 클래스
 		const room	= ROOM;
 		/***
 			내부 명령어
@@ -4032,7 +3961,8 @@
 			-기존 명령어 접근을 막거나 주석 처리는 권장하지 않습니다.
 		***/
 		const internalCommands = {
-			["CM.comAdminList"] :		["admin", "show_admin", "adminlist", "adminList", "admins", "show_admins", "어드민", "어드"],
+			["CM.comAdminList"] :		["admin", "show_admin", "adminlist", "adminList", "admin_list", "admins", "show_admins", "어드민", "어드"],
+			["CM.comSleepList"] :		["afks", "afklist", "afk_list", "show_afks"],
 
 			["CM.comRecaptcha"] :		["recaptcha", "리캡챠", "리캡차", "ㄱㄷㅊㅁㅐㅅㅊㅗㅁ", "flzoqci", "flzoqck"],
 
@@ -4099,8 +4029,8 @@
 			["CS.comPrivateChat"] :		["e", "귓속말", "귓말", "귓", "개인", "ㄷ",	"!rnltthrakf", "rnltakf", "rnlt"],
 
 			//	등번호 설정 및 초기화
-			["PS.setAvatar"] :			["avatar", "아바타", "ㅇㅂㅌ", "ㅁㅍㅁㅅㅁㄱ", "등번호", "emdqjsgh"],
-			["PS.resetAvatar"] :		["clear_avatar", "reset_avatar", "avatar_clear", "클리어_아바타", "ㅋㄹㅇ_ㅇㅂㅌ", "칟ㅁㄱ_ㅁㅍㅁㅅㅁㄱ", "리셋_아바타", "clearavatar", "resetavatar", "클리어아바타", "아바타클리어", "ㅋㄹㅇㅇㅂㅌ", "칟ㅁㄱㅁㅍㅁㅅㅁㄱ", "리셋아바타", "초기화아바타", "아바타초기화", "초기화_아바타", "아바타_초기화"],
+			["CM.comAvatar"] :			["avatar", "아바타", "ㅇㅂㅌ", "ㅁㅍㅁㅅㅁㄱ", "등번호", "emdqjsgh"],
+			["CM.comResetAvatar"] :		["clear_avatar", "reset_avatar", "avatar_clear", "클리어_아바타", "ㅋㄹㅇ_ㅇㅂㅌ", "칟ㅁㄱ_ㅁㅍㅁㅅㅁㄱ", "리셋_아바타", "clearavatar", "resetavatar", "클리어아바타", "아바타클리어", "ㅋㄹㅇㅇㅂㅌ", "칟ㅁㄱㅁㅍㅁㅅㅁㄱ", "리셋아바타", "초기화아바타", "아바타초기화", "초기화_아바타", "아바타_초기화"],
 
 			//	채팅 모드 설정
 			["CM.comChatMode"] :		["chatmode", "촘스ㅐㅇㄷ", "챗모드", "채팅모드", "챗", "채팅", "cotahem", "coxldahem", "cot", "coxld"],
@@ -4118,7 +4048,7 @@
 			["CM.infoRanking"] :		["ranking", "rank", "랭킹", "랭", "순", "순위", "fodzld", "tnsdnl"],
 
 			//	맵 정보
-			["CM.infoMaps"] :			["maplist", "maps", "cm", "맵리스트", "맵목록", "map", "맵", "유즈맵", "page", "페이지", "ㅔㅁㅎㄷ", "vpdlwl", "츠"],
+			["CM.infoMaps"] :			["maplist", "map_list", "maps", "cm", "맵리스트", "맵목록", "map", "맵", "유즈맵", "page", "페이지", "ㅔㅁㅎㄷ", "vpdlwl", "츠"],
 		}
 		/***
 			추가 명령어
@@ -4135,7 +4065,7 @@
 		room.onPlayerLeave			= function(player){ 						//		플레이어 퇴장 이벤트
 			TS.addTimer("gm_onPlayerLeave", () => GM.onPlayerLeave(player));
 		}
-		room.onPlayerActivity		= (player) => PS.onPlayerActivity(player);	//		플레이어 동작 응답 이벤트
+		room.onPlayerActivity		= (player) => PM.onPlayerActivity(player);	//		플레이어 동작 응답 이벤트
 																				//		플레이어 강제 퇴장 이벤트
 		room.onPlayerKicked			= (kickedPlayer, reason, ban, byPlayer) => AMN.onPlayerKicked(kickedPlayer, reason, ban, byPlayer);
 
@@ -4155,7 +4085,7 @@
 																				//		킥 제한 이벤트
 		room.onKickRateLimitSet		= (min, rate, burst, player) => GM.onKickRateLimitSet(min, rate, burst, player);
 		room.onPlayerTeamChange		= function(player, byPlayer){ 				//		팀 교체 이벤트
-			PS.onPlayerTeamChange(player, byPlayer);
+			PM.onPlayerTeamChange(player, byPlayer);
 			SC.onPlayerTeamChange(player, byPlayer);
 		}
 		room.onTeamVictory			= (scores)		=> GM.onTeamVictory(scores);		//	팀 승리 이벤트
