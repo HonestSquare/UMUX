@@ -1,5 +1,5 @@
 		/***
-			API LEVEL: 10(4.0 b8; Build 943)
+			API LEVEL: 10(4.0 b9; Build 949)
 			===<README>===
             UMUX Beta Program(이하 UMBP)은 보다 빠르게
             UMUX의 신버전을 체험해 볼 수 있는 프로그램입니다.
@@ -27,14 +27,14 @@
 		const	HOSTNAME 	= "서버 매니저";
 		const	PUBLIC 		= true;
 											//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGMMi3l_elPRmHUNXg.v4y3X4UQArE";
+		const	TOKEN		= "thr1.AAAAAGMV8coKct7_ExhskQ.Ia_jaBnmOqM";
 		const	NOPLAYER	= true;
 											//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";
 		const	LAT			= 37.566667 + (Math.floor(Math.random() * 4000) - 2000) / 10000;
 		const	LON			= 126.978406 + (Math.floor(Math.random() * 4000) - 2000) / 10000;
 		let		PASSWORD	= " ";
-		
+
 		const MAXPLAYERS 	= (MAXLIMIT < 2 ? 2 : (MAXLIMIT > 30 ? 30 : MAXLIMIT));
 		const INITSERVER	= str => {		//	초기 비번 설정, 서버 초기화
 			let isWhiteSpace = s => s == undefined ? true : s.trim().length == 0;		//	공백 문자 확인
@@ -265,7 +265,9 @@
 			}
 			onGameStop(player){				//			게임 종료 이벤트
 				this._gameStats = c_GAME_STATS.STOP;
-				SC.clearTouchedList();		//	선두자 명단 모두 지우기
+				SC.clearTouchedList();			//	선두자 명단 모두 지우기
+				//	타이머 제거
+				TS.clearTimerByName("goal");
 				if(PM.isValid(player)){
 					PM.updateTime(player.id);		//	마지막 활동 시간 저장
 					SYS.log(true, "%d(이)가 경기를 종료함", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player.id));
@@ -326,12 +328,12 @@
 				return isUpdate;
 			}
 			onPlayerLeave(player){				//			플레이어 퇴장 이벤트
-				if(!PM.findPlayerById(player.id)._hasKicked)
+				if(!player._hasKicked)
 					SYS.log(true, "퇴장: %d%d", c_LOG_TYPE.BELL, [
-						SYS.showPlayerInfo(player.id, c_PLAYERINFO_TYPE.PUBLIC),
-						(AMN.isBlacklist(player.id) ? "(블랙리스트)" : '')
+						player.showPlayerInfo(c_PLAYERINFO_TYPE.PUBLIC),
+						(AMN.isBlacklist(player._id) ? "(블랙리스트)" : '')
 					]);
-				PM.clearPlayerById(player.id);		//	플레이어 데이터베이스 지우기
+				player.clearPlayer();		//	플레이어 데이터베이스 지우기
 				if(PM.cntPlayers() > 0)		//	접속자가 있으면 권한 갱신
 					AMN.updateAdmins();
 				else{						//	접속자가 없으면 비밀번호 초기화
@@ -417,33 +419,25 @@
 					let getAttacker	= (t, p) => ((!PM.isValid(p) || !PM.findLocalId(p)) ? GM.getTeamName(t) : SYS.showPlayerInfo(p, c_PLAYERINFO_TYPE.NAME) + "님");
 					//	출력
 					let goalTimer = TS.addTimer("goal", () => {
-						let showAvatar = function(order, player, avatar){
-							if(PM.findPlayerList().find(p => p._id == player) == undefined		//	도중 퇴장이나
-							|| PM.findPlayerById(player)._team != attack){						//	팀을 옮긴 경우
-								room.setPlayerAvatar(player);
+						let showAvatar = function(s, t, c){
+							if(PM.findPlayerList().find(p => p._id == t) == undefined		//	도중 퇴장이나
+							|| PM.findPlayerById(t)._team != attack){						//	팀을 옮긴 경우
+								room.setPlayerAvatar(t);
 								return;
 							}
-							if(order % 2 == 0)
-								room.setPlayerAvatar(player, avatar);
+							if(s % 2 == 0)
+								room.setPlayerAvatar(t, c);
 							else
-								room.setPlayerAvatar(player);
-							if(order > 4)
-								return room.setPlayerAvatar(player);
+								room.setPlayerAvatar(t);
 						}
-						let getCurrentOrder = function(to, m){
-							let min = m > 2 ? m : 2
-							let max = to;
-							let pos = Math.floor(max / min);
-							return max - pos * min;
-						}
-						let tmList = TS.findTimers(goalTimer, true);
-						let target = tmList.slice(-1)[0];
-						let currentOrder = getCurrentOrder(target._order, 6);
-						showAvatar(currentOrder, goalTimer.player, '⚽');
+						let tmList = TS.findTimerByName(goalTimer._name, player);
+						let target = tmList.at(-1);
+						let currentOrder = goalTimer.calcCurrentSequence(target._sequence, 2);
+						let totalSequence = goalTimer.calcTotalSequence(target._sequence);
+						showAvatar(currentOrder, goalTimer._player, '⚽');
 						if(PM.isValid(assist)) showAvatar(currentOrder, assist, '👍');
-						if(currentOrder > 4){
+						if(totalSequence > 6)
 							return TS.clearTimerByName(goalTimer._name, goalTimer._player);
-						}
 					}, player, MS, true);
 
 					let sendMsg = function(...rd){
@@ -546,33 +540,6 @@
 				}
 				return false;
 			}
-
-			isAfkPlayer(...args){		//					장기 비활동 플레이어 판정
-				let getArg = function(a){
-					switch(a.length){
-						case 1:		//	isAfkPlayer(player)
-							return [a[0], TS.time, getAfkLimitTime() * MS];
-						case 2:		//	isAfkPlayer(player, delay)
-							return [a[0], TS.time, a[1]];
-						case 3:		//	isAfkPlayer(player, nowTime, delay)
-							return a;
-						default:
-							return false;
-					}
-				}
-				let arg = getArg(args);
-				let player = arg[0], nowTime = arg[1], delay = arg[2];
-
-				if(!delay || delay <= 5) return false;		//	5 이하의 값이면 판정 생략
-				if(!PM.findLocalId(player)) return false;	//	미접속자인 경우
-				//	경기 도중 관전이면 처리 중단
-				if(this._gameStats == c_GAME_STATS.TICK && PM.findPlayerById(player)._team == c_TEAM.SPECTATOR) return false;
-				//	경기 미진행 상태에서 관리자가 아닌 경우 처리 중단
-				if(this._gameStats != c_GAME_STATS.TICK && AMN.getAdmin(player) < 1) return false;
-				//	장기 대기열 명단에 포함되면 처리 중단
-				if(PM.findPlayerById(player)._isSleep) return false;
-				return (Math.abs(nowTime - PM.findPlayerById(player)._time) >= delay);
-			}
 			
 			get cntMatch(){				//					누적 경기 횟수
 				return this._countMatch;
@@ -621,34 +588,33 @@
 				return nameList.hasOwnProperty(value) ? nameList[value] : SYS.sendError(c_ERROR_TYPE.E_ETC);
 			}
 
-			checkAfkPlayer(player){						//		장기 무응답 플레이어 판정
-				let isAfk = function(index, limit){
-					if(!getAfkLimitTime() || getAfkLimitTime() <= 5) return false;		//	5 이하의 값이면 판정 생략
-					if(!PM.findLocalId(player)) return false;							//	미접속자인 경우
+			isAfkPlayer(player){						//		장기 무응답 플레이어 판정
+				let maxTime = GM._afkLimitTime;
+				let isAfk = function(limit){
+					if(!SYS.hasInRange(maxTime, 5, 60 * 60 * 3)) return false;		//	범위 내 값이면 판정 생략
+					if(!PM.findLocalId(player)) return false;						//	미접속자인 경우
+					let target = PM.findPlayerById(player);
 					//	경기 도중 관전이면 처리 중단
-					if(this._gameStats == c_GAME_STATS.TICK && PM.findPlayerById(index)._team == c_TEAM.SPECTATOR) return false;
+					if(GM._gameStats == c_GAME_STATS.TICK && target._team == c_TEAM.SPECTATOR) return false;
 					//	경기 미진행 상태에서 관리자가 아닌 경우 처리 중단
-					if(this._gameStats != c_GAME_STATS.TICK && AMN.getAdmin(index) < 1) return false;
+					if(GM._gameStats != c_GAME_STATS.TICK && target._admin < 1) return false;
 					//	장기 대기열 명단에 포함되면 처리 중단
-					if(PM.findPlayerById(index)._isSleep) return false;
-					return (TS.time - PM.findPlayerById(index)._time >= limit * MS);
+					if(target._isSleep == true) return false;
+					return (TS.time - target._time >= limit * MS);
 				}
-				if(!isAfk(player, getAfkLimitTime())) return false;
-				//	경고 메시지 출력
-				let showAlretMsg = function(target){
-					if(target == player)
-						return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림", "반응이 없으면 퇴장될 수 있습니다", target, (PM.findPlayerById(target)._team == c_TEAM.SPECTATOR ? "!afk" : "!join spec"), c_LIST_COLOR.GRAY);
-					if(AMN.getAdmin(target) < AMN.getAdmin(player)) return;
-					if(PM.findPlayerById(target)._team == c_TEAM.SPECTATOR || PM.findPlayerById(target)._team == PM.findPlayerById(player)._team)
-						return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 안내", "%d님의 반응이 없는 경우, 자동으로 퇴장됩니다", target, ("!join spec " + '#' + player), c_LIST_COLOR.GRAY, null, 0, SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.PUBLIC));
-				}
-				PM.findPlayerList().forEach(p => showAlretMsg(p._id));
-				//	퇴장 처리
-				let afkTimer = TS.addTimer("afkTimer", () => {
-					if(isAfk(afkTimer._player, afkTimer._delay * 3) == false) return;					//	이미 응답한 경우
+				if(!isAfk(maxTime)) return false;
+				PM.findPlayerList().forEach(target => {			//	경고 메시지 출력
+					if(target._id == player)
+						return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림", "반응이 없으면 퇴장될 수 있습니다", target._id, (target._team == c_TEAM.SPECTATOR ? "!afk" : "!join spec"), c_LIST_COLOR.GRAY);
+					if(target._admin < AMN.getAdmin(player)) return;
+					if(target._team == c_TEAM.SPECTATOR || target._team == PM.findPlayerById(player)._team)
+						return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 안내", "%d님의 반응이 없는 경우, 자동으로 퇴장됩니다", target._id, ("!join spec " + '#' + player), c_LIST_COLOR.GRAY, null, 0, SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.PUBLIC));
+				});
+				let afkTimer = TS.addTimer("afkTimer", () => {	//	퇴장 처리
+					if(!isAfk(maxTime)) return;					//	이미 응답한 경우
 					if(PM.findPlayerList().find(p => p._id == afkTimer._player) == undefined) return;	//	퇴장한 경우
-					PM.onPlayerInactivity(PM.findPlayerById(afkTimer._player));
-				}, player, getAfkLimitTime() / 2 * MS);
+					PM.onPlayerInactivity(afkTimer._player);
+				}, player, maxTime / 2 * MS);
 				return true;
 			}
 			checkPublicId(msg, player, hasAllRange){	//		#ID 판별
@@ -920,7 +886,7 @@
 			findBlacklistByAddress(conn){							//		IP로 블랙리스트 찾기
 				return this._blacklist.filter(bl => bl._address == conn);
 			}
-			findMutelist(isPublic){						//					채금 명단 구하기
+			findMutedList(isPublic){						//					채금 명단 구하기
 				return PM.findPlayerList(isPublic).filter(p => p._isMute == true);
 			}
 
@@ -1038,9 +1004,9 @@
 					SYS.log(true, "영구 퇴장 명단을 초기화 함", c_LOG_TYPE.NOTICE);
 				}
 			}
-			clearMuteList(player){				//								채팅 금지 명단 초기화
+			clearMutedList(player){				//								채팅 금지 명단 초기화
 				let isValidByPlayer = PM.isValid(player);
-				let ml = this.findMutelist(true);
+				let ml = this.findMutedList(true);
 				if(ml.length < 1)
 					return isValidByPlayer ? NC.caution("채팅 금지 명단에 새겨진 기록이 아직 없습니다.", player) : SYS.log(false, "이미 데이터가 초기화 되었으므로 접근할 수 없음.", c_LOG_TYPE.WARNING);
 				ml.forEach(p => {
@@ -1170,20 +1136,39 @@
 				if(AMN.getAdmin(player) == 2) return;		//	이미 권한이 있는 경우
 				SYS.log(true, "%d(이)가 최고 권한 로그인을 시도함(실패)", c_LOG_TYPE.WARNING, SYS.showPlayerInfo(player));
 			}
-			mutePlayer(target, byPlayer){		//					|	채팅 금지
+			mutePlayer(target, time, byPlayer){		//					|	채팅 금지
 				// 이미 채팅이 금지돼 있는 경우
 				if(!PM.isValid(target) || PM.findPlayerById(target)._isMute) return;
 				let isValidByPlayer = PM.isValid(byPlayer);
 				PM.setPlayerById(target, "isMute", true);
 				if(isValidByPlayer){
-					NC.locked(true, "%d님이 %d님의 채팅을 금지하였습니다.", null, null, [SYS.showPlayerInfo(byPlayer, c_PLAYERINFO_TYPE.NAME), SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME)]);
-					SYS.log(true, "%d(이)가 %d(이)의 채팅을 금지함.", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(byPlayer), SYS.showPlayerInfo(target)]);
+					NC.locked(true, "%d님이 %d님의 채팅을 %d 금지합니다.", null, null, [
+						SYS.showPlayerInfo(byPlayer, c_PLAYERINFO_TYPE.NAME),
+						SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME),
+						SYS.hasInRange(time, 5, 59) ? "잠시 동안" : time >= 60 ? `${time}초 간` : "한동안"
+					]);
+					SYS.log(true, "%d(이)가 %d(이)의 채팅을 금지함.", c_LOG_TYPE.NOTICE, [
+						SYS.showPlayerInfo(byPlayer),
+						SYS.showPlayerInfo(target),
+						time > 0 ? `${time}초 간` : "무제한"
+					]);
 				}
 				else{
-					NC.locked(true, "%d님의 채팅이 금지되었습니다.", null, null, SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME));
-					SYS.log(true, "%d(이)의 채팅이 금지됨.", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(target));
+					NC.locked(true, "%d님의 채팅이 %d 금지됩니다.", null, null, [
+						SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME),
+						SYS.hasInRange(time, 5, 59) ? "잠시 동안" : time >= 60 ? `${time}초 간` : "한동안"
+					]);
+					SYS.log(true, "%d(이)의 채팅이 %d 금지됨.", c_LOG_TYPE.NOTICE, [
+						SYS.showPlayerInfo(target),
+						time > 0 ? `${time}초 간` : "무제한"
+					]);
 				}
 				SYS.updateListIndex(target);				//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
+				if(time < 5) return;
+				TS.clearTimerByName("mute", target);
+				TS.addTimer("mute", () => {
+					if(PM.findPlayerById(target)._isMute) AMN.unmutePlayer(target);
+				}, target, time * MS);
 			}
 			logonAdmin(player, msg, type){		//						최고 권한 로그인
 				if(type != 2) return AMN.missPassword(player, msg, type);		//	첫 두 글자가 '!!'로 시작하지 않으면 실패 처리
@@ -1202,6 +1187,7 @@
 				room.setPlayerAvatar(target);			//	등번호 초기화
 				SYS.updateListIndex(target);			//	플레이어 데이터베이스에 따라 그래픽 유저 인터페이스 갱신
 				if(!PM.findLocalId(target)) return;		//	미접속자는 별도로 출력하지 않음
+				TS.clearTimerByName("mute", target);
 				if(isValidByPlayer){
 					NC.locked(false, "%d님이 %d님의 채팅을 허용하였습니다.", null, null, [SYS.showPlayerInfo(byPlayer, c_PLAYERINFO_TYPE.NAME), SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME)]);
 					SYS.log(true, "%d(이)가 %d(이)의 금지된 채팅을 허용함.", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(byPlayer), SYS.showPlayerInfo(target)]);
@@ -1264,12 +1250,11 @@
 				}
 				TS.addTimer("announcement", () => {
 					if(PM.isValid(Math.abs(target)) && target < 0){		//	ID가 음수이면 해당 ID를 제외한 모든 플레이어에게 전송
-						for(let p of PM.findPlayerList()){
-							if(Math.abs(target) != p._id) sendMsg(msg, p._id, color, style, sound);
+						for(let p of PM.findPlayerList().filter(p => p._id != Math.abs(target))){
+							sendMsg(msg, p._id, color, style, sound);
 						}
 					}
-					else
-						sendMsg(msg, target, color, style, sound);
+					else sendMsg(msg, target, color, style, sound);
 				}, target, delay);
 			}
 			
@@ -1298,11 +1283,11 @@
 						return;
 					case 6:
 					case 5:		//	5단계: 강제 퇴장+채팅 금지
-						AMN.mutePlayer(player);
+						AMN.mutePlayer(player, 60);
 					case 3:		//	3단계: 강제 퇴장
 						return AMN.setKick(player, c_LIST_ICON.NEGATIVE + "금지어 감지");
 					case 4:		//	4단계: 경고 문구+채팅 금지
-						AMN.mutePlayer(player);
+						AMN.mutePlayer(player, 30);
 					case 2:		//	2단계: 경고 문구
 						let msg = [
 							"방금 한 말에 금지어가 포함돼 있어요.",
@@ -1383,7 +1368,7 @@
 			findPlayerById(target){
 				return this._playerList.find(p => p._id == target);
 			}
-			
+
 			set maxFwdCount(limit){					//					금지어 최대 감지량 지정
 				if(limit >= 3 && this._maxFwdCount != limit){ 
 					this._maxFwdCount = limit;
@@ -1392,7 +1377,6 @@
 				else SYS.log(false, "올바르지 않는 값으로 접근됨", c_LOG_TYPE.WARNING);
 			}
 			set maxRptCount(limit){					//					도배 최대 감지량 지정
-				//	비활성화 추가
 				if(limit == false){
 					this._maxRptCount = false;
 					SYS.log(true, "도배 최대 감지량 변경: %d", c_LOG_TYPE.NOTICE, "비활성화");
@@ -1678,11 +1662,11 @@
 							break;
 						case 6:
 						case 5:		//	5단계: 강제 퇴장+채팅 금지
-							AMN.mutePlayer(p);
+							AMN.mutePlayer(p, 60);
 						case 3:		//	3단계: 강제 퇴장
 							return AMN.setKick(p, c_LIST_ICON.NEGATIVE + "도배 감지");
 						case 4:		//	4단계: 경고 문구+채팅 금지
-							AMN.mutePlayer(p);
+							AMN.mutePlayer(p, 30);
 						case 2:		//	2단계: 경고 문구
 							break;
 					}
@@ -1726,27 +1710,37 @@
 			constructor(){
 				
 			}
-			dka(player, msg, type){						//	!대깨알			|	이스터에그
-				if(type != 0) return;
-				NC.announce("전체" + c_LIST_EMOTION[3] + "AlphaGo" + c_LIST_EMOTION[3] + ": 대가리 깨져도 알파고", player, null, (Math.floor(Math.random() * 6)), c_LIST_SOUND.LOUD, (Math.floor(Math.random() * 30) * 100));
+			btg(player, msg, type){						//			이스터에그
+				let lnList = ["김", "이", "박", "최", "정", "강", "조", "윤", "장", "임"];
+				let name = lnList.at(Math.floor(Math.random() * lnList.length));
+				let identify = (c, str) => NC.extMsg(getFaceEmoji(c), str, player, null, c_LIST_COLOR.YELLOW);
+				let getFaceEmoji = function(c){
+					let e = c_LIST_EMOTION.at(Math.floor(Math.random() * c_LIST_EMOTION.length));
+					return e + c + "타고" + e;
+				}
+				switch(type){
+					case 0:		//	!배타고
+					case 1:		//	?배타고
+						return identify(name, `안녕하세요, 저는 ${name}타고라고 합니다.`);
+					case 2:		//	!!배타고
+						return identify("배", "여기 이스터 에그 없어요");
+				}
 			}
 			setTeamColors(player, msg, type){						//						!uniform		|	팀 유니폼
 				switch(type){
 					case 0:			//	!uniform
-						let comIndex = msg;
-
-						//	인자값 길이 확인
-						if(!SYS.hasInRange(comIndex.length, 4, 6)){
-							let getMsg = function(len){
-								if(!len) return "유니폼을 적용할 팀을 입력하세요.";
-								switch(len){
+						let len = msg.length;
+						if(!SYS.hasInRange(len, 4, 6)){		//	인자값 길이에 따라 도움말 출력
+							let getMsg = function(l){
+								switch(l){
+									case 0:		return "유니폼을 적용할 팀을 입력하세요."
 									case 1:		return "각도를 지정하지 않았습니다.";
 									case 2:		return "등번호 색상을 지정하지 않았습니다.";
 									case 3:		return "배경 색상을 지정하지 않았습니다.";
-									default:	return "배경 색상은 최대 3가지까지 지정할 수 있습니다.";
+									default:	return "배경은 최대 3가지 색상을 조합할 수 있습니다.";
 								}
 							}
-							return NC.caution(getMsg(comIndex.length), player, "?uniform");
+							return NC.caution(getMsg(len), player, "?uniform");
 						}
 
 						//	팀 ID 확인
@@ -1760,19 +1754,20 @@
 									return null;
 							}
 						}
-						let team = getTeam(comIndex[0]);
+						let team = getTeam(msg[0]);
 						if(team == null) return NC.caution("유니폼을 적용할 팀을 지정하지 않았습니다.", player, "?uniform");
 
 						//	각도 범위 확인
-						let angle = parseInt(comIndex[1]);
+						let angle = parseInt(msg[1]);
 						if(!SYS.hasInRange(angle, 0, 180)) return NC.caution("각도는 0°~180° 사이의 값으로 입력해야 합니다.", player, "?uniform");
 
 						//	색상 코드 확인
 						let getBgColorList = str => str.map(e => NC.getColor(e, true));
-						let bgList = getBgColorList(comIndex.slice(2));
+						let bgList = getBgColorList(msg.slice(2));
 						for(let b of bgList){
 							if(b == null) return NC.caution("색상 코드가 올바르지 않습니다.", player, "?uniform");
 						}
+
 						PM.setTeamColors(team, angle, bgList[0], bgList.slice(1));
 						NC.uniMsg(c_LIST_ICON.NORMAL_BOLD + "유니폼 변경",
 						"%d님이 %d의 유니폼을 변경했습니다." + newLine + "%d",
@@ -1780,7 +1775,7 @@
 						SYS.log(true, "%d(이)가 %d의 유니폼을 변경함 <%d>", c_LOG_TYPE.NOTICE, [SYS.showPlayerInfo(player), GM.getTeamName(team), msg.join(' ')]);
 						break;
 					case 1:			//	?uniform
-						return NC.help("텍스트 색을 FFFFFF, 배경색을 FFCC00 및 AABBCC이고, 각도가 30°인 레드팀 유니폼으로 변경하려면",
+						return NC.help("텍스트 색이 FFFFFF이고 배경이 FFCC00 및 AABBCC이며, 각도가 30°인 레드팀 유니폼으로 변경하려면",
 						"!uniform red 30 FFFFFF FFCC00 AABBCC", player);
 				}
 			}
@@ -1789,8 +1784,8 @@
 					case 0:		//	!도배방지
 						if(!AMN.getAdmin(player)) return CM.helpCom(player, msg, 0);		//	도움말
 						let context = ["도배 방지", "분란 방지", "정숙 유지", "질서 유지", "도배 방지"];
-						NC.announce("〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰" + newLine + context.join(newLine) + newLine + "〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰",
-						null, c_LIST_COLOR.ORANGE, c_LIST_STYLE.BOLD, c_LIST_SOUND.LOUD);
+						NC.announce("%d" + newLine + context.join(newLine) + newLine + "%d",
+						null, c_LIST_COLOR.ORANGE, c_LIST_STYLE.BOLD, c_LIST_SOUND.LOUD, 0, "〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰");
 						SYS.log(true, "%d(이)가 도배 방지 문자를 출력함.", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player));
 						break;
 					case 1:		//	?도배방지
@@ -1959,7 +1954,7 @@
 						return AMN.setKick(target, detail);
 					case 1:		//	?kick
 						return NC.help("공용 ID가 42인 플레이어를 \'%d\'이라는 사유로 퇴장 시키려면", 
-						"!kick #42 %d", player, "민트초코를 지지함");
+						"!kick #42 %d", player, null, "민트초코를 지지함");
 				}
 			}
 			comLockPrivateChat(player, msg, type){					//	!lock_private	|	귓속말 채팅 금지/허용
@@ -2015,9 +2010,17 @@
 						if(!PM.isValid(target)) return CM.comMute(player, msg, 1);	//	대상을 잘못 지목한 경우
 						if(target == player) return NC.caution("자기 자신의 채팅을 금지할 수 없습니다.", player);
 						if(PM.findPlayerById(target)._isMute) return NC.caution("%d님의 채팅은 이미 금지돼 있습니다.", player, ("!unmute " + '\#' + target), SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME));
-						return AMN.mutePlayer(target, player);
+						return AMN.mutePlayer(target, 0, player);
 					case 1:			//	?mute
 						return NC.help("공용 ID가 42인 플레이어의 채팅을 금지하려면", "!mute #42", player);
+				}
+			}
+			comMutedList(player, msg, type){				//						채팅 금지 명단 조회 명령어
+				switch(type){
+					case 0:		//	!muted_list
+						return PM.showMutedList(player);
+					case 1:		//	?muted_list
+						break;
 				}
 			}
 			comPinHost(player, msg, type){					//	!lock_host		|	방장 이동 설정
@@ -2119,7 +2122,7 @@
 				switch(type){
 					case 0:			//	!unmute
 						if(!AMN.getAdmin(player)) return NC.acess(player);		//	권한이 없는 경우
-						if(msg == "all") return AMN.clearMuteList(player);		//	영구 퇴장 목록 초기화
+						if(msg == "all") return AMN.clearMutedList(player);		//	영구 퇴장 목록 초기화
 						let target = msg.length > 0 ? GM.checkPublicId(msg[0], player) : null;
 						if(PM.isValid(target)){
 							if(!PM.findPlayerById(target)._isMute)				//	채금자가 아닐 경우
@@ -2133,7 +2136,7 @@
 
 			helpBot(player, msg, type){							//	!bothelp		|	서버 도움말
 				if(type != 0) return;
-				return CS.showHelpCommandList("서버", [
+				return CS.showHelpCommandList("시스템", [
 					["!about(정보)", "!admin_list(관리자 명단)"],
 					["!kick #ID(강제 퇴장)", "!r(시작/종료)", "!rr(재시작)", "!show_pw(비번 표시)", "!set_pw(비번 설정)", "!clear_pw(비번 해제)", "!clear_bans(영구 퇴장 초기화)", "!recaptcha(reCAPTCHA 설정)"]
 				], player);
@@ -2141,14 +2144,14 @@
 			helpChat(player, msg, type){							//	!chathelp		|	채팅 도움말
 				if(type != 0) return;
 				return CS.showHelpCommandList("채팅", [
-					["!e #ID(개인)", "!t(팀별)", "!a(전체)", "!chatmode(기본 채팅 모드)", "!disturb on/off(수신)"],
+					["!e #ID(개인)", "!t(팀별)", "!a(전체)", "!chatmode(기본 채팅 모드)", "!disturb on/off(수신)", "!mute_list(채팅 금지 명단)"],
 					["!freeze/unfreeze(채팅 녹이기/얼리기)", "!mute/unmute #ID(채팅 금지/허용)", "!unmute #ID(채팅 허용)", "!lock_private(귓속말 채팅 금지/허용)", "!도(도배 방지 문자)"]
 				], player);
 			}
 			helpCom(player, msg, type){							//	!help			|	명령어 도움말
 				if(type != 0) return;
 				return CS.showHelpCommandList("일반", [
-					["!bothelp(서버)", "!chathelp(채팅)", "!joinhelp(참가)", "!maphelp(맵)", "!rankhelp(랭킹)", "!scorehelp(점수)"]
+					["!bothelp(시스템)", "!chathelp(채팅)", "!joinhelp(참가)", "!maphelp(맵)", "!rankhelp(랭킹)", "!scorehelp(점수)"]
 				], player);
 			}
 			helpJoin(player, msg, type){ 							//	!joinhelp		|  	참가 도움말
@@ -2224,7 +2227,7 @@
 			}
 			infoRoom(player, msg, type){							//	!about			| 	서버 정보
 				if(type != 0) return;
-				NC.info("봇방", DESCRIPTION
+				NC.info("시스템", DESCRIPTION
 					+ newLine + "릴리스 날짜: " + SYS._releaseDate		//	릴리스 및 업데이트 날짜
 					+ ' | ' + SYS.showInfo(),						//	***UMUX 저작물 표기(이 구문은 지우지 마시오)***
 					null, "!help");
@@ -2319,7 +2322,7 @@
 				SYS.addListIndex(player.id);
 			}
 			onPlayerInactivity(player){				//						플레이어 동작 무응답 체크
-				AMN.setKick(player.id, c_LIST_ICON.NEGATIVE + "비활동 플레이어");
+				AMN.setKick(player, c_LIST_ICON.NEGATIVE + "비활동 플레이어");
 			}
 
 			initPlayerList(player){
@@ -2445,40 +2448,15 @@
 				TS.clearTimerByName("afkAvatar", player);
 				TS.clearTimerByName("afkTimer", player);
 				TS.clearTimerByName("afkCheck", player);
-				room.setPlayerAvatar(player);
 				if(GM.afkLimitTime == false) return;
 				//	장기 무응답 플레이어 판정
-				let afkChckTimer = TS.addTimer("afkCheck", () => { 
-					if(!GM.isAfkPlayer(afkChckTimer._player, afkChckTimer._delay)){ 
-						return;
-					}
-					let showAlretMsg = function(target){					//	경고 메시지 출력
-						if(target == afkChckTimer._player)
-							return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림", "반응이 없으면 퇴장될 수 있습니다", target, (PM.findPlayerById(target)._team == c_TEAM.SPECTATOR ? "!afk" : "!join spec"), c_LIST_COLOR.GRAY);
-						if(AMN.getAdmin(target) < AMN.getAdmin(afkChckTimer._player)) return;
-						if(PM.findPlayerById(target)._team == c_TEAM.SPECTATOR || PM.findPlayerById(target)._team == PM.findPlayerById(afkChckTimer._player).team)
-							return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 안내", SYS.showPlayerInfo(afkChckTimer._player, c_PLAYERINFO_TYPE.PUBLIC) + "님의 반응이 없는 경우, 자동으로 퇴장됩니다", target, ("!join spec " + '#' + afkChckTimer._player), c_LIST_COLOR.GRAY);
-					}
-					PM.findPlayerList().forEach(p => showAlretMsg(p._id));
-					let afkTimer = TS.addTimer("afkTimer", () => {			//	퇴장 처리
-						if(GM.isAfkPlayer(afkTimer._player, afkTimer._delay * 3) == false){ 
-							return;					//	이미 응답한 경우
-						}
-						if(PM.findPlayerList().find(p => p._id == afkTimer._player) == undefined) return;	//	퇴장한 경우
-						PM.onPlayerInactivity(PM.findPlayerById(afkTimer._player));
-					}, afkChckTimer._player, GM.afkLimitTime / 2 * MS);
+				let afkChckTimer = TS.addTimer("afkCheck", () => {
+					if(!GM.isAfkPlayer(afkChckTimer._player)) return;
 					let avatarTimer = TS.addTimer("afkAvatar", () => {		//	등번호 알림
 						let tmList = avatarTimer.findTimerByName();
 						if(!tmList.length) return;
-						let getCurrentOrder = function(to, m){
-							let min = m > 2 ? m : 2
-							let max = to;
-							let pos = Math.floor(max / min);
-							return max - pos * min;
-						}
-						let target = tmList.slice(-1)[0];
-						let currentOrder = getCurrentOrder(target._order, 2);
-						switch(currentOrder){
+						let target = tmList.at(-1);
+						switch(avatarTimer.calcCurrentSequence(target._sequence, 2)){
 							case 0:
 								room.setPlayerAvatar(avatarTimer._player, "잠수");
 								break;
@@ -2503,7 +2481,15 @@
 			resetAvatar(player){						//	등번호 초기화
 				this.findPlayerById(player).resetAvatar();
 			}
-
+			
+			showMutedList(player, isPublic){				//					채팅 금지 명단 출력
+				let getMsg = function(pub){
+					if(CS._isFreeze) return "현재 채팅창이 얼려져 있습니다";
+					let mutes = AMN.findMutedList(pub);
+					return mutes.length > 0 ? mutes.map(p => p.showPlayerInfo(c_PLAYERINFO_TYPE.PUBLIC)).join(" | ") : "비어 있음";
+				}
+				NC.uniMsg(c_LIST_ICON.NORMAL + "채팅 금지 명단", getMsg(isPublic), player);
+			}
 			showSleepList(player, isPublic){				//					장기 대기열 명단 출력
 				let getAfks = function(pub){
 					return PM._playerList.filter(p => {
@@ -2771,7 +2757,7 @@
 						switch(last._id){
 							case player:
 								if(this.hasCommonRange(0, player)){	//	계속 선두하고 있으면
-									TS.clearTimer(ltpTimer.id);	//	타이머 종료
+									TS.clearTimer(ltpTimer._id);	//	타이머 종료
 									break;
 								}
 							default:
@@ -2947,33 +2933,43 @@
 		}
 		/*** 시간 매니저 클래스 ***/
 		class TimeManager{
-			constructor(name, id, func, delay, preId, target){		//	타이머 지정
+			constructor(name, id, func, delay, preId, target, seq){		//	타이머 지정
 				let proc = setTimeout(func, delay);
-				if(!delay || delay < 100) return;	//	간격 시간이 짧으면 데이터베이스 등록 생략
+				let isRepeat = (preId ? true : false);
 				let isEquals = (a, b) => a.toString() === b.toString();
 				let checkFunc = function(timer){	//	중복 타이머가 있으면 지우기
-					if(timer.player != target || timer.proc == proc) return false;
-					if(timer.isRepeat) return false;
-					return isEquals(func, timer.func);
+					if(timer._player != target || timer._proc == proc) return false;
+					if(timer._isRepeat) return false;
+					return isEquals(func, timer._func);
 				}
-				let order = TS.findTimers({"id" : id, "func" : func});
-				this._id		= id;				//			타이머 ID
-				this._name		= name;				//			타이머 이름
-				this._player	= target;			//			플레이어 ID
-				this._time		= TS.time;		//			등록 시간
-				this._delay		= delay;			//			지연 시간
-				this._func		= func;				//			기능 함수
-				this._proc		= proc;				//			타이머 함수
-				this._order 	= (order.length < 1 ? 0 : order[order.length - 1]._order + 1);
-				this._isRepeat	= (preId ? true : false);	//	반복 여부
-				let overloaded = TS._timerList.filter(tm => checkFunc(tm));
-				if(overloaded.length > 0) overloaded.forEach(tm => this.clearTimer());
+
+				this._id		= Object.freeze(id);					//	타이머 ID
+				this._name		= Object.freeze(name);					//	타이머 이름
+				this._player	= Object.freeze(target);				//	플레이어 ID
+				this._time		= Object.freeze(TS.time);				//	등록 시간
+				this._delay		= Object.freeze(delay);					//	지연 시간
+				this._func		= Object.freeze(func);					//	기능 함수
+				this._proc		= Object.freeze(proc);					//	타이머 함수
+				this._sequence	= Object.freeze(seq);
+				this._isRepeat	= Object.freeze(isRepeat);	//	반복 여부
+
+				let overloaded = TS.findTimerByName(name, target).filter(t => t._isRepeat == false);
+				if(overloaded.length > 0) overloaded.forEach(t => !t._id.includes('r'));
 			}
 			findTimerByName(){				//	타이머 이름으로 찾기
 				return TS.findTimerByName(this._name, this._player);
 			}
 			findTimerByPlayer(){			//	타이머 플레이어로 찾기
 				return TS.findTimerByPlayer(this._player);
+			}
+
+			calcCurrentSequence(mx, mn){
+				let min = mn > 2 ? mn : 2
+				let max = (mx - 1) / 2;
+				return max - Math.floor(max / min) * min;
+			}
+			calcTotalSequence(seq){
+				return (seq - 1) / 2;
 			}
 
 			clearTimer(){			//						타이머 지우기(ID)
@@ -3038,35 +3034,47 @@
 				return true;
 			}
 
-			addTimer(name, func, player, delay, isRepeat){	//		타이머 추가
+			addTimer(name, func, player, delay, isRepeat, seq){	//		타이머 추가
 				if(name == undefined || name == null) return SYS.log("타이머는 고유의 이름을 가져야 합니다.", c_LOG_TYPE.ERROR);
-				if(this._timerList == undefined)			//			데이터베이스가 없으면 초기화
-					this._timerList.splice(0);
-				let startId = this.time + '-' + (this._timerList.filter(tm => tm.length > 0 && tm._id.split('-')[0] == this.time)).length;
+				let getStartOrder = function(str){
+					if(seq > 0) return seq;
+					let targets = TS.findTimerByName(str, player);
+					switch(targets.length){
+						case 0:
+						case 1:
+						case 2:
+							return 0;
+						default:
+							return targets.at(-1)._sequence + 1;
+					}
+				}
+				let startId = this.time + '-' + this._timerList.filter(t => t._id.split('-')[0] == this.time).length;
 				let repeatId = startId + 'r';
-				let initTimer = (name, id, func, delay, preId, target) => this._timerList.push(new TimeManager(name, id, func, delay, preId, target));
-				initTimer(name, startId, func, delay, (isRepeat ? startId : null), player);
+				let initTimer = (name, id, func, delay, preId, target, seq) => this._timerList.push(new TimeManager(name, id, func, delay, preId, target, seq));
+				initTimer(name, startId, func, delay, (isRepeat ? startId : null), player, getStartOrder(name));
 				if(isRepeat == true){
 					if(!delay || delay < 100)
 						return SYS.log(false, "너무 짧은 간격 시간은 성능에 영향을 끼칠 수 있습니다", c_LOG_TYPE.WARNING);
 					if(SYS.hasInRange(delay, MS / 10, MS - 1))
-						SYS.log(false, "너무 짧은 간격 시간은 성능에 영향을 끼칠 수 있습니다"
-						+ newLine + "타이머 ID: " + startId + newLine + "타이머 이름: " + name, c_LOG_TYPE.WARNING);
+                        SYS.log(false, "너무 짧은 간격 시간은 성능에 영향을 끼칠 수 있습니다"
+                        + newLine + "타이머 ID: %d | 타이머 이름: %d", c_LOG_TYPE.WARNING, [startId, name]);
 					initTimer(name, repeatId, (() => {
-						this.addTimer(name, func, player, delay, true);
+						this.addTimer(name, func, player, delay, true, getStartOrder(name) + 2);
 						if(this.findTimerById(startId) == undefined) return;
 						if(this.findTimerById(repeatId) == undefined) return;
-					}),
-					delay, startId, player);
+					}), delay, startId, player, getStartOrder(name) + 1);
 				}
-				let resetTimer = function(t){
-					if(SYS.hasInRange(TS.time - t._time , 0, (t._isRepeat ? 2 : 1) * t._delay)) return;
-					if(t._id == startId && t._isRepeat == true) return;
-					TS.clearTimer(t._id);
-				}
-				this._timerList.forEach(t => resetTimer(t));		//	이미 처리한 타이머 지우기
+				this._timerList.filter(t => {			//	이미 처리한 타이머 지우기
+					if(SYS.hasInRange(this.time - t._time, 0, (t._isRepeat ? 2 : 1) * t._delay)) return false;
+					if(t._id == startId && t._isRepeat == true) return false;
+					return true;
+				}).forEach(t => {
+					if(!delay) this._timerList.splice(this._timerList.indexOf(t), 1);
+					else this.clearTimer(t._id);
+				});
 				//	타이머 ID로 반환
-				return (!delay || delay < 100 ? false : this.findTimerById(startId));
+				if(delay >= 100) return this.findTimerById(startId);
+				return false;
 			}
 			
 			showCurrentTime(type){		//							시간 출력
@@ -3090,6 +3098,7 @@
 
 			findTimerById(findId){				//	타이머 ID로 찾기
 				if(this._timerList == undefined) return undefined;
+				if(!findId) return undefined;
 				return this._timerList.find(tm => tm._id == findId);
 			}
 			findTimerByName(name, player){				//	타이머 이름으로 찾기
@@ -3113,7 +3122,7 @@
 					});
 				}				
 				let timers = getEqualTimers(target);
-				if(target.isRepeat){			//	반복 타이머 포함
+				if(target._isRepeat){			//	반복 타이머 포함
 					let rpTm = this.findTimerById(target._id + 'r');
 					if(rpTm) timers.concat(getEqualTimers(rpTm));
 				}
@@ -3122,13 +3131,9 @@
 
 			clearTimer(findId){		//						타이머 지우기(ID)
 				let timer = this.findTimerById(findId);
-				if(timer == undefined) return;			//	없으면 처리 종료
-				for(let i = 0; i < this._timerList.length; i++){
-					if(this._timerList[i]._id == timer._id){
-						clearTimeout(timer._proc);		//	타이머 제거
-						this._timerList.splice(i, 1);		//	대기열 제거		
-					}
-				}
+				if(timer == undefined || timer._id == undefined) return;			//	없으면 처리 종료
+				clearTimeout(timer._proc);
+				this._timerList.splice(this._timerList.indexOf(timer), 1);	//	목록에서 제거
 			}
 			clearTimerByFunc(target){		//						타이머 지우기(구문)
 				let timers = this.findTimers(target, true);
@@ -3344,16 +3349,13 @@
 						[true, "노래하는메시", "3231312E3230392E37362E323038"], [true, "노래하는메시", "3138332E3130382E3138312E313538"],
 						[true, "노래하는메시", "3131322E3136362E3133362E3331"], [true, "노래하는메시", "3131332E35322E3139362E313733"],
 						[true, "노래하는메시", "35382E3134302E3231312E323237"], [true, "노래하는메시", "3132312E3134392E322E313539"],
-						[true, "노래하는메시", "35382E3134302E3231302E3730"],
-						[true, "노래하는메시", "3231312E3235302E3138382E313035"],
-						[true, "노래하는메시", "3132342E352E31332E323237"],
-						[true, "노래하는메시", "33392E3131382E3132302E3534"],
-						[true, "노래하는메시", "3138302E38332E39312E323139"],
-						[true, "노래하는메시", "35382E3134332E3138312E313035"],
-						[true, "노래하는메시", "3132342E352E392E313331"],
-						[true, "노래하는메시", "3131382E3234312E3131382E3236"],
-						[true, "노래하는메시", "3231312E3230332E3235352E3634"],
-						[true, "노래하는메시", "3136382E3132362E38392E313335"],
+						[true, "노래하는메시", "35382E3134302E3231302E3730"], [true, "노래하는메시", "3231312E3235302E3138382E313035"],
+						[true, "노래하는메시", "3132342E352E31332E323237"], [true, "노래하는메시", "33392E3131382E3132302E3534"],
+						[true, "노래하는메시", "3138302E38332E39312E323139"], [true, "노래하는메시", "35382E3134332E3138312E313035"],
+						[true, "노래하는메시", "3132342E352E392E313331"], [true, "노래하는메시", "3131382E3234312E3131382E3236"],
+						[true, "노래하는메시", "3231312E3230332E3235352E3634"], [true, "노래하는메시", "3136382E3132362E38392E313335"],
+                        [true, "노래하는메시", "3132342E35342E3137352E38"],
+                        [true, "노래하는메시대작전", "3131382E3137362E34372E313332"],
 						[true, undefined, "3138322E3232342E33312E313031"],
 						[true, undefined, "3131362E3132312E3233352E3830"],
 						[true, undefined, "3231312E3234332E3232322E3733"],
@@ -3612,7 +3614,7 @@
 				titleNodes[2].forEach(tn => this.addWebElement(dbBlueTd, tn));
 				//	---팀 개별 노드 생성---
 				for(let i = 0; i < MAXPLAYERS; i++){
-					let dbRedNodes	= document.createElement("pre");	this.initAttributeId(dbRedNodes, 'r' + 0);
+                    let dbRedNodes	= document.createElement("pre");	this.initAttributeId(dbRedNodes, 'r' + 0);
 					initCssClass(dbRedNodes, "nodeCom");
 					this.initAttributeColors(dbRedNodes, c_LIST_COLOR.BG_CONTAINER, c_LIST_COLOR.TEXT_STATUS);
 					let dbSpecNodes	= document.createElement("pre");	this.initAttributeId(dbSpecNodes, 's' + 0);
@@ -3877,11 +3879,10 @@
 				[arr[a], arr[b]] = [arr[b], arr[a]];	//	구조 분해 할당(a, b를 b, a로 자리 교체)
 			}
 		}
-		const TM 	= new TimeManager();					//	시간 관리 클래스
 		const TS	= new TimeSystem(c_TIME_TYPE.NORMAL);	//	시간 관리 클래스
 		const SYS	= new GameSystem(						//	시스템 클래스
 			/* 버전, 릴리스 일자, 개발자 버전 유무, 데모 모드 유무, 비밀번호 고정 유무 */
-			"v10.0", "2021.03.23", true, true, false
+			"v10.0", "2022.09.05", true, true, false
 		);
 		const GM 	= new GameManager(						//	게임 매니저 클래스
 			/* 장기 무응답 플레이어 판정 시간, 도달 기준 시간  */
@@ -3908,10 +3909,11 @@
 			-기존 명령어 접근을 막거나 주석 처리는 권장하지 않습니다.
 		***/
 		const internalCommands = {
-			["CM.comAdminList"] :		["admin", "show_admin", "adminlist", "adminList", "admin_list", "admins", "show_admins", "어드민", "어드"],
-			["CM.comSleepList"] :		["afks", "afklist", "afk_list", "show_afks"],
+			["CM.comAdminList"] :		["admin", "show_admin", "adminlist", "adminList", "admin_list", "admins", "show_admins", "어드민", "어드", "어드명단", "어드목록", "관리자", "관리명단", "관리목록", "권한명단", "권한목록"],
+			["CM.comMutedList"]	:		["mutes", "mutedlist", "muted_list", "mutedList", "mutelist", "mute_list", "muteList", "채팅금지명단", "채금명단", "채금자", "채금목록"],
+			["CM.comSleepList"] :		["afks", "afklist", "afk_list", "show_afks", "잠수명단", "잠수자", "잠수목록"],
 
-			["CM.comRecaptcha"] :		["recaptcha", "리캡챠", "리캡차", "ㄱㄷㅊㅁㅐㅅㅊㅗㅁ", "flzoqci", "flzoqck"],
+			["CM.comRecaptcha"] :		["recaptcha", "리캡챠", "리캡차", "ㄱㄷㅊㅁㅐㅅㅊㅗㅁ", "flzoqci", "flzoqck", "로봇"],
 
 			["CM.comKick"] :			["kick", "킥", "강제퇴장", "퇴장", "강퇴", "ㅏㅑ차", "zlr", "rkdwpxhlwkd", "xhlwkd", "rkdxhl"],
 			["CM.comResetGame"] :		["rr", "ㄱㄱ", "리", "re"],	//	다시 시작
@@ -3951,7 +3953,7 @@
 				"about", "aboutinfo", "info", "aboutver", "verinfo", "version", "버전", "ver", "정보", "wjdqh"
 			],
 
-			["CM.dka"] : ["대깨알", "대가리", "알파고"]			//	이스터 에그
+			["CM.btg"] : ["알파고", "파고", "배타고", "베타고", "타고", "alphaGo", "AlphaGo", "alphago", "betaGo", "BetaGo", "betago"]			//	이스터 에그
 		}
 		/***
 			표준 명령어
@@ -4010,7 +4012,7 @@
 			GM.onPlayerJoin(player);
 		}
 		room.onPlayerLeave			= function(player){ 						//		플레이어 퇴장 이벤트
-			TS.addTimer("gm_onPlayerLeave", () => GM.onPlayerLeave(player));
+			TS.addTimer("gm_onPlayerLeave", () => GM.onPlayerLeave(PM.findPlayerById(player.id)));
 		}
 		room.onPlayerActivity		= (player) => PM.onPlayerActivity(player);	//		플레이어 동작 응답 이벤트
 																				//		플레이어 강제 퇴장 이벤트
