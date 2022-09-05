@@ -1,4 +1,4 @@
-// API LEVEL(VERSION): 8(2.2.0 r19)
+// API LEVEL(VERSION): 8(2.2.0 r20)
 //==========================================<README>==========================================
 // 유즈맵 대표카페(이하 UM)에서 진행하고 있는 한국어화 유즈맵 봇방 프로젝트로, 
 // 사용자 인터페이스(UI)뿐만 아니라 플레이의 매사 모든 순간까지 아우르는 사용자 경험(UX)입니다.
@@ -2052,7 +2052,7 @@ class IoSystem{
 		this.initialized = false;
 		this.VersionRoom 			= "v1.00";			// 방 버전
 		this.VersionUMUX  			= "2.2.0";			// UMUX 버전(건드리지 마시오)
-		this.SecurityPatchLevel		= "2022.06.01";		// UMUX 보안 패치 수준(건드리지 마시오)
+		this.SecurityPatchLevel		= "2022.09.01";		// UMUX 보안 패치 수준(건드리지 마시오)
 		this.log = function(io, msg){
 			if(msg){
 				if(!io) return console.log(TM.showDate() + ' ◀ ' + msg);		// 입력
@@ -2106,13 +2106,20 @@ class IoSystem{
 				PS.initBlacklist(true, undefined, "3132342E35332E3137362E3831"),
 				PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), PS.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), PS.initBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
 
-				    
+				
 				PS.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), PS.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"), PS.initBlacklist(true, "노래하는메시", "3232312E3135312E3132312E313731"), PS.initBlacklist(true, "노래하는메시", "3232302E37362E3230302E35"), PS.initBlacklist(true, "노래하는메시", "3231312E3232342E3232392E313637"), PS.initBlacklist(true, "노래하는메시", "3232302E37352E3230392E3637"), PS.initBlacklist(true, "노래하는메시", "3136332E3138302E3131382E313734"), PS.initBlacklist(true, "노래하는메시", "3231312E3230342E3132352E323430"), PS.initBlacklist(true, "노래하는메시", "35382E3233332E38302E3532"), PS.initBlacklist(true, "노래하는메시", "3138332E3130322E34332E313735"), PS.initBlacklist(true, "노래하는메시", "3132312E3139302E3233332E313635"), PS.initBlacklist(true, "노래하는메시", "3131392E3139322E3235342E323438"), PS.initBlacklist(true, "노래하는메시", "3132312E3134332E3133342E3637"), PS.initBlacklist(true, "노래하는메시", "3232322E3131322E34392E313630"),
 				PS.initBlacklist(true, "노래하는메시", "3132352E3133322E39392E3338"), PS.initBlacklist(true, "노래하는메시", "3231302E3132312E3136352E3337"), PS.initBlacklist(true, "노래하는메시", "3232312E3136352E37392E323338"), PS.initBlacklist(true, "노래하는메시", "3232302E37392E3137382E323230"), PS.initBlacklist(true, "노래하는메시", "3232322E3131372E3132322E3433"),
 				PS.initBlacklist(true, "노래하는메시", "312E3233312E36322E313335"), PS.initBlacklist(true, "노래하는메시", "3232302E37322E39362E3637"), PS.initBlacklist(true, "노래하는메시", "3132312E3136322E3231332E323130"), PS.initBlacklist(true, "노래하는메시", "3232312E3135352E3234342E313532"), PS.initBlacklist(true, "노래하는메시", "3132312E3133302E31332E3938"), PS.initBlacklist(true, "노래하는메시", "3231312E3235302E3138382E3437"),
 				PS.initBlacklist(true, "노래하는메시", "3231312E3230392E37362E323038"), PS.initBlacklist(true, "노래하는메시", "3138332E3130382E3138312E313538"),
 				PS.initBlacklist(true, "노래하는메시", "3131322E3136362E3133362E3331"), PS.initBlacklist(true, "노래하는메시", "3131332E35322E3139362E313733"),
 				PS.initBlacklist(true, "노래하는메시", "35382E3134302E3231312E323237"), PS.initBlacklist(true, "노래하는메시", "3132312E3134392E322E313539"),
+				PS.initBlacklist(true, "노래하는메시", "35382E3134302E3231302E3730"), PS.initBlacklist(true, "노래하는메시", "3231312E3235302E3138382E313035"),
+				PS.initBlacklist(true, "노래하는메시", "3132342E352E31332E323237"), PS.initBlacklist(true, "노래하는메시", "33392E3131382E3132302E3534"),
+				PS.initBlacklist(true, "노래하는메시", "3138302E38332E39312E323139"), PS.initBlacklist(true, "노래하는메시", "35382E3134332E3138312E313035"),
+				PS.initBlacklist(true, "노래하는메시", "3132342E352E392E313331"), PS.initBlacklist(true, "노래하는메시", "3131382E3234312E3131382E3236"),
+				PS.initBlacklist(true, "노래하는메시", "3231312E3230332E3235352E3634"), PS.initBlacklist(true, "노래하는메시", "3136382E3132362E38392E313335"),
+				PS.initBlacklist(true, "노래하는메시", "3132342E35342E3137352E38"),
+				PS.initBlacklist(true, "노래하는메시대작전", "3131382E3137362E34372E313332"),
 
 				PS.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
 				PS.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
