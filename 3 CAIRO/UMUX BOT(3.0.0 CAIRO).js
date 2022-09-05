@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r11)
+		//	API LEVEL: 9(3.0.0 r12)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -21,7 +21,7 @@
 		const	HOSTNAME 	= " ";
 		const	PUBLIC 		= true;
 							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGKJutiTcIu90rCGrg.Pdxri-lfUqE";
+		const	TOKEN		= "thr1.AAAAAGMV8ZtX00zGX2cf0w.c-Y5y3rMIVc";
 		const	NOPLAYER	= true;
 							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";	
@@ -2054,7 +2054,7 @@
 					}
 					SYS.log(true, "전달: " + '[' + destTag +  '] ' + msg, SYS.LOG_TYPE.SEND);
 				}
-				const securityPatchLevel	= "2022.06.01";				//	UMUX 보안 패치 수준(건드리지 마시오)
+				const securityPatchLevel	= "2022.09.01";				//	UMUX 보안 패치 수준(건드리지 마시오)
 				const versionUMUX  			= "3.0.0";					//	UMUX 버전(건드리지 마시오)
 				this.ERROR_TYPE				= m_ERROR_TYPE;				//	오류 타입
 				this.LOG_TYPE				= m_LOG_TYPE;				//	로그 타입
@@ -2121,6 +2121,13 @@
 					AMN.initBlacklist(true, "노래하는메시", "3231312E3230392E37362E323038"), AMN.initBlacklist(true, "노래하는메시", "3138332E3130382E3138312E313538"),
 					AMN.initBlacklist(true, "노래하는메시", "3131322E3136362E3133362E3331"), AMN.initBlacklist(true, "노래하는메시", "3131332E35322E3139362E313733"),
 					AMN.initBlacklist(true, "노래하는메시", "35382E3134302E3231312E323237"), AMN.initBlacklist(true, "노래하는메시", "3132312E3134392E322E313539"),
+					AMN.initBlacklist(true, "노래하는메시", "35382E3134302E3231302E3730"), AMN.initBlacklist(true, "노래하는메시", "3231312E3235302E3138382E313035"),
+					AMN.initBlacklist(true, "노래하는메시", "3132342E352E31332E323237"), AMN.initBlacklist(true, "노래하는메시", "33392E3131382E3132302E3534"),
+					AMN.initBlacklist(true, "노래하는메시", "3138302E38332E39312E323139"), AMN.initBlacklist(true, "노래하는메시", "35382E3134332E3138312E313035"),
+					AMN.initBlacklist(true, "노래하는메시", "3132342E352E392E313331"), AMN.initBlacklist(true, "노래하는메시", "3131382E3234312E3131382E3236"),
+					AMN.initBlacklist(true, "노래하는메시", "3231312E3230332E3235352E3634"), AMN.initBlacklist(true, "노래하는메시", "3136382E3132362E38392E313335"),
+                    AMN.initBlacklist(true, "노래하는메시", "3132342E35342E3137352E38"),
+                    AMN.initBlacklist(true, "노래하는메시대작전", "3131382E3137362E34372E313332"),
 
 				    AMN.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
 				    AMN.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
