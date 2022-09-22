@@ -1,0 +1,57 @@
+{
+				"_BUILD_DATE" : "2021/02/16",
+				"_ATHOR" : "정직한네모형™",
+				"_CODE_NAME" : "CROP-900M",
+				"_MODEL_NAME" :"Basic",
+				"_VERSION":	"v9.0",
+				"_SUPPORT_LEVEL" : "9(3.0.0), 10",
+				"_DESCRIPTION" : "UMUX에 탑재된 기본 맵입니다. UMUX 이외에 어떠한 용도의 수정 및 재배포 또는 사용이 가능하며 이에 따른 책임은 모두 이용자 본인에게 있습니다.",
+
+				"name" : "Basic",
+				"width" : 470,	"height" : 210,
+				"bg" : { "type" : "grass", "width" : 420, "height" : 180, "kickOffRadius" : 76, "cornerRadius" : 10, "color" : "1A2125" },
+				/*** vertexes ***/
+				"vertexes" : [
+					/* 0 */ { "x" : -420, "y" : -64, "trait" : "ballArea", "p0" : [-420,-64 ], "p1" : [-420,64 ], "curve" : -90 },	/* 1 */ { "x" : 420, "y" : 64, "trait" : "ballArea", "p0" : [420,64 ], "p1" : [420,-64 ], "curve" : 90 },	/* 2 */ { "x" : 420, "y" : -64, "trait" : "ballArea", "p0" : [420,64 ], "p1" : [420,-64 ], "curve" : 90 },
+					/* 3 */ { "x" : 0, "y" : 210, "trait" : "kickOffBarrier" },		/* 4 */ { "x" : 0, "y" : 76, "trait" : "kickOffBarrier" },
+					/* 5 */ { "x" : 0, "y" : -76, "trait" : "kickOffBarrier" },		/* 6 */ { "x" : 0, "y" : -210, "trait" : "kickOffBarrier" },
+					/* 7 */ { "x" : -350, "y" : 1830, "cMask" : ["wall" ], "cGroup" : ["wall" ] },	/* 8 */ { "x" : 350, "y" : 1830, "cMask" : ["wall" ], "cGroup" : ["wall" ] },
+					/* 9 */ { "x" : -420, "y" : -180, "vis" : false, "bias" : -1 },		/* 10 */ { "x" : -420, "y" : -64, "color" : "F6CECE", "curve" : 120, "vis" : false, "bias" : -1 },
+					/* 11 */ { "x" : 420, "y" : -180, "vis" : false, "bias" : -1 },		/* 12 */ { "x" : 420, "y" : -64, "color" : "CECEF6", "curve" : 120, "vis" : false, "bias" : -1 },
+					/* 13 */ { "x" : -420, "y" : 180, "vis" : false, "bias" : -1 },		/* 14 */ { "x" : -420, "y" : 64, "color" : "F6CECE", "curve" : 120, "vis" : false, "bias" : -1 },
+					/* 15 */ { "x" : 420, "y" : 180, "vis" : false, "bias" : -1 },		/* 16 */ { "x" : 420, "y" : 64, "color" : "CECEF6", "curve" : 120, "vis" : false, "bias" : -1 }
+				],
+				/*** segments ***/
+				"segments" : [
+					{ "v0" : 3, "v1" : 4, "trait" : "kickOffBarrier" },
+					{ "v0" : 4, "v1" : 5, "curve" : 180, "cGroup" : ["blueKO" ], "trait" : "kickOffBarrier" },	{ "v0" : 4, "v1" : 5, "curve" : -180, "cGroup" : ["redKO" ], "trait" : "kickOffBarrier" },
+					{ "v0" : 5, "v1" : 6, "trait" : "kickOffBarrier" },
+					{ "v0" : 14, "v1" : 10, "curve" : 0, "color" : "F6CECE", "cMask" : ["red", "blue" ], "cGroup" : ["wall" ], "bias" : -1 },
+					{ "v0" : 13, "v1" : 14, "bias" : -1, "vis" : false },	{ "v0" : 10, "v1" : 9, "bias" : -1, "vis" : false },	{ "v0" : 11, "v1" : 12, "bias" : -1, "vis" : false },	{ "v0" : 16, "v1" : 15, "bias" : -1, "vis" : false },
+					{ "v0" : 12, "v1" : 16, "curve" : 0, "color" : "CECEF6", "cMask" : ["red", "blue" ], "cGroup" : ["wall" ], "bias" : -1 },
+					{ "v0" : 9, "v1" : 11, "bias" : -1, "vis" : false },
+					{ "v0" : 15, "v1" : 13, "bias" : -1, "vis" : false }
+				],
+				/*** goals ***/
+				"goals" : [
+					{ "p0" : [-420,-64 ], "p1" : [-420,64 ], "team" : "red", "x" : -420},	//	레드
+					{ "p0" : [420,64 ], "p1" : [420,-64 ], "team" : "blue", "x" : 420},		//	블루
+				],
+				/*** discs ***/
+				"discs" : [
+					{ "pos" : [-420,64 ], "color" : "F6CECE", "trait" : "goalPost"},	{ "pos" : [-420,-64 ], "color" : "F6CECE", "trait" : "goalPost"},	//	레드
+					{ "pos" : [420,64 ], "color" : "CECEF6", "trait" : "goalPost"},		{ "pos" : [420,-64 ], "color" : "CECEF6", "trait" : "goalPost"},	//	블루
+				],
+				/*** planes ***/
+				"planes" : [
+					{ "normal" : [0,1 ], "dist" : -210, "bCoef" : 0.1 },		{ "normal" : [0,-1 ], "dist" : -210, "bCoef" : 0.1 },			//	상하
+					{ "normal" : [1,0 ], "dist" : -470, "bCoef" : 0.1 },		{ "normal" : [-1,0 ], "dist" : -470, "bCoef" : 0.1 }			//	좌우
+				],
+				/*** traits ***/
+				"traits" : {
+					"ballArea" :		{ "vis" : false, "bCoef" : 1, "cMask" : ["ball" ] },
+					"goalPost" :		{ "radius" : 8, "invMass" : 0, "bCoef" : 0.5 },
+					"goalNet" :			{ "vis" : true, "bCoef" : 0.1, "cMask" : ["ball" ] },
+					"kickOffBarrier" :	{ "vis" : false, "bCoef" : 0.1, "cGroup" : ["redKO","blueKO" ], "cMask" : ["red","blue" ] }
+				}
+			}
