@@ -4,4 +4,5 @@
 - 아래 문서상의 조건을 위배하지 않는다면 누구나 자유롭게 수정이 가능합니다.
   - [사용자 가이드라인](github.com/HonestSquare/UMUX/wiki/UMUX-User-Guidelines)
   - [라이센스](github.com/HonestSquare/UMUX/blob/master/LICENCE)
+- 개발자를 위해 소스를 분석하고 해석한 참고서를 제공하고 있습니다
   - [레퍼런스](github.com/HonestSquare/UMUX/wiki/UMUX-Reference_10)
