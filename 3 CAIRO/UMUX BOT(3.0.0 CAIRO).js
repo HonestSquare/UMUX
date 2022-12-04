@@ -1,4 +1,4 @@
-		//	API LEVEL: 9(3.0.0 r12)
+		//	API LEVEL: 9(3.0.0 r13)
 		//==========================================================<README>==========================================================
 		//	유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball headless host API 기반의 한국어화 봇방 프로젝트로,
 		//	겉만 반지르르한 조각에 불과한 사용자 인터페이스(UI)가 아닌,
@@ -21,7 +21,7 @@
 		const	HOSTNAME 	= " ";
 		const	PUBLIC 		= true;
 							//	token; You can obtain it at https://www.haxball.com/rs/api/getheadlesstoken
-		const	TOKEN		= "thr1.AAAAAGMV8ZtX00zGX2cf0w.c-Y5y3rMIVc";
+		const	TOKEN		= "thr1.AAAAAGOMJcmOT_WsxwnPag.t5bV1RXVC-Q";
 		const	NOPLAYER	= true;
 							//	지역 코드, 위도, 경도(기본값 기준이며, 위도와 경도는 항상 동적으로 초기화 됨)
 		const	REGION_CODE	= "kr";	
@@ -268,6 +268,7 @@
 						let blacklistMap = [						//	경기장 블랙리스트
 							"rip host",
 							"maymun cetesi tarafindan ziyaret edildin",
+							"İŞİD BOMBACISI EBU BEKUR TARAFINDAN PATLAMAYA MARUZ KALDIN",
 							"Arabadan Atladı Amı Patladı"
 						];
 						let isMatchName		= function(a, b){		//	이름 일치 확인
@@ -2054,7 +2055,7 @@
 					}
 					SYS.log(true, "전달: " + '[' + destTag +  '] ' + msg, SYS.LOG_TYPE.SEND);
 				}
-				const securityPatchLevel	= "2022.09.01";				//	UMUX 보안 패치 수준(건드리지 마시오)
+				const securityPatchLevel	= "2022.12.01";				//	UMUX 보안 패치 수준(건드리지 마시오)
 				const versionUMUX  			= "3.0.0";					//	UMUX 버전(건드리지 마시오)
 				this.ERROR_TYPE				= m_ERROR_TYPE;				//	오류 타입
 				this.LOG_TYPE				= m_LOG_TYPE;				//	로그 타입
@@ -2093,28 +2094,21 @@
 					console.groupEnd();
 					AMN.updatePassword(PASSWORD);
 					//	---슈퍼 블랙리스트 초기화---
-				    AMN.initBlacklist(true, "에드", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "에드", "3131382E33342E3235312E3334"), AMN.initBlacklist(true, "에드", "37342E38322E36302E3832"),AMN.initBlacklist(true, "에드", "36352E34392E3132362E3839"), AMN.initBlacklist(true, "에드", "3132352E3138372E3133352E3239"), AMN.initBlacklist(true, "에드", "37322E35322E38372E3737"), AMN.initBlacklist(true, "에드", "31342E34372E3131322E313232"), AMN.initBlacklist(true, "에드", "3232312E3136352E3136332E313530"), AMN.initBlacklist(true, "에드", "3138322E3232342E33312E313136"), AMN.initBlacklist(true, "에드", "3138332E3130302E3135362E32353"), AMN.initBlacklist(true, "에드", "3138332E3130302E3135362E323532"), AMN.initBlacklist(true, "에드", "3139382E31362E37342E323035"), AMN.initBlacklist(true, "에드", "37342E38322E36302E313739"), AMN.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
+					AMN.initBlacklist(true, "에드", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "에드", "3131382E33342E3235312E3334"), AMN.initBlacklist(true, "에드", "37342E38322E36302E3832"), AMN.initBlacklist(true, "에드", "36352E34392E3132362E3839"), AMN.initBlacklist(true, "에드", "3132352E3138372E3133352E3239"), AMN.initBlacklist(true, "에드", "37322E35322E38372E3737"), AMN.initBlacklist(true, "에드", "31342E34372E3131322E313232"), AMN.initBlacklist(true, "에드", "3232312E3136352E3136332E313530"), AMN.initBlacklist(true, "에드", "3138322E3232342E33312E313136"), AMN.initBlacklist(true, "에드", "3138332E3130302E3135362E32353"), AMN.initBlacklist(true, "에드", "3138332E3130302E3135362E323532"), AMN.initBlacklist(true, "에드", "3139382E31362E37342E323035"), AMN.initBlacklist(true, "에드", "37342E38322E36302E313739"), AMN.initBlacklist(true, "Walker", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "페르난지뉴", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "앙헬리노", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "Man from Wuhan", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "Knife", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "웨인 루니", "34392E3137342E3133332E3131"), AMN.initBlacklist(true, undefined, "34392E3137342E3133332E3131"), AMN.initBlacklist(true, "가즈으앗", "34392E3137342E3133332E3131"), 
 					AMN.initBlacklist(true, "어둠의 악마", "3231392E3234382E3230332E313430"),
-
-				    AMN.initBlacklist(true, "랄랄랄", "3132342E35392E37332E313931"), 
-
-				    AMN.initBlacklist(true, undefined, "3138322E3232342E33312E3330"), AMN.initBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
-				    AMN.initBlacklist(true, undefined, "3137382E36322E352E313537"), AMN.initBlacklist(true, undefined, "3137382E3132382E38392E313530"),
-
-				    AMN.initBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"), AMN.initBlacklist(true, undefined, "36312E3235352E382E313532"),
-
-				    AMN.initBlacklist(true, "서든", "31342E34372E3131322E313330"), AMN.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), AMN.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), AMN.initBlacklist(true, "Preber", "37322E35322E38372E3937"), AMN.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), AMN.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
-
-				    AMN.initBlacklist(true, undefined, "3132352E3137362E342E313335"), AMN.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
-				    AMN.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
-				    AMN.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
-
-				    AMN.initBlacklist(true, undefined, "3131362E3132342E3137382E3433"), AMN.initBlacklist(true, undefined, "3137352E3139372E3231392E313031"), AMN.initBlacklist(true, undefined, "3137352E3139372E3231392E313031"), AMN.initBlacklist(true, undefined, "35392E31362E35342E313631"),
-
-				    AMN.initBlacklist(true, undefined, "3132342E35332E3137362E3831"),
-				    AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), AMN.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
-
-				    
+					AMN.initBlacklist(true, "랄랄랄", "3132342E35392E37332E313931"), 
+					AMN.initBlacklist(true, undefined, "3138322E3232342E33312E3330"), AMN.initBlacklist(true, undefined, "3130342E3133312E3137362E323334"), 
+					AMN.initBlacklist(true, undefined, "3137382E36322E352E313537"), AMN.initBlacklist(true, undefined, "3137382E3132382E38392E313530"),
+					AMN.initBlacklist(true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"), AMN.initBlacklist(true, undefined, "36312E3235352E382E313532"),
+					AMN.initBlacklist(true, "서든", "31342E34372E3131322E313330"), AMN.initBlacklist(true, "프레버", "31342E34372E3131322E313330"), AMN.initBlacklist(true, "Preber", "31342E34372E3131322E313330"), AMN.initBlacklist(true, "Preber", "37322E35322E38372E3937"), AMN.initBlacklist(true, "Preber", "36352E34392E3132362E3931"), AMN.initBlacklist(true, "Preber", "37322E35322E38372E3937"),
+					AMN.initBlacklist(true, undefined, "3132352E3137362E342E313335"), AMN.initBlacklist(true, undefined, "3137352E3231342E392E3834"),
+					AMN.initBlacklist(true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536"), 
+					AMN.initBlacklist(true, "쥐알티", "312E3234362E3139312E323134"),
+					AMN.initBlacklist(true, undefined, "3131362E3132342E3137382E3433"), AMN.initBlacklist(true, undefined, "3137352E3139372E3231392E313031"), AMN.initBlacklist(true, undefined, "3137352E3139372E3231392E313031"), AMN.initBlacklist(true, undefined, "35392E31362E35342E313631"),
+					AMN.initBlacklist(true, undefined, "3132342E35332E3137362E3831"),
+					AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3330"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3331"), AMN.initBlacklist(true, "농협신", "3131382E3137362E34372E313233"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3232"), AMN.initBlacklist(true, "농협신", "3132352E3137392E3231312E3533"),
+					AMN.initBlacklist(true, "농협신", "3137352E3139372E34382E3532"),
+					
 					AMN.initBlacklist(true, "노래하는메시", "3131382E3137362E34372E313332"), AMN.initBlacklist(true, "노래하는메시", "3132352E3139312E37302E313031"), AMN.initBlacklist(true, "노래하는메시", "3232312E3135312E3132312E313731"), AMN.initBlacklist(true, "노래하는메시", "3232302E37362E3230302E35"), AMN.initBlacklist(true, "노래하는메시", "3231312E3232342E3232392E313637"), AMN.initBlacklist(true, "노래하는메시", "3232302E37352E3230392E3637"), AMN.initBlacklist(true, "노래하는메시", "3136332E3138302E3131382E313734"), AMN.initBlacklist(true, "노래하는메시", "3231312E3230342E3132352E323430"), AMN.initBlacklist(true, "노래하는메시", "35382E3233332E38302E3532"), AMN.initBlacklist(true, "노래하는메시", "3138332E3130322E34332E313735"), AMN.initBlacklist(true, "노래하는메시", "3132312E3139302E3233332E313635"), AMN.initBlacklist(true, "노래하는메시", "3131392E3139322E3235342E323438"), AMN.initBlacklist(true, "노래하는메시", "3132312E3134332E3133342E3637"), AMN.initBlacklist(true, "노래하는메시", "3232322E3131322E34392E313630"),
 					AMN.initBlacklist(true, "노래하는메시", "3132352E3133322E39392E3338"), AMN.initBlacklist(true, "노래하는메시", "3231302E3132312E3136352E3337"), AMN.initBlacklist(true, "노래하는메시", "3232312E3136352E37392E323338"), AMN.initBlacklist(true, "노래하는메시", "3232302E37392E3137382E323230"), AMN.initBlacklist(true, "노래하는메시", "3232322E3131372E3132322E3433"),
 					AMN.initBlacklist(true, "노래하는메시", "312E3233312E36322E313335"), AMN.initBlacklist(true, "노래하는메시", "3232302E37322E39362E3637"), AMN.initBlacklist(true, "노래하는메시", "3132312E3136322E3231332E323130"), AMN.initBlacklist(true, "노래하는메시", "3232312E3135352E3234342E313532"), AMN.initBlacklist(true, "노래하는메시", "3132312E3133302E31332E3938"), AMN.initBlacklist(true, "노래하는메시", "3231312E3235302E3138382E3437"),
@@ -2126,27 +2120,21 @@
 					AMN.initBlacklist(true, "노래하는메시", "3138302E38332E39312E323139"), AMN.initBlacklist(true, "노래하는메시", "35382E3134332E3138312E313035"),
 					AMN.initBlacklist(true, "노래하는메시", "3132342E352E392E313331"), AMN.initBlacklist(true, "노래하는메시", "3131382E3234312E3131382E3236"),
 					AMN.initBlacklist(true, "노래하는메시", "3231312E3230332E3235352E3634"), AMN.initBlacklist(true, "노래하는메시", "3136382E3132362E38392E313335"),
-                    AMN.initBlacklist(true, "노래하는메시", "3132342E35342E3137352E38"),
-                    AMN.initBlacklist(true, "노래하는메시대작전", "3131382E3137362E34372E313332"),
-
-				    AMN.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
-				    AMN.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
-				    AMN.initBlacklist(true, undefined, "3231312E3234332E3232322E3733"),
-				    AMN.initBlacklist(true, undefined, "33392E3131372E37392E313337"),
-
-				    AMN.initBlacklist(true, "drogba", "3131382E33322E37372E323531"), AMN.initBlacklist(true, "드록바", "3131382E33322E37372E323531"), AMN.initBlacklist(true, "드록바", "35382E3134332E37362E3635"),
-
-				    AMN.initBlacklist(true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"),
-
-				    AMN.initBlacklist(true, "soy el mas pro", "3139302E34392E3137302E313038"),
-				    AMN.initBlacklist(true, "Ricardo", "3138362E3132332E3231352E3234"),
-
-				    AMN.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"), AMN.initBlacklist(true, "HYNN", "3232322E3130352E302E313733"), AMN.initBlacklist(true, "HYNN", "3231382E35312E31392E3338"),
+					AMN.initBlacklist(true, "노래하는메시", "3132342E35342E3137352E38"),
+					AMN.initBlacklist(true, "노래하는메시대작전", "3131382E3137362E34372E313332"),
+					AMN.initBlacklist(true, "노래하는메시대작전", "34392E3136312E3130322E313834"),
+					AMN.initBlacklist(true, undefined, "3138322E3232342E33312E313031"),
+					AMN.initBlacklist(true, undefined, "3131362E3132312E3233352E3830"),
+					AMN.initBlacklist(true, undefined, "3231312E3234332E3232322E3733"),
+					AMN.initBlacklist(true, undefined, "33392E3131372E37392E313337"),
+					AMN.initBlacklist(true, "drogba", "3131382E33322E37372E323531"), AMN.initBlacklist(true, "드록바", "3131382E33322E37372E323531"), AMN.initBlacklist(true, "드록바", "35382E3134332E37362E3635"),
+					AMN.initBlacklist(true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"),
+					AMN.initBlacklist(true, "soy el mas pro", "3139302E34392E3137302E313038"),
+					AMN.initBlacklist(true, undefined, "3138362E3132332E3231352E3234"),
+					AMN.initBlacklist(true, "HYNN", "3231392E3130302E33372E323433"), AMN.initBlacklist(true, "HYNN", "3232322E3130352E302E313733"), AMN.initBlacklist(true, "HYNN", "3231382E35312E31392E3338"),
 					AMN.initBlacklist(true, "Roseanne", "3231392E3130302E33372E323433"), AMN.initBlacklist(true, "Roseanne","33392E3131342E36312E313230"),
-
-				    AMN.initBlacklist(true, "루니", "31342E33362E3231352E3936"),
-
-				    AMN.initBlacklist(true, "제주스", "36342E36322E3231392E3232"), AMN.initBlacklist(true, "네테로", "36342E36322E3231392E3232"),
+					AMN.initBlacklist(true, undefined, "31342E33362E3231352E3936"),
+					AMN.initBlacklist(true, undefined, "36342E36322E3231392E3232"),
 					//	---블랙리스트 초기화---
 					//	아래와 같은 형식으로 명단을 작성할 수 있습니다.
 					//	<예시> AMN.initBlacklist(false, "알파고"), 또는 AMN.initBlacklist(true, undefined, "12345678901234567890"),
