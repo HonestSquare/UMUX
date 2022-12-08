@@ -1,7 +1,7 @@
 /***
 	<ABOUT>
-	Version 4.0 r1
-	Level 10(Build 1000.0)
+	Version 4.0 r2
+	Level 10(Build 1000.1)
 	<README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프로젝트로,
@@ -2094,7 +2094,7 @@ class Commands{
 					return t == false || SC.findRankListByPlayer(t) == undefined ? p : t;
 				}
 				let target = getTarget(msg, player);
-				return NC.info("플레이어 전적", [SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.PUBLIC), SC.findRankListByPlayer(player).about
+				return NC.info("플레이어 전적", [SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.PUBLIC), SC.findRankListByPlayer(target).about
 				].join(newLine), player, "!ranking");
 			case 1:		//	?stats == !helpscore
 				return CM.helpScore(player);
@@ -2239,7 +2239,7 @@ class PlayerManager{
 		let oldPlayer = this.findPlayerList(true).findLast(p => p._id != newPlayer._id && p._network == newPlayer._network);
 		if(!PM.isValid(oldPlayer)) return false;		//	중복 계정 없음(최초 입장)
 		for(const [k, v] of Object.entries(oldPlayer)){
-			if(!["id", "name", "team", "time", "network", "address",
+			if(!["id", "name", "team", "admin", "time", "network", "address",
 				"isSleep", "detector"
 			].includes(k.replace('_', ''))) newPlayer[k] = v;
 		}
@@ -2266,19 +2266,18 @@ class PlayerManager{
 		//	장기 무응답 플레이어 판정
 		let afkChckTimer = TM.addTimer("afkCheck", () => {
 			let target = PM.findPlayerById(afkChckTimer._player);
-			if(PM.isAfkPlayer(target._id)){
-				PM.findPlayerList().forEach(p => {				//	경고 메시지 출력
-					if(p._id == target._id)
-						return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림",
-						"반응이 없으면 퇴장될 수 있습니다",
-						p._id, (p._team == c_TEAM.SPECTATOR ? "!afk" : "!join spec"), c_LIST_COLOR.SILVER);
-					if(p._admin < 2 || p._admin < target._admin) return;
-					if(p._team == c_TEAM.SPECTATOR || p._team == target._team)
-						return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 안내",
-						"%d님의 반응이 없는 경우, 자동으로 퇴장됩니다",
-						p._id, NC.fmtStr("!join spec #%d", target._id), c_LIST_COLOR.SILVER, null, 0, target.showPlayerInfo(c_PLAYERINFO_TYPE.PUBLIC));
-				});
-			}
+			if(!PM.isAfkPlayer(target._id)) return;
+			for(let p of PM.findPlayerList()){					//	경고 메시지 출력
+				if(p._id == target._id)
+					return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림",
+					"반응이 없으면 퇴장될 수 있습니다",
+					p._id, (p._team == c_TEAM.SPECTATOR ? "!afk" : "!join spec"), c_LIST_COLOR.SILVER);
+				if(p._admin < 2 || p._admin < target._admin) return;
+				if(p._team == c_TEAM.SPECTATOR || p._team == target._team)
+					return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 안내",
+					"%d님의 반응이 없는 경우, 자동으로 퇴장됩니다",
+					p._id, NC.fmtStr("!join spec #%d", target._id), c_LIST_COLOR.SILVER, null, 0, target.showPlayerInfo(c_PLAYERINFO_TYPE.PUBLIC));
+			};
 			let avatarTimer = TM.addTimer("afkAvatar", {		//	등번호 알림
 				EXECUTE : () => {
 					let tmList = avatarTimer.findTimerByName();
