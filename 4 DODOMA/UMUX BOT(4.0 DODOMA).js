@@ -1,7 +1,7 @@
 /***
 	<ABOUT>
-	Version 4.0 r2
-	Level 10(Build 1000.1)
+	Version 4.0 r3
+	Level 10(Build 1000.2)
 	<README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프로젝트로,
@@ -425,7 +425,7 @@ class GameManager{
 			let rp = SC.findRankListByPlayer(p._id);
 			if(rp != undefined){	//	랭킹 갱신
 				if(p._team == winner) rp.win += 1;
-				else rp.lost += 1;
+				else if(p._team != c_TEAM.SPECTATOR) rp.lost += 1;
 			}
 		}
 		NC.extMsg(c_LIST_ICON.NORMAL_BOLD + "경기 종료", "%d이 승리하였습니다.",		//	경기 종료 및 승패 결과 출력
@@ -1016,11 +1016,11 @@ class Notification{
 		return /^[a-fA-F0-9]+/.test(color) ? `0x${color}` : (hasRaw ? color : `0x${c_LIST_COLOR.DEFAULT}`);
 	}
 	findSound(sound){								/* 소리 지정 */
-		if(!Object.entries(c_LIST_SOUND).map(([k, v]) => v).includes(sound)) return c_LIST_SOUND.NORMAL;
+		if(!Object.values(c_LIST_SOUND).includes(sound)) return c_LIST_SOUND.NORMAL;
 		return sound;
 	}
 	findStyle(style){								/* 서식 지정 */
-		if(!Object.entries(c_LIST_STYLE).map(([k, v]) => v).includes(style)) return c_LIST_STYLE.NORMAL;
+		if(!Object.values(c_LIST_STYLE).includes(style)) return c_LIST_STYLE.NORMAL;
 		return style;
 	}
 			
@@ -2216,7 +2216,7 @@ class PlayerManager{
 		return this._playerList.filter(p => p.localId > 0);
 	}
 	findPlayerListByTeam(team){															/* 플레이어 데이터베이스 개별 팀 명단 구하기 */
-		if(!Object.entries(c_TEAM).map(([k, v]) => v).hasOwnProperty(team)) return this._playerList;
+		if(!Object.values(c_TEAM).hasOwnProperty(team)) return this._playerList;
 		return this._playerList.filter(p => p._team == team);
 	}
 	findPlayerById(target){		return this._playerList.find(p => p._id == target); }	/* 플레이어 데이터베이스 구하기 */
@@ -2336,7 +2336,7 @@ class PlayerManager{
 	
 	cntPlayers(team){						/* 접속자 인원 구하기 */
 		let pl = room.getPlayerList().filter(p => p.id != 0);
-		if(Object.entries(c_TEAM).map(([k, v]) => v).hasOwnProperty(team))
+		if(Object.values(c_TEAM).hasOwnProperty(team))
 			return pl.filter(p => p.team == team).length;					//	팀별 접속자
 		return (team == "public" ? this._playerList : pl).length;			//	모든 접속자
 	}
@@ -2494,7 +2494,7 @@ class PlayerSystem{
 		this.discProp = {'x' : this.dpPosition.x + dx, 'y' : this.dpPosition.y + dy};
 	}
 	moveTeam(t){				/* 플레이어 팀 이동 */
-		if(!Object.entries(c_TEAM).map(([k, v]) => v).hasOwnProperty(t)) return SYS.sendError(c_ERROR_TYPE.E_ETC);
+	if(!Object.values(c_TEAM).hasOwnProperty(t)) return SYS.sendError(c_ERROR_TYPE.E_ETC);
 		room.setPlayerTeam(this._id, t);
 	}
 	teleportPosition(tx, ty){	/* 플레이어 좌표 변경(절대 좌표) */
@@ -2766,7 +2766,7 @@ class TimeManager{
 	get fmtTime(){	return this._timeFormats; }				/* 시간 출력 형식 */
 
 	set fmtTime(index){		/* 시간 출력 형식 */
-		if(!Object.entries(c_TIME_TYPE).map(([k, v]) => v).hasOwnProperty(index)) return SYS.sendError(c_ERROR_TYPE.E_ETC);
+		if(!Object.values(c_TIME_TYPE).hasOwnProperty(index)) return SYS.sendError(c_ERROR_TYPE.E_ETC);
 		this._timeFormats = index;
 	}
 
@@ -3665,7 +3665,7 @@ class GameSystem{
 		let destStr = getDestTypeToString(destType);
 		let context = NC.fmtStr(" →[%d%d]%d", [destStr, (destType == 3 ? (": " + SYS.showPlayerInfo(target)) : ''), msg]);
 		this.log(true, "전달: [%d]%d", c_LOG_TYPE.SEND, [destStr, msg]);
-		if(Object.entries(c_TEAM).map(([k, v]) => v).hasOwnProperty(destType)) return CS.sendTeamChat(destType, 0, context);
+		if(Object.values(c_TEAM).hasOwnProperty(destType)) return CS.sendTeamChat(destType, 0, context);
 		if(destType == 3) return CS.sendPrivateChat(target, 0, NC.fmtStr(" →[%d: %d]%d", [destStr, SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.PUBLIC), msg]));
 		CS.sendAlert(context);
 	}
