@@ -1,7 +1,7 @@
 /***
 	<ABOUT>
-	Version 4.0 r3
-	Level 10(Build 1000.2)
+	Version 4.0 r4
+	Level 10(Build 1000.4)
 	<README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프로젝트로,
@@ -1241,8 +1241,7 @@ class ChatManager{
 		for(let fw of forbiddenWords){
 			let isEquals = function(s, t){			//	단어 일치 확인
 				//	공백 처리
-				if(s == undefined || t == undefined) return false;
-				if(CS.isWhiteSpace(s) == true || CS.isWhiteSpace(t) == true) return false;
+				if([s, t].some(v => CS.isWhiteSpace(v))) return false;
 				//	우회 문자 처리
 				let reg = /[0-9`~!@#$%^&*()_|=?;:'"▣◈﻿⊙◎,.<>​\{\}\[\]\+\\\/]/gi;
 				if(!reg.test(t)) s = s.replace(reg, '');
@@ -1307,7 +1306,7 @@ class ChatManager{
 		}
 		else{
 			NC.locked(bool, "귓속말 채팅이 %d되었습니다.", null, null, (bool ? "금지" : "허용"));
-			SYS.log(true, "reCAPTCHA가 %d됨", c_LOG_TYPE.NOTICE, (bool ? "금지" : "허용"));
+			SYS.log(true, "귓속말 채팅이 %d됨", c_LOG_TYPE.NOTICE, (bool ? "금지" : "허용"));
 		}
 	}
 	sendAlert(msg, target, ...replace){				/* 관리자 채팅 전송 */
@@ -2266,7 +2265,7 @@ class PlayerManager{
 		//	장기 무응답 플레이어 판정
 		let afkChckTimer = TM.addTimer("afkCheck", () => {
 			let target = PM.findPlayerById(afkChckTimer._player);
-			if(!PM.isAfkPlayer(target._id)) return;
+			if(!target.isAfk()) return;
 			for(let p of PM.findPlayerList()){					//	경고 메시지 출력
 				if(p._id == target._id)
 					return NC.extMsg(c_LIST_ICON.NEGATIVE + "비활동 플레이어 알림",
