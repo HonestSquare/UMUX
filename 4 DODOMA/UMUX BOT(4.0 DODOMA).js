@@ -1,7 +1,7 @@
 /***
 	<ABOUT>
-	Version 4.0 r4
-	Level 10(Build 1000.4)
+	Version 4.0 r5
+	Level 10(Build 1000.5)
 	<README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프로젝트로,
@@ -905,7 +905,7 @@ class Administration{
 		AMN.giveAdmin(player);
 	}
 	missPassword(player, msg, type){			/* 최고 권한 로그인 오입력 */
-		if(type != 2) return AMN.missPassword(player, msg, type);		//	첫 두 글자가 '!!'로 시작하지 않으면 무효 처리
+		if(type != 2) return;
 		if(AMN.hasAdmin(player, 2)) return;								//	이미 권한이 있는 경우
 		SYS.log(true, "%d(이)가 최고 권한 로그인을 시도함(실패)", c_LOG_TYPE.WARNING, SYS.showPlayerInfo(player));
 	}
