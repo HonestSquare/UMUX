@@ -1,0 +1,620 @@
+[   /* 블랙리스트 명단 */
+    {
+        "address": "34392E3137342E3133332E3131",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3131382E33342E3235312E3334",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "37342E38322E36302E3832",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "36352E34392E3132362E3839",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3138372E3133352E3239",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "37322E35322E38372E3737",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "31342E34372E3131322E313232",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232312E3136352E3136332E313530",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3138322E3232342E33312E313136",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3138332E3130302E3135362E32353",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3138332E3130302E3135362E323532",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3139382E31362E37342E323035",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "37342E38322E36302E313739",
+        "super": true,
+        "nickname": "에드",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "34392E3137342E3133332E3131",
+        "super": true,
+        "nickname": "Knife",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231392E3234382E3230332E313430",
+        "super": true,
+        "nickname": "어둠의 악마",
+        "reason": null
+    },
+    {
+        "address": "3132342E35392E37332E313931",
+        "super": true,
+        "nickname": "랄랄랄",
+        "reason": null
+    },
+    {
+        "address": "3130342E3233362E3231332E323330",
+        "super": true,
+        "nickname": "제몸무게가 220kg인데 정상인가요",
+        "reason": null
+    },
+    {
+        "address": "31342E34372E3131322E313330",
+        "super": true,
+        "nickname": "프레버",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "31342E34372E3131322E313330",
+        "super": true,
+        "nickname": "Preber",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "37322E35322E38372E3937",
+        "super": true,
+        "nickname": "Preber",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "36352E34392E3132362E3931",
+        "super": true,
+        "nickname": "Preber",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "37322E35322E38372E3937",
+        "super": true,
+        "nickname": "Preber",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "312E3234362E3139332E313536",
+        "super": true,
+        "nickname": "어드안주면인터넷찢는개",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "312E3234362E3139312E323134",
+        "super": true,
+        "nickname": "쥐알티",
+        "reason": null
+    },
+    {
+        "address": "3132352E3137392E3231312E3330",
+        "super": true,
+        "nickname": "농협3021003643681",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3330",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3331",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3131382E3137362E34372E313233",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3232",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3533",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3236",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3435",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3534",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3131",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3330",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3231",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E33",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E38",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3138332E3130362E37392E3631",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E3537",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3137392E3231312E35",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3130362E3130322E3132382E3838",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231312E35312E3131302E313437",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "34392E3134322E3131312E313030",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3137352E3139372E34382E3532",
+        "super": true,
+        "nickname": "농협신",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3131382E3137362E34372E313332",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3139312E37302E313031",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232312E3135312E3132312E313731",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232302E37362E3230302E35",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231312E3232342E3232392E313637",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232302E37352E3230392E3637",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3136332E3138302E3131382E313734",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231312E3230342E3132352E323430",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "35382E3233332E38302E3532",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3138332E3130322E34332E313735",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132312E3139302E3233332E313635",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3131392E3139322E3235342E323438",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132312E3134332E3133342E3637",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232322E3131322E34392E313630",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3133322E39392E3338",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231302E3132312E3136352E3337",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232312E3136352E37392E323338",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232302E37392E3137382E323230",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232322E3131372E3132322E3433",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "312E3233312E36322E313335",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232302E37322E39362E3637",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132312E3136322E3231332E323130",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232312E3135352E3234342E313532",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132312E3133302E31332E3938",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231312E3235302E3138382E3437",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231312E3230392E37362E323038",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3138332E3130382E3138312E313538",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3131322E3136362E3133362E3331",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3131332E35322E3139362E313733",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "35382E3134302E3231312E323237",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132312E3134392E322E313539",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231312E3230352E3231372E3130",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "35382E3134302E3231302E3730",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231312E3235302E3138382E313035",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132342E352E31332E323237",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "33392E3131382E3132302E3534",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3138302E38332E39312E323139",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "35382E3134332E3138312E313035",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132342E352E392E313331",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3131382E3234312E3131382E3236",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231312E3230332E3235352E3634",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3136382E3132362E38392E313335",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132342E35342E3137352E38",
+        "super": true,
+        "nickname": "노래하는메시",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3131382E3137362E34372E313332",
+        "super": true,
+        "nickname": "노래하는메시대작전",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "34392E3136312E3130322E313834",
+        "super": true,
+        "nickname": "노래하는메시대작전",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3131382E33322E37372E323531",
+        "super": true,
+        "nickname": "drogba",
+        "reason": null
+    },
+    {
+        "address": "3131382E33322E37372E323531",
+        "super": true,
+        "nickname": "드록바",
+        "reason": null
+    },
+    {
+        "address": "35382E3134332E37362E3635",
+        "super": true,
+        "nickname": "드록바",
+        "reason": null
+    },
+    {
+        "address": "3131382E362E32352E313034",
+        "super": true,
+        "nickname": "경상도에서태어난아기를영국에서길렀더니내가나왔다",
+        "reason": null
+    },
+    {
+        "address": "3139302E34392E3137302E313038",
+        "super": true,
+        "nickname": "soy el mas pro",
+        "reason": null
+    },
+    {
+        "address": "3231392E3130302E33372E323433",
+        "super": true,
+        "nickname": "Roseanne",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231392E3130302E33372E323433",
+        "super": true,
+        "nickname": "HYNN",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232322E3130352E302E313733",
+        "super": true,
+        "nickname": "HYNN",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231382E35312E31392E3338",
+        "super": true,
+        "nickname": "HYNN",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3231392E3234392E3231342E3437",
+        "super": true,
+        "nickname": "HYNN",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232302E3131362E3233352E39",
+        "super": true,
+        "nickname": "HYNN",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3132352E3133392E3133312E313734",
+        "super": true,
+        "nickname": "HYNN",
+        "reason": "부정한 게임 이용"
+    },
+    {
+        "address": "3232302E39332E3134362E313535",
+        "super": true,
+        "nickname": "HYNN",
+        "reason": "부정한 게임 이용"
+    }
+]
