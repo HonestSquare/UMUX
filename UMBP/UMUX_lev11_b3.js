@@ -1,7 +1,7 @@
 /***
 <ABOUT>
-	Version 5.0 b2
-	Level 11(Build 1047)
+	Version 5.0 b3
+	Level 11(Build 1051)
 <README>
 	UMUX Beta Program(이하 UMBP)은 보다 빠르게
 	UMUX의 신버전을 체험해 볼 수 있는 프로그램입니다.
@@ -24,7 +24,7 @@ const	DESCRIPTION	= "봇방입니다.";
 const	MAXLIMIT	= 12;
 const	HOSTNAME 	= "서버 매니저";
 const	PUBLIC		= true;
-const	TOKEN		= "thr1.AAAAAGS_wFz7JVQhlCQ4rA.pf4d0BmCzqQ";
+const	TOKEN		= "thr1.AAAAAGTKKxbqUrSOOqS-Iw.c3fEKtNUv_I";
 const	NOPLAYER	= true;
 /*** 지역 코드, 위도, 경도 ***/
 const	REGION_CODE	= "kr";
@@ -170,13 +170,19 @@ const initStadiums = async function(links){
         return ["https", "http"].includes(url.protocol.replace(':', ''));
     }
 	for(let r of links.filter(async n => isValidHttpUrl(n))){
-		let st = (await requestStadium(r)).join('');
+		let st = (await requestExternalFile(r)).join('');
 		customStadiumList.push(st);
 	}
 }
-const requestStadium = ln => fetch(ln).then((response) => response.text()).then(res => {
+const requestExternalFile = ln => fetch(ln).then((response) => response.text()).then(res => {
 	return Promise.all(res);
 });
+const convertScript = async(ln) => {
+	let removeComments = str => str.replace(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g,'');
+	let jn = (await requestExternalFile(ln)).join('');
+	let vb = JSON.parse(removeComments(jn));
+	return vb;
+}
 initStadiums([
 	"https://raw.githubusercontent.com/HonestSquare/UMUX/master/CROP-900M.hbs"
 ]);
@@ -316,7 +322,7 @@ class GameManager{
         let agTimer = TM.addTimer("alertGameTime", () => {
             let target = agTimer.findTimerByName().at(-1);
             if(target == undefined) return false;
-			let title = NC.fmtStr("%d%d시간 동안 플레이 했습니다", [c_LIST_ICON.NEGATIVE, agTimer.calcTotalSequence(target.seq) + 1]);
+			let title = NC.fmtStr("%d시간 동안 플레이 했습니다", agTimer.calcTotalSequence(target.seq) + 1);
 			NC.caution(title, "과도한 게임 이용은 정상적인 일상생활에 지장을 줄 수 있습니다", agTimer.player, null, null);
         }, pp.id, SEC_TO_MS * 60 * 60, true);
 		return hasVisitRecord;
@@ -343,7 +349,7 @@ class GameManager{
 		shortLink.innerHTML = NC.fmtStr("서버 주소: <a href=\"%d\" target=\"_blank\"> %d</a>", address);
 		if(!SYS.hasInitSrv){		//	객체 초기화가 필요한 경우
 			SYS.initServer(address);	//	서버 초기화
-			SYS.initDashboard();			//	그래픽 유저 인터페이스 초기화
+			SYS.initDashboard();		//	그래픽 유저 인터페이스 초기화
 			LM.log(false, "서버 가동 시작", c_LOG_TYPE.BINDING);
 			return;
 		}
@@ -448,13 +454,12 @@ class GameManager{
 		}
 		//	전적 갱신
 		if(PM.isValid(attacker)){
-			let getStats = function(p){
-				let target = SC.findRankListByPlayer(p);
-				return PM.isValid(target) ? target : SC.findRankListByPlayer(SC.initRankList(p));
-			}
-			if(attackTeam == defendTeam) getStats(attacker).owgl += 1;
-			else getStats(attacker).goal += 1;
-			if(PM.isValid(assist)) SC.findRankListByPlayer(assist.id).asst += 1;
+			let getRankPlayer = p => SC.findRankListByPlayer(p);
+			let tr = getRankPlayer(attacker);
+			let sr = getRankPlayer(assist);
+			if(attackTeam == defendTeam) tr.owgl += 1;
+			else tr.goal += 1;
+			if(PM.isValid(sr)) sr.asst += 1;
 		}
 		if(attackTeam != defendTeam) SC.updateGoals(team);					//	득점 데이터 갱신
 		SYS.updateDashboard();													//	그래픽 유저 인터페이스 갱신
@@ -519,7 +524,7 @@ class GameManager{
 		if(size < 1) return defaultStadiumList;
 		let getName = function(st){
 			let m = Function('"use strict";return (' + st + ')')();
-			if(!m.hasOwnProperty("name")) return "비어 있음";
+			if(!Object.hasOwn(m, "name")) return "비어 있음";
 			if(CS.isWhiteSpace(m.name)) return "제목 없음";
 			return m.name;
 		}
@@ -528,12 +533,14 @@ class GameManager{
 			return getName(mp);
 		});
 	}
-	findTeamName(value){			/* 팀 상태(숫자>문자열) */
+	findTeamName(value, abr){			/* 팀 상태(숫자>문자열) */
 		let nameList = {
-			[c_TEAM.SPECTATOR] : "관전석", [c_TEAM.RED] : "레드팀", [c_TEAM.BLUE] : "블루팀"
+			[c_TEAM.SPECTATOR] :	["관전석", "관전"],
+			[c_TEAM.RED] :			["레드팀", "레드"],
+			[c_TEAM.BLUE] :			["블루팀", "블루"]
 		}
-        if(nameList.hasOwnProperty(value)) return nameList[value];
-		throw LM.error(c_ERROR_TYPE.E_ETC);
+		if(!Object.hasOwn(nameList, value)) throw LM.error(c_ERROR_TYPE.E_ETC);
+        return nameList[value].at(abr ? 1 : 0);
 	}
 
 	checkPublicId(msg, player, hasAllRange){	/* #ID 판별 */
@@ -659,6 +666,7 @@ class Administration{
 	}
 
 	get allowJoin(){			return this.#isAllowTeamSwitch; }	/* 플레이어 팀 자율 이동 */
+	get bl(){					return this.#blacklist; }			/* 블랙리스트 명단 */
     get defStdm(){              return this.#defaultStadium; }      /* 고정 맵 데이터 */
 	get dynmcAdmin(){			return this.#enableDynamicAdmin; }	/* 플레이어 권한 동적 부여 */
 	get lockStadium(){			return this.#isLockStadium; }		/* 맵 고정 여부 */
@@ -699,7 +707,7 @@ class Administration{
 		if(!PM.isValid(player)) throw LM.error(c_ERROR_TYPE.E_PLAYER_INFO);
 		let pName = PM.findPlayerById(player).name;
 		let pAddress = this.findAddress(player);
-		let target = this.#blacklist.find(b => b.hasMatchedDatabase(pName, pAddress, isSuper));
+		let target = this.bl.find(b => b.hasMatchedDatabase(pName, pAddress, isSuper));
 		if(target == undefined) return false;
 		if(target.name == undefined) target.name = pName;					//	이름 데이터가 비어 있으면 갱신
 		else if(target.addr == undefined) target.addr = pAddress;	        //	주소 데이터가 비어 있으면 갱신
@@ -752,15 +760,15 @@ class Administration{
 		return PM.findPlayerList().filter(p => AMN.hasAdmin(p.id, level));
 	}
 	findBlacklistByAddress(conn){				/* IP로 블랙리스트 찾기 */
-		return this.#blacklist.filter(bl => bl.addr == conn);
+		return this.bl.filter(bl => bl.addr == conn);
 	}
 	findBlacklistByName(str){					/* 닉네임으로 블랙리스트 찾기 */
-		return this.#blacklist.filter(bl => bl.name == str);
+		return this.bl.filter(bl => bl.name == str);
 	}
     findBlacklistByPlayer(player, isSuper){     /* 플레이어 ID로 블랙리스트 찾기 */
         let pName = PM.findPlayerById(player).name;
 		let pAddress = this.findAddress(player);
-        return this.#blacklist.find(b => b.hasMatchedDatabase(pName, pAddress, isSuper));
+        return this.bl.find(b => b.hasMatchedDatabase(pName, pAddress, isSuper));
     }
 	findMutedList(isPublic){					/* 채금 명단 구하기 */
 		return PM.findPlayerList(isPublic).filter(p => p.isMute == true);
@@ -768,9 +776,9 @@ class Administration{
 	findNetwork(target){						/* 플레이어 네트워크 구하기 */
 		return PM.findPlayerById(target).ntwk;
 	}
-			
+
 	addBlacklist(isSuper, name, conn, reason){		    /* 블랙리스트 명단 추가 */
-		return this.#blacklist.push(new BlacklistSystem(isSuper, name, conn, reason));
+		return this.bl.push(new BlacklistSystem(isSuper, name, conn, reason));
 	}
 	addBlacklistByPlayer(target, isSuper, reason){      /* 플레이어를 블랙리스트 명단으로 추가 */
 		let pp = PM.findPlayerById(target);
@@ -1155,7 +1163,7 @@ class NotificationManager{
 					return NC.addNotiList(n, c_TAG_NOTFCN.BRIEF, [null, 
 						getRep(a.at(1)) + (a.at(2) ? NC.fmtStr("(이것을 찾으셨나요: %d)", a.at(2)) : '')
 					], [null, c_LIST_STYLE.SMALL], [null, NC.isColor(a.at(4)) ? a.at(4) : NC.msc.NOTICE], a.at(3));
-				case 10:	//	#send(name, tag, title, content, targets, advCom, titleColor, contentColor, delay, ...replace)
+				case 10:	//	#send(name, tag, title, content, targets, advCom, titleColor, contentColor, delay, ...replace)	
 					let hasTitle = (a.at(2) != null);
 					let titleText = (hasTitle ? (CS.isWhiteSpace(a.at(2)) ? c_LIST_ICON.POSTIVE + "알림" : a.at(2)) + (a.at(5) ? NC.fmtStr("(이것을 찾으셨나요: %d)", a.at(5)) : '') : null);
 					return NC.addNotiList(n, a.at(1), [titleText, getRep(a.at(3))], [c_LIST_STYLE.SMALL, c_LIST_STYLE.SMALL], [a.at(6), hasTitle ? a.at(7) : a.at(6)], a.at(4));
@@ -1368,7 +1376,7 @@ class NotificationSystem{
 	#sendAnnouncement(string, color, style, sound){
         let send = tp => room.sendAnnouncement(string, tp, color, style, sound);
         if(!Array.isArray(this.targets)) return send(this.targets);
-        for(let tp of Array.isArray(this.targets) ? this.targets : [this.targets]){
+        for(let tp of this.targets){
             send(tp);
         }
 	}
@@ -1635,40 +1643,33 @@ class ChatManager{
 		]);
 		if(filter) NC.alret(fromPlayer);
 	}
-	sendTeamChat(teamId, player, msg){				/* 팀 채팅 전송 */
-		if(player == 0)								//	콘솔창에서 게임으로 전달
-			return PM.findPlayerListByTeam(teamId).forEach(p => this.sendAlert("%d (귓속말 답장: !e #0)", p.id, msg));
+	sendTeamChat(teamId, player, msg, ...replace){				/* 팀 채팅 전송 */
+		if(!Object.hasOwn(Object.values(c_TEAM), teamId)) throw LM.error(c_ERROR_TYPE.E_ETC);
+		if(player == 0){							//	콘솔창에서 게임으로 전달
+			for(let pp of PM.findPlayerListByTeam(teamId)){
+				this.sendAlert("→[%d]%d (귓속말 답장: !e #0)", pp.id, [GM.findTeamName(team, true), msg]);
+			}
+			return LM.log(true, "전달: [%d]%d", [GM.findTeamName(team, true), msg, replace[0]]);
+		}
 		if(this.hasMutedChat(player)) return this.sendEmojiChat(player, msg);	//	채팅 금지
-		let getTeamToString = function(t){
-			let strList = Object.entries({
-				[c_TEAM.RED] : "레드", [c_TEAM.BLUE] : "블루", [c_TEAM.SPECTATOR] : "관전"
-			}).find(([k, v]) => k == t);
-			if(strList == undefined) throw LM.error(c_ERROR_TYPE.E_ETC);
-			return strList[1];
-		}
 		let filter = (PM.isValid(player) ? this.hasForbiddenWord(msg) : false);
-		let title = getTeamToString(teamId) + (PM.isValid(player) ? filter ? c_TAG_GRADE[0] : PM.findTagGrade(player) : PM.findTagTeam(teamId));
-		let showMsg = function(player, context){
-			for(let p of PM.findPlayerListByTeam(teamId)){
-				if(!PM.isValid(player)) CS.sendAlert(context, p.id);
-				else CS.sendMsg(context, p.id);
+		let title = NC.fmtStr("%d%d", [GM.findTeamName(teamId, true), filter ? c_TAG_GRADE[0] : PM.findTagGrade(player)]);
+		let showMsg = function(p, c, s, ...r){
+			for(let tp of PM.findPlayerListByTeam(teamId)){
+				CS.sendMsg(s, tp.id, r[0]);
+				if(tp.id != p) NC.announce("tip", [null, NC.fmtStr("(팀 채팅 답장: !%d)", c.at(0))],
+					tp.id, [null, c_LIST_COLOR.GRAY], [null, c_LIST_STYLE.SMALL], c_LIST_SOUND.MUTED);
 			}
 		}
-		if(!PM.isValid(player)) return showMsg(0, msg);
-		let getContext = function(lev, str){
-			let msgCore = str.slice(0, CM.maxMsgLen);
-			let sendContext = (arg) => ((PM.isValid(player) ? SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.LOCAL) : ("(#0)" + HOSTNAME)) + ": ") + arg;
-			switch(lev){
+		let getContext = function(l, f, m){
+			switch(l){
 				case 4: case 5:
-					if(filter == true)	return sendContext("관리자에 의해 삭제된 메시지입니다.");
-				default:				return sendContext(msgCore);
+					if(f == true)	return sendContext("관리자에 의해 삭제된 메시지입니다.");
+				default:			return m.slice(0, CM.maxMsgLen);
 			}
 		}
-		showMsg(player, title + getContext(this.detectorLev, msg));
-        let strCom = CM.findCommand(standardCommands, CM.comTeamChat).val.at(0);
-        for(let tp of PM.findPlayerListByTeam(teamId).filter(tp => tp.chmd != 1 && tp.id != player)){
-            NC.announce("tip", [null, NC.fmtStr("(팀 채팅 답장: !%d)", strCom.at(0))], tp.id, [null, c_LIST_COLOR.GRAY], [null, c_LIST_STYLE.SMALL], c_LIST_SOUND.MUTED);
-        }
+		let strCom = CM.findCommand(standardCommands, CM.comTeamChat).val.at(0);
+		showMsg(player, strCom, "%d%d: %d", [title, SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.LOCAL), getContext(this.detectorLev, filter, msg)]);
 		LM.log(true, "%d%d: %d", c_LOG_TYPE.NORMAL, [title, SYS.showPlayerInfo(player), msg]);
 		if(filter) NC.alret(player);
 	}
@@ -1676,8 +1677,7 @@ class ChatManager{
 		if(this.isFreezeChat == false) return;
 		TM.clearTimerByName("freeze", player);
 		this.isFreezeChat = false;
-		let isValidByPlayer = PM.isValid(player);
-		if(isValidByPlayer){
+		if(PM.isValid(player)){
 			NC.locked(false, "%d님이 채팅창을 녹였습니다", null, null, SYS.showPlayerInfo(player, c_PLAYERINFO_TYPE.NAME));
 			LM.log(true, "%d(이)가 채팅창을 녹임", c_LOG_TYPE.NOTICE, SYS.showPlayerInfo(player));
 			return;
@@ -1936,7 +1936,7 @@ class CommandManager{
 				let chatMsg = msg.length > 1 ? msg.slice(1).join(' ') : '';
 				if(target == 0){
 					let mark = (CS.hasForbiddenWord(chatMsg) ? c_TAG_GRADE[0] : player.tagGrade);
-					CS.sendMsg("외부%d%d→%d: %d", player.id, [mark, player.showPlayerInfo(c_PLAYERINFO_TYPE.LOCAL), HOSTNAME, chatMsg]);
+					CS.sendMsg("개인%d%d→%d: %d", player.id, [mark, player.showPlayerInfo(c_PLAYERINFO_TYPE.LOCAL), HOSTNAME, chatMsg]);
 					LM.log(false, "%d%d: %d", c_LOG_TYPE.BINDING, [mark, player.showPlayerInfo(), chatMsg]);
 					return;
 				}
@@ -2034,8 +2034,8 @@ class CommandManager{
 	comClearPassword(player, msg, type){		/* 비밀번호 해제 */
 		switch(type){
 			case 0:			//	!clear_pw
-			if(!player.admin) return NC.access(player.id);
-			return AMN.clearPassword(player.id);
+				if(!player.admin) return NC.access(player.id);
+				return AMN.clearPassword(player.id);
 			case 1:			//	?clear_pw
 				return NC.help("비밀번호를 해제하려면", "!clear_pw", player.id);
 		}
@@ -2517,7 +2517,7 @@ class PlayerManager{
 	onPlayerActivity(player){				/* 플레이어 응답 이벤트 */
         let pp = this.findPlayerById(player.id);
         pp.updateTime(TM.date.time);             //	마지막 활동 시간 저장
-		if(pp.team == c_TEAM.SPECTATOR) return;
+        if(pp.team == c_TEAM.SPECTATOR) return;
         if(GM.gameStats != c_GAME_STATS.TICK) return;
         if(pp.hasCommonRange(0) == true)
             SC.addTouchedList(pp.id);
@@ -2570,16 +2570,22 @@ class PlayerManager{
 		return this.findPlayerById(player).isAfk(time);
 	}
 	isValid(target, includeHost){				/* 유효 플레이어 확인 */
-		if(includeHost == true && target == 0) return true;
-		if(this.cntPlayers("public") < 1) return false;
-		if(typeof target == "number") return SYS.hasInRange(target, 0, this.cntPlayers("public"), true);
-		if(target == undefined || target == null) return false;
-		return SYS.hasInRange(target[(target.hasOwnProperty("_id") ? '_' : '') + "id"], 0, this.cntPlayers("public"), true);
+		if(target == 0 && includeHost == true) return true;
+		let getNumber = function(t){
+			switch(typeof t){
+				case "number":	return t;
+				case "object":
+					if(t != null && [t, Object.getPrototypeOf(t)].some(p => Object.hasOwn(p, "id")) == true) return t.id;
+				default:		return -1;
+			}
+		}
+		return SYS.hasInRange(getNumber(target), 0, this.cntPlayers("public"), true);
 	}
 	hasCommonRange(player, ball, range){		/* 충돌 여부 판정 */
-		return PM.findPlayerById(player).hasCommonRange(ball, range);
+		return this.findPlayerById(player).hasCommonRange(ball, range);
 	}
 	hasJoined(player){
+		if(!this.isValid(player)) return false;
 		return this.findPlayerById(player).hasJoined();
 	}
 	findDiscProp(target){		return this.findPlayerById(target).discProp; }			/* 플레이어 객체 구하기 */
@@ -2592,7 +2598,7 @@ class PlayerManager{
 		return this.#playerList.filter(p => p.localId > 0);
 	}
 	findPlayerListByTeam(team){															/* 플레이어 데이터베이스 개별 팀 명단 구하기 */
-		if(!Object.values(c_TEAM).hasOwnProperty(team)) return this.#playerList;
+		if(!Object.hasOwn(Object.values(c_TEAM), team)) return this.#playerList;
 		return this.#playerList.filter(p => p.team == team);
 	}
 	findPlayerById(target){		return this.#playerList.find(p => p.id == target); }	/* 플레이어 데이터베이스 구하기 */
@@ -2677,7 +2683,7 @@ class PlayerManager{
 	
 	cntPlayers(team){						/* 접속자 인원 구하기 */
 		let pl = room.getPlayerList().filter(p => p.id != 0);
-		if(Object.values(c_TEAM).hasOwnProperty(team))
+		if(Object.hasOwn(Object.values(c_TEAM), team))
 			return pl.filter(p => p.team == team).length;					//	팀별 접속자
 		return (team == "public" ? this.#playerList : pl).length;			//	모든 접속자
 	}
@@ -2842,7 +2848,7 @@ class PlayerSystem{
 	}
 
     updateTeam(v){                  /* 플레이어 팀 갱신 */
-        if(!Object.values(c_TEAM).hasOwnProperty(v)) throw LM.error(c_ERROR_TYPE.E_PLAYER_INFO);
+        if(!Object.hasOwn(Object.values(c_TEAM), v)) throw LM.error(c_ERROR_TYPE.E_PLAYER_INFO);
         this.#team = v;
     }
     updateTime(t){					/* 응답 시간 갱신 */
@@ -2952,7 +2958,7 @@ class PlayerSystem{
 			[c_PLAYERINFO_TYPE.PUBLIC]	: NC.fmtStr("(#%d)%d", [this.id, name]),
 			[c_PLAYERINFO_TYPE.NAME]	: name
 		}
-		if(ml.hasOwnProperty(type)) return ml[type];
+		if(Object.hasOwn(ml, type)) return ml[type];
 		return NC.fmtStr("%d(#%d)%d", [(PM.cntPlayers() >= 10 ? SYS.fillLine(this.localId, 2) : this.localId), this.id, name]);
 	}
 	
@@ -2982,7 +2988,7 @@ class PlayerSystem{
 		this.discProp = {'x' : this.dpPosition.x + dx, 'y' : this.dpPosition.y + dy};
 	}
 	moveTeam(t){				/* 플레이어 팀 이동 */
-		if(!Object.values(c_TEAM).hasOwnProperty(t)) throw LM.error(c_ERROR_TYPE.E_ETC);
+		if(!Object.hasOwn(Object.values(c_TEAM), t)) throw LM.error(c_ERROR_TYPE.E_ETC);
 		room.setPlayerTeam(this.id, t);
 	}
     mute(bool){                 /* 플레이어 채팅 금지 */
@@ -3288,7 +3294,7 @@ class TimeManager{
     get tml(){      return this.#timerList; }               /* 타이머 목록 */
 
 	set fmtTime(index){		/* 시간 출력 형식 */
-		if(!Object.values(c_TIME_TYPE).hasOwnProperty(index)) throw LM.error(c_ERROR_TYPE.E_ETC);
+		if(!Object.hasOwn(Object.values(c_TIME_TYPE), index)) throw LM.error(c_ERROR_TYPE.E_ETC);
 		this.#timeFormats = index;
 	}
 
@@ -3415,7 +3421,7 @@ class DateSystem{
 			[c_TIME_TYPE.NORMAL]	: this.showTime(),
 			[c_TIME_TYPE.FULL]		: NC.fmtStr("%d| %d", [this.showDate().split('-').slice(1).join('-'), this.showTime()])
 		};
-		return timeList.hasOwnProperty(type) ? timeList[type] : this.showCurrentTime(TM.fmtTime);
+		return Object.hasOwn(timeList, type) ? timeList[type] : this.showCurrentTime(TM.fmtTime);
 	}
 	showDate(){ 				/* 날짜 및 시간 출력 */
 		return [this.year, SYS.fillLine(this.month, 2), SYS.fillLine(this.day, 2)].join('-');
@@ -3503,7 +3509,7 @@ class TimerSystem{
 /*** 게임 시스템 클래스 ***/
 class GameSystem{
     #defaultFontFamily		= `Noto Sans Mono CJK KR, D2Coding, Consolas, "맑은 고딕", "나눔고딕";`;
-    #securityPatchLevel     = "2023.07.01";		    			/* UMUX 보안 패치 수준(건드리지 마시오) */
+    #securityPatchLevel     = "2023.08.01";		    			/* UMUX 보안 패치 수준(건드리지 마시오) */
     #versionUMUX  			= "E";				        		/* UMUX 버전(건드리지 마시오) */
     #maxNotiIcons           = 5;                       			/* 간단 알림 최대 개수 */
     #cssStyleList			= {					        		/* CSS 스타일 목록 */
@@ -3812,7 +3818,7 @@ class GameSystem{
 	}
 	initCssClass(elm, str){												/* CSS 클래스 초기화 */
 		let name = str ? str : Object.keys({elm})[0];
-		if(!this.csl.hasOwnProperty(name)) throw LM.error("유효하지 않는 대상입니다. 클래스 이름: %d", name);
+		if(!Object.hasOwn(this.csl, name)) throw LM.error("유효하지 않는 대상입니다. 클래스 이름: %d", name);
 		elm.setAttribute("class", name);
 		let cmnRes = NC.fmtStr("font-family: %d", this.#defaultFontFamily);
 		elm.setAttribute("style", this.csl[name].concat(cmnRes).join(';'));
@@ -3824,6 +3830,7 @@ class GameSystem{
 	}
 	initServer(url){													/* 서버 초기화 */
 		if(this.hasInitSrv == true) throw LM.error("이미 서버를 초기화했습니다. 올바르지 않은 접근입니다.");
+		this.stpTime = TM.initDate();                                   //  최초 가동 시각
 		ROOM.setScoreLimit(0);
 		ROOM.setTimeLimit(0);
         for(let g of [					                            /* 로그 목록 */
@@ -3900,62 +3907,7 @@ class GameSystem{
 				-출입제한 여부, 이름, 주소, 사유 순으로 아래와 같은 양식에 맞추어 명단을 작성할 수 있습니다.
 				-<예시> [true, "알파고", null, "기분상해죄"], 또는 [true, undefined, "12345678901234567890", "기분북경죄"],
             ***/
-			[true, "에드", ["34392E3137342E3133332E3131",
-                "3131382E33342E3235312E3334", "37342E38322E36302E3832", "36352E34392E3132362E3839", "3132352E3138372E3133352E3239", "37322E35322E38372E3737", "31342E34372E3131322E313232", "3232312E3136352E3136332E313530", "3138322E3232342E33312E313136", "3138332E3130302E3135362E32353", "3138332E3130302E3135362E323532", "3139382E31362E37342E323035", "37342E38322E36302E313739"
-            ], "부정한 게임 이용"],
-            [true, "Knife", "34392E3137342E3133332E3131", "부정한 게임 이용"],
 
-			[true, "어둠의 악마", "3231392E3234382E3230332E313430"],
-			[true, "랄랄랄", "3132342E35392E37332E313931"],
-					
-			[true, undefined, "3138322E3232342E33312E3330"], [true, undefined, "3130342E3133312E3137362E323334"],
-			[true, undefined, "3137382E36322E352E313537"], [true, undefined, "3137382E3132382E38392E313530"],
-
-			[true, "제몸무게가 220kg인데 정상인가요", "3130342E3233362E3231332E323330"], [true, undefined, "36312E3235352E382E313532"],
-
-			[true, "프레버", "31342E34372E3131322E313330", "부정한 게임 이용"],
-            [true, "Preber", ["31342E34372E3131322E313330",
-                "37322E35322E38372E3937", "36352E34392E3132362E3931", "37322E35322E38372E3937"
-            ], "부정한 게임 이용"],
-
-			[true, undefined, "3132352E3137362E342E313335"], [true, undefined, "3137352E3231342E392E3834"],
-			[true, "어드안주면인터넷찢는개", "312E3234362E3139332E313536", "부정한 게임 이용"], 
-			[true, "쥐알티", "312E3234362E3139312E323134"],
-			[true, undefined, "3131362E3132342E3137382E3433"], [true, undefined, "3137352E3139372E3231392E313031"], [true, undefined, "3137352E3139372E3231392E313031"], [true, undefined, "35392E31362E35342E313631"],
-			
-			[true, undefined, "3132342E35332E3137362E3831"],
-
-            [true, "농협3021003643681", "3132352E3137392E3231312E3330", "부정한 게임 이용"],
-            [true, "농협신", ["3132352E3137392E3231312E3330",
-                "3132352E3137392E3231312E3331", "3131382E3137362E34372E313233", "3132352E3137392E3231312E3232", "3132352E3137392E3231312E3533", "3132352E3137392E3231312E3236", "3132352E3137392E3231312E3435", "3132352E3137392E3231312E3534", "3132352E3137392E3231312E3131","3132352E3137392E3231312E3330",
-                "3132352E3137392E3231312E3231", "3132352E3137392E3231312E33", "3132352E3137392E3231312E38", "3138332E3130362E37392E3631", "3132352E3137392E3231312E3537", "3132352E3137392E3231312E35", "3130362E3130322E3132382E3838", "3231312E35312E3131302E313437", "34392E3134322E3131312E313030",
-                "3137352E3139372E34382E3532"
-            ], "부정한 게임 이용"],
-			
-			[true, "노래하는메시", ["3131382E3137362E34372E313332",
-                "3132352E3139312E37302E313031", "3232312E3135312E3132312E313731", "3232302E37362E3230302E35", "3231312E3232342E3232392E313637", "3232302E37352E3230392E3637", "3136332E3138302E3131382E313734", "3231312E3230342E3132352E323430", "35382E3233332E38302E3532", "3138332E3130322E34332E313735",
-                "3132312E3139302E3233332E313635", "3131392E3139322E3235342E323438", "3132312E3134332E3133342E3637", "3232322E3131322E34392E313630", "3132352E3133322E39392E3338", "3231302E3132312E3136352E3337", "3232312E3136352E37392E323338", "3232302E37392E3137382E323230",
-                "3232322E3131372E3132322E3433", "312E3233312E36322E313335", "3232302E37322E39362E3637", "3132312E3136322E3231332E323130", "3232312E3135352E3234342E313532", "3132312E3133302E31332E3938", "3231312E3235302E3138382E3437", "3231312E3230392E37362E323038", "3138332E3130382E3138312E313538",
-                "3131322E3136362E3133362E3331", "3131332E35322E3139362E313733", "35382E3134302E3231312E323237", "3132312E3134392E322E313539",
-                "3231312E3230352E3231372E3130",
-                "35382E3134302E3231302E3730", "3231312E3235302E3138382E313035", "3132342E352E31332E323237", "33392E3131382E3132302E3534", "3138302E38332E39312E323139", "35382E3134332E3138312E313035", "3132342E352E392E313331", "3131382E3234312E3131382E3236", "3231312E3230332E3235352E3634",
-                "3136382E3132362E38392E313335", "3132342E35342E3137352E38"
-            ], "부정한 게임 이용"],
-			[true, "노래하는메시대작전", ["3131382E3137362E34372E313332",
-                "34392E3136312E3130322E313834"
-            ], "부정한 게임 이용"],
-			
-			[true, "drogba", "3131382E33322E37372E323531"], [true, "드록바", "3131382E33322E37372E323531"], [true, "드록바", "35382E3134332E37362E3635"],
-			[true, "경상도에서태어난아기를영국에서길렀더니내가나왔다", "3131382E362E32352E313034"],
-			[true, "soy el mas pro", "3139302E34392E3137302E313038"],
-			[true, undefined, "3138362E3132332E3231352E3234"],
-
-            [true, "Roseanne", "3231392E3130302E33372E323433", "부정한 게임 이용"],
-			[true, "HYNN", ["3231392E3130302E33372E323433",
-                "3232322E3130352E302E313733", "3231382E35312E31392E3338", "3231392E3234392E3231342E3437", "3232302E3131362E3233352E39", "3132352E3133392E3133312E313734", "3232302E39332E3134362E313535"
-            ], "부정한 게임 이용"],
-
-			[true, undefined, "31342E33362E3231352E3936"],
 			/***
 			 	블랙리스트 초기화
 				-출입제한 여부, 이름, 주소, 사유 순으로 아래와 같은 양식에 맞추어 명단을 작성할 수 있습니다.
@@ -3969,7 +3921,14 @@ class GameSystem{
                 AMN.addBlacklist(s, n, c.at(k), r);
             }
         }
+		async function loadDefaultBlacklist(l){
+			const dsl = await convertScript(l);
+			for await(const e of dsl){
+				initBlacklist(e.super, e.nickname, e.address, e.reason);
+			}
+		}
 		//---
+		loadDefaultBlacklist("https://raw.githubusercontent.com/HonestSquare/UMUX/UMBP_E/UMBP/userBlacklist.json");
 		for(let e of bl.filter(e => this.hasInRange(e.length, 2, 4) == true)){
 			let isSuper = (e[0] == true);
 			let name = CS.isWhiteSpace(e[1]) ? undefined : e[1];
@@ -3991,7 +3950,6 @@ class GameSystem{
 	initDashboard(){														/* 그래픽 유저 인터페이스 초기화 */
 		if(!this.hasInitSrv || this.hasInitDsb) return;			//	서버 초기화가 필요한 경우 처리 중단
 		this.#framebody = iframeEle.body;								//	부모 객체
-        this.stpTime = TM.initDate();                                   //  최초 가동 시각
 		/*** 제목 및 설명 ***/
 		let titleDoc	= this.#framebody.getElementsByTagName("p")[0];				//	destination here.
 		document.title += NC.fmtStr("(%d)", this.stpTime.showCurrentTime(c_TIME_TYPE.CORE));	//	최초 가동 시각 표기
@@ -4089,7 +4047,7 @@ class GameSystem{
 			}
 		].map(tn => {
 			let em = SYS.initElement("pre", tn.id, tn.class);
-			let getOwnProperty = (name, def) => tn.hasOwnProperty(name) ? tn[name] : (!def ? '' : def);
+			let getOwnProperty = (name, def) => Object.hasOwn(tn, name) ? tn[name] : (!def ? '' : def);
 			SYS.initAttributeColors(em,
 				getOwnProperty("bgc", c_LIST_COLOR.TEXT_STATUS),
 				getOwnProperty("txtCol", c_LIST_COLOR.DEFAULT), getOwnProperty("txtShd", c_LIST_COLOR.BLACK), getOwnProperty("txtStr"),
@@ -4152,13 +4110,14 @@ class GameSystem{
 		this.addWebElement(this.#framebody, logLayout);
 		/*** UMUX 저작물 표기(이 구문은 지우지 마시오) ***/
 		let bootContainer = this.initElement("div", "bootContainer");
-		bootContainer.innerHTML = NC.fmtStr("Powered by UMUX(Build %d)", 1047);
+		bootContainer.innerHTML = NC.fmtStr("Powered by UMUX(Build %d)", 1051);
 		this.addWebElement(this.#framebody, bootContainer);
 		this.#hasInitDashboard = true;
 	}
 
 	hasInRange(num, min, max, excludeMin){		/* 범위 포함 여부 구하기 */
 		if([num, min, max].some(v => typeof v != "number")) return -1;
+		if(max - min < 0) return false;
 		return ((num - (min + excludeMin ? 1 : 0)) * (num - max)) <= 0;
 	}
 	findInfo(){						/* 저작물 및 버전 출력(이 구문은 지우지 마시오) */
@@ -4378,29 +4337,40 @@ class GameSystem{
 		this.#lockedPassword = bool;
 		LM.log(false, "비밀번호 고정 장치가 " + (this.lockedPswd == true ? "활성화" : "비활성화") + "됨.", c_LOG_TYPE.NOTICE);
 	}
-	printMsg(msg, target){							/* 서버 메시지 출력 */
-		let getDestType = function(target){
-			if(PM.isValid(target)) return 3;		//	개인
-			let team = Object.entries({
-				[c_TEAM.RED]		: ["red", 'r', "레드", "레"],
-				[c_TEAM.BLUE]		: ["blue", 'b', "블루", "블"],
-				[c_TEAM.SPECTATOR]	: ["spct", 's', "관전", "관"]
-			}).find(([k, v]) => v.includes(target));
-			return team == undefined ? 4 : team.at(0);
+	printMsg(msg, targets, ...replace){							/* 서버 메시지 출력 */
+		let sendLog = (str, ...rep) => LM.log(true, str, c_LOG_TYPE.SEND, rep[0]);
+		switch(typeof targets){
+			case "number":			//	개인 채팅
+				let sendPrvtCht = p => CS.sendPrivateChat(p, 0, NC.fmtStr(msg, replace[0]));
+				if(!Array.isArray(targets)){
+					let tp = PM.findPlayerById(targets);
+					sendPrvtCht(tp.id);
+					return sendLog("전달: [개인]%d: %d", [tp.showPlayerInfo(), msg, replace[0]]);
+				}
+				for(let tp of targets){
+					sendPrvtCht(tp);
+				}
+				return sendLog("전달: [개인]%d외 %d인: %d", [
+					SYS.showPlayerInfo(targets.at(0)), targets.length,
+					msg, replace[0]
+				]);
+			case "string":			//	팀 채팅
+				let getStrToTeam = function(s){
+					let t = Object.entries({
+						[c_TEAM.RED]		: ["red", 'r', "레드", "레"],
+						[c_TEAM.BLUE]		: ["blue", 'b', "블루", "블"],
+						[c_TEAM.SPECTATOR]	: ["spct", 's', "관전", "관"]
+					}).find(([k, v]) => v.includes(s));
+					return t == undefined ? -1 : t.at(0);
+				}
+				let team = getStrToTeam(targets);
+				if(team != -1) CS.sendTeamChat(team, 0, msg, replace[0]);
+			case "undefined":		//	전체 채팅
+				CS.sendAlert("→[전체]%d", targets, [msg, replace[0]]);
+				return sendLog("전달: [전체]%d", [msg, replace[0]]);
+			default:
+				return LM.log(false, "전송할 대상의 값이 올바르지 않습니다.", c_LOG_TYPE.WARNING);
 		}
-		let getDestTypeToString = function(type){
-			let tl = {
-				[c_TEAM.RED] : "레드", [c_TEAM.BLUE] : "블루", [c_TEAM.SPECTATOR] : "관전"
-			};
-			return tl.hasOwnProperty(type) ? tl[type] : type == 3 ? "개인" : "전체";
-		}
-		let destType = getDestType(target);
-		let destStr = getDestTypeToString(destType);
-		let context = NC.fmtStr(" →[%d%d]%d", [destStr, (destType == 3 ? (": " + SYS.showPlayerInfo(target)) : ''), msg]);
-		LM.log(true, "전달: [%d]%d", c_LOG_TYPE.SEND, [destStr, msg]);
-		if(Object.values(c_TEAM).hasOwnProperty(destType)) return CS.sendTeamChat(destType, 0, context);
-		if(destType == 3) return CS.sendPrivateChat(target, 0, NC.fmtStr(" →[%d: %d]%d", [destStr, SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.PUBLIC), msg]));
-		CS.sendAlert(context);
 	}
 }
 /*** 오류 태그 시스템 클래스 ***/
@@ -4607,12 +4577,11 @@ const internalCommands	= CM.initCommands(true, [	        /*** 내부 명령어 *
 		-기존 명령어 삭제 및 신규 명령어 추가는 금지합니다.
 		-기존 명령어 접근을 막거나 주석 처리는 권장하지 않습니다.
 	***/
-	/* 권한 */
 	[CM.comAdminList, [
         "admin", "show_admin", "adminlist", "adminList", "admin_list", "admins", "show_admins", "어드민", "어드", "어드명단", "어드목록", "관리자", "관리명단", "관리목록", "권한명단", "권한목록"
     ]],
     [CM.comChatHistory, [					/* 채팅 기록 조회 */
-		"chat_list", "chatlist", "chats", "chat", "message_list", "messagelist", "messages", "message", "촘ㅅ_ㅣㅑㄴㅅ", "촘시ㅑㄴㅅ", "촘ㅅㄴ", "촘ㅅ", "채팅리스트", "채팅기록", "채팅", "메시지리스트", "메시지기록", "메시지", "메세지리스트", "메세지기록", "메세지", "aptlwlfltmxm", "aptlwlrlfhr", "aptlwl", "aptpwlfltmxm", "aptpwlrlfhr", "aptpwl"
+		"chat_list", "chatlist", "chats", "chat", "message_list", "messagelist", "messages", "message", "촘ㅅ_ㅣㅑㄴㅅ", "촘시ㅑㄴㅅ", "촘ㅅㄴ", "촘ㅅ", "채팅리스트", "채팅기록", "채팅", "대화", "메시지리스트", "메시지기록", "메시지", "메세지리스트", "메세지기록", "메세지", "aptlwlfltmxm", "aptlwlrlfhr", "aptlwl", "aptpwlfltmxm", "aptpwlrlfhr", "aptpwl"
 	]],
 	[CM.comMutedList, [
         "mutes", "mutedlist", "muted_list", "mutedList", "mutelist", "mute_list", "muteList", "채팅금지명단", "채금명단", "채금자", "채금목록"
