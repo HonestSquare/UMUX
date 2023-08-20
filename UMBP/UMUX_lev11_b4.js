@@ -1,7 +1,7 @@
 /***
 <ABOUT>
 	Version 5.0 b4
-	Level 11(Build 1058)
+	Level 11(Build 1059)
 <README>
 	UMUX Beta Program(이하 UMBP)은 보다 빠르게
 	UMUX의 신버전을 체험해 볼 수 있는 프로그램입니다.
@@ -24,7 +24,7 @@ const	DESCRIPTION	= "봇방입니다.";
 const	MAXLIMIT	= 12;
 const	HOSTNAME 	= "서버 매니저";
 const	PUBLIC		= true;
-const	TOKEN		= "thr1.AAAAAGTgrjkm7u3deVfqog.Sa4finZuEVo";
+const	TOKEN		= "thr1.AAAAAGTh0WBpPRwU1uZjaQ.VlJPBZbyV0E";
 const	NOPLAYER	= true;
 /*** 지역 코드, 위도, 경도 ***/
 const	REGION_CODE	= "kr";
@@ -399,7 +399,7 @@ class GameManager{
 						NC.extMsg(title, "%1이 %0했습니다", null, null, color, null, 0, [getGoalType(rd[0], rd[1]), getAttacker(rd[0], rd[2])]);
 						return LM.log(true, "%0➡%1 공격: %2", c_LOG_TYPE.NOTICE, [PM.findTagTeam(rd[0]), PM.findTagTeam(rd[1]), SYS.showPlayerInfo(rd[2])]);
 					case 4:		//	공격 팀→방어 팀: 득점자(어시스트 포함)
-						NC.extMsg(title, ["%1이 %0했습니다", "(도움: %d)"].join(newLine), null, null, color, null, 0,
+						NC.extMsg(title, ["%1이 %0했습니다", "(도움: %2)"].join(newLine), null, null, color, null, 0,
 						[getGoalType(rd[0], rd[1]), getAttacker(rd[0], rd[2]), SYS.showPlayerInfo(rd[3].id, c_PLAYERINFO_TYPE.NAME)]);
 						return LM.log(true, "%0➡%1 공격: %2(도움: %3)", c_LOG_TYPE.NOTICE, [PM.findTagTeam(rd[0]), PM.findTagTeam(rd[1]), SYS.showPlayerInfo(rd[2]), SYS.showPlayerInfo(rd[3].id)]);
 				}
@@ -4102,7 +4102,7 @@ class GameSystem{
 		this.initAttributeColors(logInputPre, NC.CRL.BLACK, NC.CRL.DEFAULT);
 		let logInputBtn	= this.initElement("button", "logInputBtn");		//	전송 버튼
 		logInputBtn.setAttribute("type", "button");
-		this.addEventInput(logInputBtn, this.#onClickBtnSendLog);
+		this.addEventInput(logInputBtn, this.onClickBtnSendLog);
 		this.initAttributeColors(logInputBtn, NC.CRL.BG_STATUS, NC.CRL.TEXT_STATUS, null, "보내기");
 		this.addDashboardEle(logInputContainer, [logInputPre, logInputBtn]);
 		this.addDashboardEle(logOutputContainer, [logOutputTitle, logOutputBox]);
