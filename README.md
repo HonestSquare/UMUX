@@ -1,11 +1,10 @@
-<p align="center"><img src="https://blogfiles.pstatic.net/MjAyMTAzMjJfMjMg/MDAxNjE2NDA3MTI4OTAy.3YjzPBERjYcOyxmcf1Pti4VgtSTm7MOSg72XjmEJesQg.gOEooWkZwG0OcWTmkFMUl9uHBZaAoeGXBm_oLDwSld0g.PNG.tjdals1413/UMUX_512.png"/></p>
-</details>
+<p align="center"><img src=https://ssl.pstatic.net/cafechat.phinf/MjAyMzA4MjFfMTMz/MDAxNjkyNjEyMzg2NDk4.8ylU86fe5G9daye35xJxdyj04xpwu5KbjkbfGd3et8Mg.C7gz30qkUJVp2rG40ZPNqAonXYzVkM5BAGJosn-tGxAg.PNG/UMUX_512.png"/></p>
 
 # 개요
 - 유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball Headless Host API 기반의 유즈맵 봇방 프로젝트로,
 - 조건에 위배되지 않는 선에서 누구나 자유롭게 수정이 가능합니다
-  - [사용자 가이드라인](github.com/HonestSquare/UMUX/wiki/UMUX-User-Guidelines)
-  - [라이센스](github.com/HonestSquare/UMUX/blob/master/LICENCE)
+  - [사용자 가이드라인](https://github.com/HonestSquare/UMUX/wiki/UMUX-User-Guidelines)
+  - [라이센스](https://github.com/HonestSquare/UMUX/blob/master/LICENCE)
   
 # 모르는 코드가 있어요!
 - 개발자를 위해 소스를 분석하고 해석한 [UMUX 레퍼런스](https://github.com/HonestSquare/UMUX/wiki/UMUX-Reference)를 제공하고 있습니다.
