@@ -1,7 +1,7 @@
 /***
 <ABOUT>
-	Version 5.0 r1
-	Level 11(Build 1075.0)
+	Version 5.0 r2
+	Level 11(Build 1075.8292)
 <README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프레임워크로,
@@ -26,7 +26,7 @@ const	DESCRIPTION	= "봇방입니다.";
 const	MAXLIMIT	= 12;
 const	HOSTNAME 	= "서버 매니저";
 const	PUBLIC		= true;
-const	TOKEN		= "thr1.AAAAAGTrMK_eMLDTl9pkXg.R6eAF3-qxIQ";
+const	TOKEN		= "thr1.AAAAAGTrN9KKv2cgWhOOIQ.28ux_VJEfJI";
 const	NOPLAYER	= true;
 /*** 언어 지역 코드, 위도, 경도 ***/
 const	LANG_CODE	= "ko";
@@ -290,7 +290,7 @@ class GameManager{              /*** 게임 매니저 클래스 ***/
 			[(hasVisitRecord ? "다시 환영합니다" : "안녕하세요"), pp.showPlayerInfo(c_PLAYERINFO_TYPE.NAME)]);
         }
         else if(hasSamePlayer)                              //	(슈퍼)블랙리스트, 중복 접속, 사칭, 다중 접속 탐지
-            NC.warning("%d님은 관심 대상입니다.", pp.id);
+			NC.warning("%d님은 관심 대상입니다.", pp.id, null, pp.showPlayerInfo(c_PLAYERINFO_TYPE.LOCAL));
 		if(PM.cntPlayers() < 2){							//	접속자가 2인 미만이면
 			PM.moveTeam(pp.id, c_TEAM.RED);				//	투입하고
 			room.startGame();								//	게임 시작
@@ -1631,11 +1631,8 @@ class ChatManager{              /*** 채팅 매니저 클래스 ***/
 			],
 			"emoji" : Object.entries(c_LIST_EMOTION).map(([k, v]) => v + k)
 		};
-		let context = msgList.at(AMN.hasAdmin(player) ? "mute" : "freeze");
-		NC.locked(true, [
-            "아래에 나열된 숫자로 감정만 전달할 수 있습니다",
-            msgList.emoji.join(" | ")
-        ].join(newLine), player);
+		let context = msgList[CS.isFreezeChat ? "mute" : "freeze"];
+		NC.locked(true, ["아래에 나열된 숫자로 감정만 전달할 수 있습니다", msgList.emoji.join(" | ")].join(newLine), player);
 		NC.access(player, context.at(SYS.pickRandomNumber(context)));
 	}
 	sendMsg(msg, targets, ...replace){					/* 일반 메시지 출력 */
@@ -1860,7 +1857,7 @@ class CommandManager{           /*** 명령어 매니저 클래스 ***/
 			"name" : s,
 			"str" : c
 		});
-        for(let i of SYS.generateNumberArray(this.HDL.length)){     //  버그
+        for(let i of SYS.generateNumberArray(this.HDL.length)){
             let strType = str.split(this.HDL[i]);
 			if(strType.length == 2) return getCommandType(i, strType[1], cmtx);
         }
@@ -2212,8 +2209,8 @@ class CommandManager{           /*** 명령어 매니저 클래스 ***/
 	comAfk(player, msg, type){					/* 장기 대기열 플레이어 설정 */
 		switch(type){
 			case 0:		//	!afk
-                if(player.isSleep) return player.addSleepList();
-                return player.deleteSleepList();
+				if(player.isSleep) return player.deleteSleepList();
+				return player.addSleepList();
 			case 1:		//	?afk
 				if(player.isSleep) return NC.help("자리에 돌아와서 게임에 다시 참여하려면", "!afk", player.id, "!join");
 				return NC.help("게임 도중 자리를 비우려면", "!afk", player.id, "!join spec");
@@ -2470,7 +2467,7 @@ class CommandManager{           /*** 명령어 매니저 클래스 ***/
 		if(AMN.allowJoin == false && PM.isValid(pp) == false) return NC.access(tp.id, "팀 자율 이동이 금지되었습니다.");		//	팀 이동 금지 처리
 		let targetTeam = getTargetTeam(team, pp.team);
 		if(tp.team == targetTeam) return NC.caution("중복된 명령어입니다.", (pp.hasJoined() ? pp.id : tp.id));
-		if(tp.isSleep) return NC.caution("게임 참여 의사가 없어 플레이할 수 없습니다. ", (pp.hasJoined() ? pp.id : tp.id), "!afk");
+		if(tp.isSleep) return NC.caution("게임 참여 의사가 없어 플레이할 수 없습니다.", (pp.hasJoined() ? pp.id : tp.id), "!afk");
 		tp.moveTeam(targetTeam);
 	}
 	loadMap(player, msg, type){					/* 맵 불러오기 */
@@ -2622,8 +2619,8 @@ class PlayerManager{            /*** 플레이어 매니저 클래스 ***/
 		return this.pyl.filter(p => p.localId > 0);
 	}
 	findPlayerListByTeam(team){															/* 플레이어 데이터베이스 개별 팀 명단 구하기 */
-		if(!Object.hasOwn(Object.values(c_TEAM), team)) return this.pyl;
-		return this.pyl.filter(p => p.team == team);
+		if(!Object.hasOwn(Object.values(c_TEAM), team)) return this.findPlayerList();
+		return this.findPlayerList().filter(p => p.team == team);
 	}
 	findTagGrade(player){																/* 플레이어 권한 마크 구하기 */
 		let pp = this.findPlayerById(player);
@@ -2872,6 +2869,7 @@ class PlayerSystem{             /*** 플레이어 시스템 클래스 ***/
 		if(this.team != c_TEAM.SPECTATOR) this.moveTeam(c_TEAM.SPECTATOR);
 		AMN.deleteAdmin(this.id);	//	최고 권한 → 보조 권한으로 격하
 		AMN.updateAdmins();
+		SYS.updatePlayerById(this.id);
 		NC.notice("%d님이 자리를 비웠습니다.", this.id * -1, null, this.showPlayerInfo(c_PLAYERINFO_TYPE.NAME));
 		NC.uniMsg(c_LIST_ICON.NORMAL + "자리 비움", "게임에 다시 참여하려면 명령어를 한 번 더 입력하세요.", this.id, "!afk");
 		LM.log(true, "대기열 추가: %d", c_LOG_TYPE.NOTICE, this.showPlayerInfo());
@@ -2951,6 +2949,7 @@ class PlayerSystem{             /*** 플레이어 시스템 클래스 ***/
 		this.#isSleep = false;
 		LM.log(true, "대기열 제거: %d", c_LOG_TYPE.NOTICE, this.showPlayerInfo());
 		AMN.updateAdmins();
+		SYS.updatePlayerById(this.id);
 		NC.notice("게임에 바로 참여할 준비가 되었습니다! ", this.id, "!join");
 	}
 	resetAvatar(){			/* 등번호 초기화 */
@@ -4073,7 +4072,7 @@ class GameSystem{               /*** 게임 시스템 클래스 ***/
 	}
 
 	hasInRange(num, min, max, excludeMin){		/* 범위 포함 여부 구하기 */
-		if([num, min, max].some(v => typeof v != "number")) return -1;
+		if([num, min, max].some(v => typeof v != "number" || isNaN(v) == true)) return false;
 		if(max < min) return false;
 		if(num > max) return false;
 		if(num < min + (excludeMin ? 1 : 0)) return false;
