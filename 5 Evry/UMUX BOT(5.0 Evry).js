@@ -1,7 +1,7 @@
 /***
 <ABOUT>
-	Version 5.0 r2
-	Level 11(Build 1075.8292)
+	Version 5.0 r3
+	Level 11(Build 1075.9271)
 <README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프레임워크로,
@@ -162,10 +162,14 @@ const initStadiums = async function(links){
         }
         return ["https", "http"].includes(url.protocol.replace(':', ''));
     }
-	for(let r of links.filter(async n => isValidHttpUrl(n))){
-		let st = (await requestExternalFile(r)).join('');
-		customStadiumList.push(st);
+	let request = async function(ln){
+		let rl = await Promise.all(ln);
+		for(let r of rl){
+			let st = isValidHttpUrl(r) ? (await requestExternalFile(r)).join('') : r;
+			customStadiumList.push(st);
+		}
 	}
+	request(links);
 }
 initStadiums([
 	"https://raw.githubusercontent.com/HonestSquare/UMUX/master/CROP-900M.hbs"
@@ -1072,7 +1076,8 @@ class NotificationManager{      /*** 알림 매니저 클래스 ***/
 				case 10:	//	#send(name, tag, title, content, targets, advCom, titleColor, contentColor, delay, ...replace)
 					let hasTitle = (a.at(2) != null);
 					let titleText = (hasTitle ? (CS.isWhiteSpace(a.at(2)) ? c_LIST_ICON.POSTIVE + "알림" : a.at(2)) + (a.at(5) ? NC.fmtStr("(이것을 찾으셨나요: %d)", a.at(5)) : '') : null);
-					return NC.addNotiList(n, a.at(1), [titleText, getRep(a.at(3))], [c_LIST_STYLE.SMALL, c_LIST_STYLE.SMALL], [a.at(6), hasTitle ? a.at(7) : a.at(6)], a.at(4));
+					let contentText = getRep(a.at(3)) + (hasTitle == false && typeof a.at(5) == "string" ? NC.fmtStr("(이것을 찾으셨나요: %d)", a.at(5)) : '');
+					return NC.addNotiList(n, a.at(1), [titleText, contentText], [c_LIST_STYLE.SMALL, c_LIST_STYLE.SMALL], [a.at(6), hasTitle ? a.at(7) : a.at(6)], a.at(4));
 				default:
 					throw LM.error([
 						"%d(이)의 인자 값의 개수는 다음 중 하나여야 합니다",
