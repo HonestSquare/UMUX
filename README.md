@@ -1,4 +1,4 @@
-<p align="center"><img src=https://ssl.pstatic.net/cafechat.phinf/MjAyMzA4MjFfMTMz/MDAxNjkyNjEyMzg2NDk4.8ylU86fe5G9daye35xJxdyj04xpwu5KbjkbfGd3et8Mg.C7gz30qkUJVp2rG40ZPNqAonXYzVkM5BAGJosn-tGxAg.PNG/UMUX_512.png"/></p>
+<p align="center"><img src=https://cafeptthumb-phinf.pstatic.net/MjAyMzA4MjdfODEg/MDAxNjkzMTM1NzIwMzIy.ABXr72B7rOFzMMOILV21Aa8_Lw3exjWJcXbT6nbCGLwg.Oo29mpMomptgBpHDVWN_d-rtU-uQMGiSOcmNu3gaOTwg.PNG/UMUX_5_-512.png"/></p>
 
 # 개요
 - 유즈맵 대표카페(이하 UM)에서 진행하고 있는 Haxball Headless Host API 기반의 유즈맵 봇방 프로젝트로,
