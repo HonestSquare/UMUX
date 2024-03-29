@@ -1,7 +1,7 @@
 /***
 <ABOUT>
-	Version 5.0 r3
-	Level 11(Build 1075.9271)
+	Version 5.0 r4
+	Level 11(Build 1075.14270)
 <README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프레임워크로,
@@ -26,10 +26,10 @@ const	DESCRIPTION	= "봇방입니다.";
 const	MAXLIMIT	= 12;
 const	HOSTNAME 	= "서버 매니저";
 const	PUBLIC		= true;
-const	TOKEN		= "thr1.AAAAAGTrN9KKv2cgWhOOIQ.28ux_VJEfJI";
+const	TOKEN		= "thr1.AAAAAGYGrDj2t6nMEsDV-Q.dncdS_utLi4";
 const	NOPLAYER	= true;
 /*** 언어 지역 코드, 위도, 경도 ***/
-const	LANG_CODE	= "ko";
+const	LANG_CODE	= "ko-KR";
 const	REGION_CODE	= "kr";
 const	LAT			= 37.566667 + (Math.floor(Math.random() * 4000) - 2000) / 10000;
 const	LON			= 126.978406 + (Math.floor(Math.random() * 4000) - 2000) / 10000;
@@ -1413,7 +1413,7 @@ class NotificationSystem{       /*** 알림 시스템 클래스 ***/
 		let cl = this.#findColors(this.colTit, this.colCtn);
 		TM.addTimer("recordNotification", () => {
 			if(this.hasTitle()) this.#sendAnnouncement(this.strTit, NC.fmtStr("0x%d", cl.at(0)), this.styTit, c_LIST_SOUND.MUTED);
-			this.#sendAnnouncement(this.strCtn, NC.fmtStr("0x%d", cl.at(1)), this.styCtn, sound ? sound : c_LIST_SOUND.NORMAL);
+			this.#sendAnnouncement(this.strCtn, NC.fmtStr("0x%d", cl.at(1)), this.styCtn, Object.values(c_LIST_SOUND).includes(sound) ? sound : c_LIST_SOUND.NORMAL);
 		}, this.targets, delay);
 	}
 }
@@ -1468,7 +1468,7 @@ class ChatManager{              /*** 채팅 매니저 클래스 ***/
 	set maxFwdCount(limit){			/* 금지어 최대 감지량 지정 */
 		let count = this.#maxForbiddenWordCount;
 		if(limit >= 3 && count != limit){ 
-			count = limit;
+			this.#maxForbiddenWordCount = limit;
 			LM.log(true, "금지어 최대 감지량 변경: %d회", c_LOG_TYPE.NOTICE, limit);
 		}
 		else LM.log(false, "올바르지 않는 값으로 접근됨", c_LOG_TYPE.WARNING);
