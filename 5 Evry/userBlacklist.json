@@ -1,5 +1,5 @@
 {
-    "date": "2023.09.01",
+    "date": "2024.04.01",
     "support_version": [
         "5.0"
     ],
@@ -544,6 +544,38 @@
             "nickname": "노래하는메시대작전",
             "reason": "부정한 게임 이용"
         },
+        {
+            "address": "36312E38332E3138352E313232",
+            "super": true,
+            "nickname": "odds",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3131322E3135332E31392E313737",
+            "super": true,
+            "nickname": "odds",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3131392E3230362E3234372E313637",
+            "super": true,
+            "nickname": "odds",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3131382E3233352E372E313833",
+            "super": true,
+            "nickname": "odds",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3131382E3233352E31352E3233",
+            "super": true,
+            "nickname": "odds",
+            "reason": "부정한 게임 이용"
+        },
+
+
         {
             "address": "3131382E33322E37372E323531",
             "super": true,
