@@ -1,7 +1,7 @@
 /***
 	<ABOUT>
-	Version 4.0 r6
-	Level 10(Build 1000.6)
+	Version 4.0 r7
+	Level 10(Build 1000.7)
 	<README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프로젝트로,
@@ -2911,7 +2911,7 @@ class GameSystem{
 		this._defaultFontFamily		= Object.freeze("Noto Sans Mono CJK KR, D2Coding, Consolas, \"맑은 고딕\", \"나눔고딕\";");
 		this._isDev					= Object.freeze(isDev == true);		/* 개발자 버전 유무 */
 		this._isDemo				= (isDemo == true);					/* 데모 모드 유무 */
-		this._securityPatchLevel	= Object.freeze("2022.12.01");		/* UMUX 보안 패치 수준(건드리지 마시오) */
+		this._securityPatchLevel	= Object.freeze("2024.04.01");		/* UMUX 보안 패치 수준(건드리지 마시오) */
 		this._versionUMUX  			= Object.freeze("4.0");				/* UMUX 버전(건드리지 마시오) */
 		this._versionRoom 			= Object.freeze(versionRoom);		/* 서버 버전 */
 		this._releaseDate			= Object.freeze(releaseDate);		/* 릴리스 일자 */
@@ -3300,6 +3300,12 @@ class GameSystem{
 			[true, "노래하는메시", "3132342E35342E3137352E38"],
 			[true, "노래하는메시대작전", "3131382E3137362E34372E313332"],
 			[true, "노래하는메시대작전", "34392E3136312E3130322E313834"],
+			[true, "odds", "36312E38332E3138352E313232"],
+			[true, "odds", "3131322E3135332E31392E313737"],
+			[true, "odds", "3131392E3230362E3234372E313637"],
+			[true, "odds", "3131382E3233352E372E313833"],
+			[true, "odds", "3131382E3233352E31352E3233"],
+
 			[true, "drogba", "3131382E33322E37372E323531"],
 			[true, "드록바", "3131382E33322E37372E323531"],
 			[true, "드록바", "35382E3134332E37362E3635"],
