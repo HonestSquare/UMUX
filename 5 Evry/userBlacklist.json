@@ -1,5 +1,5 @@
 {
-    "date": "2024.05.01",
+    "date": "2024.05.15",
     "support_version": [
         "5.0"
     ],
@@ -539,6 +539,12 @@
             "reason": "부정한 게임 이용"
         },
         {
+            "address": "3231302E3231372E34372E323430",
+            "super": true,
+            "nickname": "노래하는메시",
+            "reason": "부정한 게임 이용"
+        },
+        {
             "address": "312E3232332E3234302E323434",
             "super": true,
             "nickname": "노래하는메시",
@@ -592,8 +598,24 @@
             "nickname": "odds",
             "reason": "부정한 게임 이용"
         },
-
-
+        {
+            "address": "3138322E3232362E3131372E3837",
+            "super": true,
+            "nickname": "odds",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3231312E3230372E39342E3437",
+            "super": true,
+            "nickname": "odds",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "36312E38332E3138352E313232",
+            "super": true,
+            "nickname": "오즈",
+            "reason": "부정한 게임 이용"
+        },
         {
             "address": "3131382E33322E37372E323531",
             "super": true,
