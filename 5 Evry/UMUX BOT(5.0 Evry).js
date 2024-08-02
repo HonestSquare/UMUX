@@ -1,7 +1,7 @@
 /***
 <ABOUT>
-	Version 5.0 r4
-	Level 11(Build 1075.14270)
+	Version 5.0 r5
+	Level 11(Build 1075.16010)
 <README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프레임워크로,
@@ -229,7 +229,7 @@ class GameManager{              /*** 게임 매니저 클래스 ***/
 		this.#isRecording = v;
 	}
 
-	onGamePause(player){ 				/* 게임 중단 이벤트 */
+	onGamePause(player){ 				/* 경기 중단 이벤트 */
 		let isValidByPlayer = PM.isValid(player);
 		this.gameStats = c_GAME_STATS.PAUSE;
 		if(isValidByPlayer) PM.updateTime(player.id, TM.date.time);			//	마지막 활동 시간 저장
@@ -237,12 +237,12 @@ class GameManager{              /*** 게임 매니저 클래스 ***/
 		TM.clearTimerByName("goal");	//	타이머 제거
 		SYS.updateDashboard();
 	}
-	onGameStart(player){				/* 게임 시작 이벤트 */
+	onGameStart(player){				/* 경기 시작 이벤트 */
 		let isValidByPlayer = PM.isValid(player);
 		this.handleGameStart();			//	경기 제어 준비
 		LM.log(true, isValidByPlayer ? "%0(이)가 경기를 시작함" : "[%0]", c_LOG_TYPE.NOTICE, isValidByPlayer ? SYS.showPlayerInfo(player.id) : "경기 시작");
 	}
-	onGameStop(player){					/* 게임 종료 이벤트 */
+	onGameStop(player){					/* 경기 종료 이벤트 */
 		let isValidByPlayer = PM.isValid(player);
 		this.gameStats = c_GAME_STATS.STOP;
 		SC.clearTouchedList();						//	선두자 명단 모두 지우기
@@ -251,13 +251,13 @@ class GameManager{              /*** 게임 매니저 클래스 ***/
 		LM.log(true, isValidByPlayer ? "%0(이)가 경기를 종료함" : "[%0]", c_LOG_TYPE.NOTICE, isValidByPlayer ? SYS.showPlayerInfo(player.id) : "경기 종료");
 		SYS.updateDashboard();
 	}
-	onGameTick(){						/* 게임 진행 이벤트 */
+	onGameTick(){						/* 경기 진행 이벤트 */
 		if(TM.date.time >= this.#firstTimeNotified + SEC_TO_MS / 10){	//	100ms 마다 처리
 			this.#firstTimeNotified = TM.date.time;						//	최근 기록 시간을 현재 시간으로 변경
 			this.handleGameTick(this.#firstTimeNotified);			//	경기 제어 처리
 		}
 	}
-	onGameUnpause(player){				/* 게임 재개 이벤트 */
+	onGameUnpause(player){				/* 경기 재개 이벤트 */
 		let isValidByPlayer = PM.isValid(player);
 		this.gameStats = c_GAME_STATS.TICK;
 		if(PM.isValid(player)) PM.updateTime(player.id, TM.date.time);	    //	마지막 활동 시간 저장
@@ -596,9 +596,9 @@ class Administration{           /*** 관리 클래스 ***/
 			t.#maxAdminLimit		= maxAdmin;			/* 최고 관리자 상한 인원 */
 			t.#pinHost				= pinHost;			/* 호스트 팀 이동 허용 여부 */
 			if(Array.isArray(blacklist)){				/* 블랙리스트 명단 */
-				let isWhiteSpace = s => s == undefined ? true : s.trim().length == 0;	/* 공백 문자 확인 */
+				let isWhiteSpace = s => s == undefined || s == 'ㅤ' ? true : s.trim().length == 0;	/* 공백 문자 확인 */
 				let initBlacklist = function(s, n, c, r){
-					if(n == undefined || c == null) return;
+					if(n == undefined && c == null) return;
 					if(!Array.isArray(c)) return t.addBlacklist(s, n, c, r);
 					for(let k of SYS.generateNumberArray(c.length)){
 						t.addBlacklist(s, n, c.at(k), r);
@@ -639,7 +639,7 @@ class Administration{           /*** 관리 클래스 ***/
 					return room.setPlayerAdmin(givenPlayer.id, false);
 			}
 			if(this.isBlacklist(givenPlayer.id)) return target.deleteAdmin();			//	블랙리스트이면 보조 권한으로 부여
-			if(this.cntAdmins(2) >= this.maxAdmin) return target.deleteAdmin();		    //	최고 관리자 최대 인원을 초과하면 보조 권한으로 부여
+			if(this.cntAdmins(c_ADMIN_TYPE.SUPER_ADMIN) >= this.maxAdmin) return target.deleteAdmin();		    //	최고 관리자 최대 인원을 초과하면 보조 권한으로 부여
 		}
 		else{				//	권한 해제(보조 권한 부여)
 			switch(target.admin){
@@ -692,7 +692,7 @@ class Administration{           /*** 관리 클래스 ***/
 		if(this.allowJoin == bool) return;
 		this.#isAllowTeamSwitch = bool;
 		NC.locked(!bool, "팀 자율 이동이 %d되었습니다.", null, null, bool ? "허용" : "금지");
-		room.setTeamsLock(bool);
+		room.setTeamsLock(!bool);
 	}
 	set dynmcAdmin(bool){		/* 권한 동적 할당 */
 		if(this.dynmcAdmin == bool) return;
@@ -717,10 +717,18 @@ class Administration{           /*** 관리 클래스 ***/
 	initBlacklist(isSuper, name, conn, reason){			/* 블랙리스트 데이터베이스 초기화 */
 		let ob = this.bl.find(b => ![b.hasMatchedName(name), b.hasMatchedAddress(conn)].some(v => v == false));
 		if(ob == undefined) return new BlacklistSystem(isSuper, name, conn, reason);
-		if(!ob.rsn.includes(reason)){
-            if(!Array.isArray(ob.rsn)) new Array(ob.rsn, reason);
-            else ob.rsn.push(reason);
-        }
+		let getReasonType = (o, n) => [
+			typeof o == "string", Array.isArray(o)
+		].findIndex(f => f == true);
+		switch(getReasonType(ob, reason)){
+			case 0:
+				new Array(ob.rsn, reason);
+				break;
+			case 1:
+				ob.rsn.push(reason);
+				break;
+			default:
+		}
 		return ob;
 	}
 
@@ -882,7 +890,7 @@ class Administration{           /*** 관리 클래스 ***/
 		);
 	}
 	deleteAdmin(player, isSub){	PM.findPlayerById(player).deleteAdmin(isSub); }		/* 권한 해제 */
-	resetGame(player){			/* 게임 재시작 */
+	resetGame(player){			/* 경기 재시작 */
 		room.stopGame();
 		room.startGame();
 	}
@@ -984,7 +992,7 @@ class Administration{           /*** 관리 클래스 ***/
 			if(mp.isMute) AMN.unmutePlayer(target);
 		}, target, time * SEC_TO_MS);
 	}
-	swapGame(player){							/* 게임 시작 및 종료 */
+	swapGame(player){							/* 경기 시작 및 종료 */
 		if(GM.gameStats == c_GAME_STATS.TICK) return room.stopGame();
 		return room.startGame();
 	}
@@ -1046,8 +1054,7 @@ class BlacklistSystem{          /*** 블랙리스트 클래스 ***/
 	hasMatchedName(str){							/* 이름 데이터 일치 확인 */
 		let a = this.name;
 		let b = str;								//	검사할 데이터
-		if(a == undefined || b == undefined) return false;							//	데이터가 없는 경우
-		if(CS.isWhiteSpace(a) == true || CS.isWhiteSpace(b) == true) return false;	//	공백 닉네임 처리
+		if([a, b].some(s => CS.isWhiteSpace(s))) return false;					//	데이터가 없거나 공백인 경우
 		//	우회 문자 처리
 		let regc = /[`~!@#$%^&*()_|=?;:'"▣◈﻿⊙◎,.<>​\{\}\[\]\+\\\/]/gi;
 		let regn = /[0-9]/gi;
@@ -1523,19 +1530,20 @@ class ChatManager{              /*** 채팅 매니저 클래스 ***/
 	
 	isWhiteSpace(str){			/* 공백 확인 */
 		if(str == undefined) return true;
+		if(str == 'ㅤ') return true;
 		return str.toString().trim().length == 0;
 	}
 	hasForbiddenWord(msg){		/* 금지어 필터링 */
 		if(this.strctLev == 0) return false;		//	0단계는 판정하지 않음
+		let isEquals = function(s, t){			//	단어 일치 확인
+			//	공백 처리
+			if([s, t].some(v => CS.isWhiteSpace(v))) return false;
+			//	우회 문자 처리
+			let reg = /[0-9`~!@#$%^&*()_|=?;:'"▣◈﻿⊙◎,.<>​\{\}\[\]\+\\\/]/gi;
+			if(!reg.test(t)) s = s.replaceAll(reg, '');
+			return s.includes(t);
+		}
 		for(let fw of this.fwl){
-			let isEquals = function(s, t){			//	단어 일치 확인
-				//	공백 처리
-				if([s, t].some(v => CS.isWhiteSpace(v))) return false;
-				//	우회 문자 처리
-				let reg = /[0-9`~!@#$%^&*()_|=?;:'"▣◈﻿⊙◎,.<>​\{\}\[\]\+\\\/]/gi;
-				if(!reg.test(t)) s = s.replaceAll(reg, '');
-				return s.includes(t);
-			}
 			if(isEquals(msg, fw)) return true;
 		}
 		return false;
@@ -2276,7 +2284,7 @@ class CommandManager{           /*** 명령어 매니저 클래스 ***/
 				return NC.help("게임을 녹화하려면", "!rec", player.id);
 		}
 	}
-	comResetGame(player, msg, type){			/* 게임 재시작 명령어 */
+	comResetGame(player, msg, type){			/* 경기 재시작 명령어 */
 		switch(type){
 			case 0:			//	!rr
 				if(!player.admin) return NC.access(player.id);
@@ -2285,7 +2293,7 @@ class CommandManager{           /*** 명령어 매니저 클래스 ***/
 				return NC.help("게임을 재시작 하려면", "!rr", player.id);
 		}
 	}
-	comSwapGame(player, msg, type){				/* 게임 시작 및 종료 명령어 */
+	comSwapGame(player, msg, type){				/* 경기 시작 및 종료 명령어 */
 		switch(type){
 			case 0:			//	!r
 				if(!player.admin) return NC.access(player.id);
@@ -2441,7 +2449,9 @@ class CommandManager{           /*** 명령어 매니저 클래스 ***/
 				}
 				let target = getTarget(msg, player.id);
                 if(!PM.isValid(target)) return;
-				return NC.info("플레이어 전적", [SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.PUBLIC), SC.findRankListByPlayer(target).about
+				let rp = SC.findRankListByPlayer(target);
+				if(!PM.isValid(rp)) return NC.caution("현재 %0님의 랭킹 데이터베이스에 접근할 수 없습니다", player.id, null, SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.NAME));
+				return NC.info("플레이어 전적", [SYS.showPlayerInfo(target, c_PLAYERINFO_TYPE.PUBLIC), rp.about
 				].join(newLine), player.id, "!ranking");
 			case 1:		//	?stats == !helpscore
 				return CM.helpScore(player);
@@ -2715,7 +2725,7 @@ class PlayerManager{            /*** 플레이어 매니저 클래스 ***/
         if(bool) this.addSleepPlayer(player);
         else this.deleteSleepPlayer(player);
 		SYS.updatePlayerById(player);	//	플레이어 데이터베이스에 따라 대시보드 갱신
-		if(AMN.hasAdmin(player, c_ADMIN_TYPE.SUPER_ADMIN) == false && AMN.cntAdmins(2) > 1) return;
+		if(AMN.hasAdmin(player, c_ADMIN_TYPE.SUPER_ADMIN) == false && AMN.cntAdmins(c_ADMIN_TYPE.SUPER_ADMIN) > 1) return;
 		AMN.updateAdmins();
 	}
 	giveAvatar(player, msg){			/* 등번호 설정 */
