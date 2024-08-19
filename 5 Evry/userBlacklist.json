@@ -1,5 +1,5 @@
 {
-    "date": "2024.05.15",
+    "date": "2024.08.15",
     "support_version": [
         "5.0"
     ],
@@ -557,6 +557,36 @@
             "reason": "부정한 게임 이용"
         },
         {
+            "address": "32372E33352E37352E3431",
+            "super": true,
+            "nickname": "노래하는메시",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "312E3233372E3231332E313034",
+            "super": true,
+            "nickname": "노래하는메시",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3232302E37392E3137352E3830",
+            "super": true,
+            "nickname": "노래하는메시",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "312E3232372E3134382E3334",
+            "super": true,
+            "nickname": "노래하는메시",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3132352E3133372E37312E313034",
+            "super": true,
+            "nickname": "노래하는메시",
+            "reason": "부정한 게임 이용"
+        },
+        {
             "address": "3131382E3137362E34372E313332",
             "super": true,
             "nickname": "노래하는메시대작전",
@@ -690,6 +720,12 @@
         },
         {
             "address": "3232302E39332E3134362E313535",
+            "super": true,
+            "nickname": "HYNN",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3131382E3233352E36362E313139",
             "super": true,
             "nickname": "HYNN",
             "reason": "부정한 게임 이용"
