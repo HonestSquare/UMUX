@@ -1035,6 +1035,9 @@ class BlacklistSystem{          /*** 블랙리스트 클래스 ***/
     set addr(v){                                        /* 공용 주소 */
         this.#address = v;
     }
+	set name(v){										/* 이름 */
+		this.#nickname = v;
+	}
     set rsn(v){                                         /* 등록 사유 */
         this.#reason = v;
     }
