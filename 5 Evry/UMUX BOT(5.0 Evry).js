@@ -1,7 +1,7 @@
 /***
 <ABOUT>
-	Version 5.0 r5
-	Level 11(Build 1075.16010)
+	Version 5.0 r6
+	Level 11(Build 1075.16570)
 <README>
 	유즈맵 대표카페(이하 UM)에서 진행하고 있는
 	Haxball Headless Host API 기반의 유즈맵 봇방 프레임워크로,
@@ -26,7 +26,7 @@ const	DESCRIPTION	= "봇방입니다.";
 const	MAXLIMIT	= 12;
 const	HOSTNAME 	= "서버 매니저";
 const	PUBLIC		= true;
-const	TOKEN		= "thr1.AAAAAGYGrDj2t6nMEsDV-Q.dncdS_utLi4";
+const	TOKEN		= "thr1.AAAAAGdvqUFlFv-2Qahimg.Uz2kVFJ-XN8";
 const	NOPLAYER	= true;
 /*** 언어 지역 코드, 위도, 경도 ***/
 const	LANG_CODE	= "ko-KR";
@@ -815,7 +815,7 @@ class Administration{           /*** 관리 클래스 ***/
 		let pp = PM.findPlayerById(target);
 		if(!PM.isValid(pp)) throw LM.error(c_ERROR_TYPE.E_PLAYER_INFO);
 		if(pp.localId > 0 && isSuper == true) this.kickPlayer(target, "%0차단된 계정", false, c_LIST_ICON.NEGATIVE_BOLD);
-		return this.addBlacklist((isSuper ? true : false), pp.name, pp.addr, reason);
+		return this.addBlacklist(isSuper, pp.name, pp.addr, reason);
 	}
 
 	updateAdmins(){			    /* 권한 갱신 */
@@ -1096,7 +1096,7 @@ class NotificationManager{      /*** 알림 매니저 클래스 ***/
 			}
 		}
 		let nt = getNoti(arg, name);
-		nt.out(arg.length > 9 ? arg.at(9) : 0);
+		nt.out(arg.length > 9 ? arg.at(8) : 0);
 	}
 
 	constructor(common, access, caution, info, locked, notice, warning){
@@ -1179,7 +1179,7 @@ class NotificationManager{      /*** 알림 매니저 클래스 ***/
 		}
         let history = getHistory(notiList, maxTime, nowTime);
 		let record = getRecord(history.reverse().slice(0, 5), nowTime, typeof maxLines != "number" ? 5 : maxLines);
-        NC.info(title, record.join(newLine), targets, null);
+        NC.info(title, record == -1 ? "비어 있음" : record.join(newLine), targets, null);
 	}
 			
 	announce(name, msg, targets, color, style, sound, delay, ...replace){
@@ -1477,7 +1477,7 @@ class ChatManager{              /*** 채팅 매니저 클래스 ***/
 	}
 	set maxFwdCount(limit){			/* 금지어 최대 감지량 지정 */
 		let count = this.#maxForbiddenWordCount;
-		if(limit >= 3 && count != limit){ 
+		if(limit >= 3 && count != limit){
 			this.#maxForbiddenWordCount = limit;
 			LM.log(true, "금지어 최대 감지량 변경: %d회", c_LOG_TYPE.NOTICE, limit);
 		}
@@ -2391,7 +2391,7 @@ class CommandManager{           /*** 명령어 매니저 클래스 ***/
 			case 0:			//	!maplist
 				let size = (customStadiumList.length > 0 ? customStadiumList : defaultStadiumList).length;
 				let target = msg.length > 0 ? parseInt(msg.at(0)) : -1;
-				if(!SYS.hasInRange(target, 0, size, true)) return CM.infoMaps(player.id, msg, 1);
+				if(!SYS.hasInRange(target, 0, size, true)) return CM.infoMaps(player, msg, 1);
 				let searchTarget = target > 2 ? size - target > 2 ? target - 3 : size - 5 : 0;
 				let nameList = GM.findStadiumNameList().slice(searchTarget, searchTarget + 5);
 				let list = new Array();
