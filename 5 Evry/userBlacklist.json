@@ -1,5 +1,5 @@
 {
-    "date": "2024.08.15",
+    "date": "2025.02.01",
     "support_version": [
         "5.0"
     ],
@@ -90,6 +90,12 @@
         },
         {
             "address": "3231392E3234382E3230332E313430",
+            "super": true,
+            "nickname": "어둠의 악마",
+            "reason": null
+        },
+        {
+            "address": "3232312E3135342E3136392E3634",
             "super": true,
             "nickname": "어둠의 악마",
             "reason": null
@@ -587,6 +593,12 @@
             "reason": "부정한 게임 이용"
         },
         {
+            "address": "3131392E31382E3131332E323032",
+            "super": true,
+            "nickname": "노래하는메시",
+            "reason": "부정한 게임 이용"
+        },
+        {
             "address": "3131382E3137362E34372E313332",
             "super": true,
             "nickname": "노래하는메시대작전",
@@ -636,6 +648,18 @@
         },
         {
             "address": "3231312E3230372E39342E3437",
+            "super": true,
+            "nickname": "odds",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3231302E3130332E31332E3831",
+            "super": true,
+            "nickname": "odds",
+            "reason": "부정한 게임 이용"
+        },
+        {
+            "address": "3132312E3136372E3130352E313030",
             "super": true,
             "nickname": "odds",
             "reason": "부정한 게임 이용"
